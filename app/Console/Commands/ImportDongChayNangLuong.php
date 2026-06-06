@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\DongChayNangLuong;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -16,8 +17,10 @@ class ImportDongChayNangLuong extends Command
 
     public function handle(): int
     {
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 6 - II, III, IV- DÒNG CHẢY NĂNG LƯỢNG.xlsx');
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 6 - II, III, IV- DÒNG CHẢY NĂNG LƯỢNG.xlsx'
+        );
 
         if (! file_exists($filePath)) {
             $this->error("File không tồn tại: {$filePath}");

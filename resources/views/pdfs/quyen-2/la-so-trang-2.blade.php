@@ -15,75 +15,87 @@
             overflow: hidden;
         }
 
-        /* Ảnh nền toàn trang */
         .bg-img {
             position: absolute;
             top: 0; left: 0;
             width: 210mm; height: 297mm;
         }
 
-        /* Container overlay — canh giữa vùng kem của cuộn */
+        /* Vùng kem cuộn lịch — canh giữa vùng parchment LBTV-143 */
         .val-block {
             position: absolute;
-            left: 28mm;
-            width: 154mm;
+            left: 27mm;
+            width: 156mm;
             text-align: center;
         }
 
-        /* Giá trị — đậm, căn giữa (đặt ngay dưới label có sẵn trên ảnh nền) */
-        .val-name {
-            color: #2E0A00;
+        .val-block p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .val-name,
+        .val-text {
+            color: #6E0101;
+            font-family: 'svn-poppins', sans-serif;
             font-weight: bold;
-            font-size: 17px;
-            line-height: 112%;
+            text-align: center !important;
+        }
+
+        .val-name {
+            font-size: 18px;
+            line-height: 122%;
             text-transform: uppercase;
-            text-align: center;
+            letter-spacing: 0.2px;
         }
 
         .val-text {
-            color: #2E0A00;
-            font-weight: bold;
-            font-size: 14px;
-            line-height: 116%;
-            text-align: center;
+            font-size: 15px;
+            line-height: 132%;
         }
 
         .val-text strong {
             font-weight: bold;
+            color: #6E0101;
+        }
+
+        .val-bat-tu {
+            font-size: 13px;
+            line-height: 138%;
         }
     </style>
 </head>
 <body>
 <div class="page">
 
-    {{-- Ảnh nền cuộn lịch (labels có sẵn trên ảnh) --}}
     <img class="bg-img" src="{{ $templatePath }}">
 
-    {{-- Họ & Tên (label ≈ 148.5mm) --}}
-    <div class="val-block" style="top: 154mm;">
+    {{-- Vị trí giá trị theo label in sẵn page-02-bg.png (LBTV-143) --}}
+    {{-- HỌ & TÊN: label ~113mm → value 122mm --}}
+    <div class="val-block" style="top: 122mm;">
         <p class="val-name">{{ $fullName }}</p>
     </div>
 
-    {{-- Giới Tính (label ≈ 165mm) --}}
-    <div class="val-block" style="top: 170.5mm;">
+    {{-- GIỚI TÍNH: label ~151mm → value 160mm --}}
+    <div class="val-block" style="top: 160mm;">
         <p class="val-text">{{ $gender }}</p>
     </div>
 
-    {{-- Ngày Sinh Dương Lịch (label ≈ 182mm) --}}
-    <div class="val-block" style="top: 187.5mm;">
+    {{-- NGÀY SINH DƯƠNG LỊCH: label ~181mm → value 190mm --}}
+    <div class="val-block" style="top: 190mm;">
         <p class="val-text">{{ $birthDate }}</p>
     </div>
 
-    {{-- Bát Tự Sinh Thần (label ≈ 210mm) --}}
+    {{-- BÁT TỰ SINH THẦN: label ~214mm → value 223mm --}}
     @if (!empty($batTu))
-    <div class="val-block" style="top: 215.5mm;">
-        <p class="val-text">{!! $batTu !!}</p>
+    <div class="val-block" style="top: 223mm;">
+        <p class="val-text val-bat-tu">{!! $batTu !!}</p>
     </div>
     @endif
 
-    {{-- Địa Chỉ (label ≈ 233mm) --}}
+    {{-- ĐỊA CHỈ: label ~246mm → value 255mm --}}
     @if (!empty($address))
-    <div class="val-block" style="top: 238.5mm;">
+    <div class="val-block" style="top: 255mm;">
         <p class="val-text">{{ $address }}</p>
     </div>
     @endif

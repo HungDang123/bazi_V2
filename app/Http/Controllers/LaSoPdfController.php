@@ -84,7 +84,9 @@ class LaSoPdfController extends Controller
             ], 409);
         }
 
-        $filename = $quyen === 1 ? 'la-so-quyen-1.pdf' : 'la-so-bat-tu.pdf';
+        $filename = $quyen === 1
+            ? PdfDownloadService::FILENAME_QUYEN_1
+            : PdfDownloadService::FILENAME_QUYEN_2;
 
         return PdfDownloadService::serveStored($path, $filename);
     }

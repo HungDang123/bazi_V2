@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\TongQuanKhiaCanh;
+use App\Support\ImportPath;
 use App\Services\DocxTextService;
 use Illuminate\Console\Command;
 
@@ -15,8 +16,10 @@ class ImportPhan5Phan6Transition extends Command
 
     public function handle(): int
     {
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 5 - PHẦN 6.docx');
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 5 - PHẦN 6.docx'
+        );
 
         if (! file_exists($filePath)) {
             $this->error("File không tồn tại: {$filePath}");

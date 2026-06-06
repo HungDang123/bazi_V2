@@ -6,6 +6,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PdfDownloadService
 {
+    public const FILENAME_QUYEN_1 = 'pdf_cuon_1.pdf';
+
+    public const FILENAME_QUYEN_2 = 'pdf_cuon_2.pdf';
+
     /**
      * Trả PDF dưới dạng stream, nén gzip nếu client hỗ trợ.
      */

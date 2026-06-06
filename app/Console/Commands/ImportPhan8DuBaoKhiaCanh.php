@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Phan8DuBaoKhiaCanh;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -18,12 +19,14 @@ class ImportPhan8DuBaoKhiaCanh extends Command
     {
         ini_set('memory_limit', '1024M');
 
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 8 - III- DỰ BÁO CÁC KHÍA CẠNH CUỘC SỐNG.xlsx');
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 8 - III- DỰ BÁO CÁC KHÍA CẠNH CUỘC SỐNG.xlsx'
+        );
 
         if (! is_file($filePath)) {
             $this->error("File không tồn tại: {$filePath}");
-            $this->info('Dùng: php artisan import:phan8-du-bao-khia-canh <đường_dẫn_file>');
+            $this->info('Dùng: php artisan import:phan8-du-bao-khia-canh imports/<file.xlsx>');
             return 1;
         }
 

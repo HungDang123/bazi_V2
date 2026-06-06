@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\DongChayGioiThieu;
+use App\Support\ImportPath;
 use App\Services\DocxTextService;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -20,13 +21,13 @@ class ImportDongChayGioiThieu extends Command
     {
         return [
             'tru_nam_tru_thang' => [
-                base_path('PHẦN 6 - II- TRỤ NĂM - TRỤ THÁNG.docx'),
+                'PHẦN 6 - II- TRỤ NĂM - TRỤ THÁNG.docx',
             ],
             'tru_thang_tru_ngay' => [
-                base_path('PHẦN 6 - III. SỰ TƯƠNG TÁC GIỮA TRỤ THÁNG VÀ TRỤ NGÀY.docx'),
+                'PHẦN 6 - III. SỰ TƯƠNG TÁC GIỮA TRỤ THÁNG VÀ TRỤ NGÀY.docx',
             ],
             'tru_ngay_tru_gio' => [
-                base_path('PHẦN 6 - IV. SỰ TƯƠNG TÁC GIỮA TRỤ NGÀY VÀ TRỤ GIỜ.docx'),
+                'PHẦN 6 - IV. SỰ TƯƠNG TÁC GIỮA TRỤ NGÀY VÀ TRỤ GIỜ.docx',
             ],
         ];
     }
@@ -55,15 +56,12 @@ class ImportDongChayGioiThieu extends Command
         return $resolved === [] ? null : $resolved;
     }
 
-    protected function resolveDocxPath(array $candidates): ?string
+    protected function resolveDocxPath(array $filenames): ?string
     {
-        foreach ($candidates as $filePath) {
-            $altPath = base_path('database/' . basename($filePath));
-            if (file_exists($filePath)) {
+        foreach ($filenames as $filename) {
+            $filePath = ImportPath::resolve(null, $filename);
+            if (is_file($filePath)) {
                 return $filePath;
-            }
-            if (file_exists($altPath)) {
-                return $altPath;
             }
         }
 
@@ -220,7 +218,7 @@ class ImportDongChayGioiThieu extends Command
     /** Đọc PHẦN 6.xlsx: nếu sheet có dòng [image] thì gán ảnh (DOCX II thường không có placeholder). */
     protected function detectImageFromPhan6Xlsx(string $truLoai): ?string
     {
-        $path = base_path('PHẦN 6.xlsx');
+        $path = ImportPath::resolve(null, 'PHẦN 6.xlsx');
         if (! file_exists($path)) {
             return null;
         }

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\NhatChuTruNgay;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -24,7 +25,7 @@ class ImportNhatChuTruNgay extends Command
         ini_set('memory_limit', '256M');
         ini_set('max_execution_time', '600');
 
-        $dir = $this->argument('dir') ?: base_path();
+        $dir = $this->argument('dir') ?: ImportPath::dir();
         if (! is_dir($dir)) {
             $this->error("Thư mục không tồn tại: {$dir}");
 

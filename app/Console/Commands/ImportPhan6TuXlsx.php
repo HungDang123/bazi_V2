@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\DongChayGioiThieu;
 use App\Models\YNghiaTuTru;
+use App\Support\ImportPath;
 use App\Services\DocxTextService;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -107,19 +108,12 @@ class ImportPhan6TuXlsx extends Command
 
     protected function resolveFilePath(): ?string
     {
-        $candidates = array_filter([
-            $this->argument('file'),
-            base_path('PHẦN 6.xlsx'),
-            'C:/Users/HUNG/Downloads/PHẦN 6.xlsx',
-        ]);
-
-        foreach ($candidates as $path) {
-            if ($path && file_exists($path)) {
-                return $path;
-            }
+        $path = ImportPath::resolve($this->argument('file'), 'PHẦN 6.xlsx');
+        if (is_file($path)) {
+            return $path;
         }
 
-        $this->error('Không tìm thấy PHẦN 6.xlsx');
+        $this->error('Không tìm thấy: '.ImportPath::file('PHẦN 6.xlsx'));
 
         return null;
     }

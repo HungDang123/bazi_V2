@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Phan8aThapThan;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -39,8 +40,10 @@ class ImportPhan8aThapThan extends Command
     {
         ini_set('memory_limit', '512M');
 
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 8A - THẬP THẦN (New).xlsx');
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 8A - THẬP THẦN (New).xlsx'
+        );
 
         if (! file_exists($filePath)) {
             $this->error("File không tồn tại: {$filePath}");

@@ -10,6 +10,7 @@ use App\Services\HanhNoiDungService;
 use App\Services\Phan3PdfPaginator;
 use App\Services\Phan5PdfService;
 use App\Services\Phan6PdfService;
+use App\Services\Phan7PdfService;
 use App\Services\Phan8PdfService;
 use App\Services\Phan9PdfService;
 use App\Services\Phan9aService;
@@ -71,13 +72,13 @@ class PdfExportController extends Controller
         $finalPath = $tempDir.'/la-so-q1-'.Str::random(10).'.pdf';
         $this->buildQuyen1Pdf($req, $finalPath);
 
-        return PdfDownloadService::download($finalPath, 'la-so-quyen-1.pdf', false);
+        return PdfDownloadService::download($finalPath, PdfDownloadService::FILENAME_QUYEN_1, false);
     }
 
     public function buildQuyen1Pdf(Request $req, string $finalPath): void
     {
         ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', '300');
+        ini_set('max_execution_time', '0');
 
         $tempDir = storage_path('app/temp');
         if (!file_exists($tempDir)) {
@@ -369,31 +370,6 @@ class PdfExportController extends Controller
             $tempFiles[]   = $pagePhan6Path;
         }
 
-        // ── PHẦN 7: 13 trang tĩnh (166 → 166b → 167 → … → 557b) ───────────────
-        $phan7Dir = resource_path('views/pdfs/phan-7');
-        $phan7Bundle = PdfStaticPageCache::resolveBundle('q1-phan7-pages-v1', [
-            $phan7Dir . '/page-166.png',
-            $phan7Dir . '/page-166b.png',
-            $phan7Dir . '/page-167.png',
-            $phan7Dir . '/page-168.png',
-            $phan7Dir . '/page-169.png',
-            $phan7Dir . '/page-170.png',
-            $phan7Dir . '/page-171.png',
-            $phan7Dir . '/page-537.png',
-            $phan7Dir . '/page-554.png',
-            $phan7Dir . '/page-555.png',
-            $phan7Dir . '/page-556.png',
-            $phan7Dir . '/page-557.png',
-            $phan7Dir . '/page-557b.png',
-        ]);
-        if ($phan7Bundle !== null) {
-            $pdfsToMerge[] = $phan7Bundle;
-        } else {
-            foreach (['page-166.png', 'page-166b.png', 'page-167.png', 'page-168.png', 'page-169.png', 'page-170.png', 'page-171.png', 'page-537.png', 'page-554.png', 'page-555.png', 'page-556.png', 'page-557.png', 'page-557b.png'] as $fname) {
-                self::appendStaticPage($pdfsToMerge, $phan7Dir . '/' . $fname, "q1-phan7-$fname");
-            }
-        }
-
         // ── PHẦN 8: bìa + Đại Vận + Niên Vận ─────────────────────────────────
         self::appendStaticPage(
             $pdfsToMerge,
@@ -522,13 +498,13 @@ class PdfExportController extends Controller
         $finalPath = $tempDir.'/la-so-q2-'.Str::random(10).'.pdf';
         $this->buildQuyen2Pdf($req, $finalPath);
 
-        return PdfDownloadService::download($finalPath, 'la-so-bat-tu.pdf', false);
+        return PdfDownloadService::download($finalPath, PdfDownloadService::FILENAME_QUYEN_2, false);
     }
 
     public function buildQuyen2Pdf(Request $req, string $finalPath): void
     {
         ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', '300');
+        ini_set('max_execution_time', '0');
 
         $tempDir = storage_path('app/temp');
         if (!file_exists($tempDir)) {
@@ -738,28 +714,14 @@ class PdfExportController extends Controller
         $pdfsToMerge[] = $page21Path;
         $tempFiles[]     = $page21Path;
 
-        // ── PHẦN 7: 13 trang tĩnh theo stt LBTV (166 → 166b → 167 → … → 557b) ─
-        $phan7Dir = resource_path('views/pdfs/phan-7');
-        $phan7Bundle = PdfStaticPageCache::resolveBundle('phan7-pages-v1', [
-            $phan7Dir . '/page-166.png',
-            $phan7Dir . '/page-166b.png',
-            $phan7Dir . '/page-167.png',
-            $phan7Dir . '/page-168.png',
-            $phan7Dir . '/page-169.png',
-            $phan7Dir . '/page-170.png',
-            $phan7Dir . '/page-171.png',
-            $phan7Dir . '/page-537.png',
-            $phan7Dir . '/page-554.png',
-            $phan7Dir . '/page-555.png',
-            $phan7Dir . '/page-556.png',
-            $phan7Dir . '/page-557.png',
-            $phan7Dir . '/page-557b.png',
-        ]);
+        // ── PHẦN 7: 11 trang tĩnh theo thứ tự đọc (537 → 166 → … → 557) ─────
+        $phan7Pages = Phan7PdfService::staticPagePaths();
+        $phan7Bundle = PdfStaticPageCache::resolveBundle(Phan7PdfService::bundleCacheKey(), $phan7Pages);
         if ($phan7Bundle !== null) {
             $pdfsToMerge[] = $phan7Bundle;
         } else {
-            foreach (['page-166.png', 'page-166b.png', 'page-167.png', 'page-168.png', 'page-169.png', 'page-170.png', 'page-171.png', 'page-537.png', 'page-554.png', 'page-555.png', 'page-556.png', 'page-557.png', 'page-557b.png'] as $fname) {
-                self::appendStaticPage($pdfsToMerge, $phan7Dir . '/' . $fname, "phan7-$fname");
+            foreach ($phan7Pages as $phan7Path) {
+                self::appendStaticPage($pdfsToMerge, $phan7Path, 'phan7-'.basename($phan7Path));
             }
         }
 

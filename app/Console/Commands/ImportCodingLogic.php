@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\CodingLogicRelationship;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -26,20 +27,14 @@ class ImportCodingLogic extends Command
 
     public function handle(): int
     {
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 6.xlsx');
+        $filePath = ImportPath::resolveFirst($this->argument('file'), [
+            'PHẦN 6.xlsx',
+            'PHẦN 6 - CODING LOGIC.xlsx',
+        ]);
 
-        if (! file_exists($filePath)) {
-            $filePath = base_path('PHẦN 6 - CODING LOGIC.xlsx');
-        }
-
-        if (! file_exists($filePath)) {
-            $filePath = base_path('database/PHẦN 6 - CODING LOGIC.xlsx');
-        }
-
-        if (! file_exists($filePath)) {
-            $this->error("File không tồn tại: {$filePath}");
-            $this->info('Đặt file tại thư mục gốc hoặc: php artisan import:coding-logic <đường_dẫn_file>');
+        if ($filePath === null) {
+            $this->error('File không tồn tại: '.ImportPath::file('PHẦN 6 - CODING LOGIC.xlsx'));
+            $this->info('Đặt file trong imports/ hoặc: php artisan import:coding-logic <đường_dẫn_file>');
             return 1;
         }
 

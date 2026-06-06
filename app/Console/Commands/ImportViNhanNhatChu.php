@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\NhatChuTruNgay;
 use App\Models\ViNhanNhatChu;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -20,7 +21,10 @@ class ImportViNhanNhatChu extends Command
         ini_set('memory_limit', '256M');
         ini_set('max_execution_time', '300');
 
-        $file = $this->argument('file') ?: base_path('PHẦN 4 - V- VÍ DỤ VỀ VỸ NHÂN.xlsx');
+        $file = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 4 - V- VÍ DỤ VỀ VỸ NHÂN.xlsx'
+        );
         if (! file_exists($file)) {
             $this->error("File không tồn tại: {$file}");
 

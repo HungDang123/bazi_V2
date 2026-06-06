@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\DinhViGocNhin;
+use App\Support\ImportPath;
 use App\Services\DocxTextService;
 use Illuminate\Console\Command;
 
@@ -18,12 +19,14 @@ class ImportPhan3BoCucNguHanhII extends Command
 
     public function handle(): int
     {
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 3 - II. BỐ CỤC NGŨ HÀNH BẢN MỆNH - MỤC 1.docx');
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 3 - II. BỐ CỤC NGŨ HÀNH BẢN MỆNH - MỤC 1.docx'
+        );
 
         if (! is_file($filePath)) {
             $this->error("File không tồn tại: {$filePath}");
-            $this->info('Chạy: php artisan import:phan3-bocuc-nguhanh-ii <đường_dẫn_file_docx>');
+            $this->info('Chạy: php artisan import:phan3-bocuc-nguhanh-ii imports/<file.docx>');
 
             return 1;
         }

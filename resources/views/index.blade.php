@@ -497,12 +497,12 @@
             border-left: 3px solid #4f46e5;
         }
 
-        thead tr {
+        .result-table thead tr {
             background-color: #009900;
             color: white;
         }
 
-        tbody tr td:nth-child(1) {
+        .result-table tbody tr td:nth-child(1) {
             background-color: #009900;
             color: white;
         }
@@ -519,6 +519,42 @@
         .header-cs-0 {
             font-size: 40px;
             font-weight: bold;
+            line-height: 1.1;
+            margin: 0 0 4px;
+        }
+
+        .result-table tbody td.text-center {
+            vertical-align: middle;
+            min-width: 88px;
+        }
+
+        .result-table tbody td.text-center p {
+            margin: 2px 0;
+            line-height: 1.3;
+        }
+
+        .result-table tbody td.text-center .ten-gods {
+            margin-top: 4px;
+            font-size: 14px;
+            line-height: 1.25;
+        }
+
+        .result-table tbody td.text-center .tang-can-cell {
+            display: inline-block;
+            min-width: 72px;
+            padding: 0 6px;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        .result-table tbody td.text-center .tang-can-cell p {
+            margin: 2px 0;
+            line-height: 1.25;
+        }
+
+        .result-table tbody td.text-center .tang-can-cell .font-bold {
+            font-size: 15px;
+            line-height: 1.2;
         }
 
         .cs_selected {
@@ -936,6 +972,8 @@
             text-align: center;
             vertical-align: middle;
             padding: 0 6px;
+            background-color: transparent;
+            color: inherit;
         }
 
         .phan5-kw-box {
@@ -2021,12 +2059,6 @@
                         .attr('aria-selected', 'true');
                     mountPhan8Group();
                     refreshQuyenSectionsVisibility();
-                    const target = $('#quyenTabBar');
-                    if (target.length) {
-                        $('html, body').animate({
-                            scrollTop: target.offset().top - 60
-                        }, 400);
-                    }
                 }
 
                 (function patchQuyenSectionShow() {
@@ -2241,7 +2273,7 @@
                             (stillWaiting(q1) || stillWaiting(q2))
                         ) {
                             pdfWorkerHintShown = true;
-                            html += '<br><span class="text-amber-700">PDF vẫn đang chờ. Hãy chạy queue worker: <code>php artisan queue:work --timeout=600</code></span>';
+                            html += '<br><span class="text-amber-700">PDF vẫn đang chờ. Hãy chạy queue worker: <code>php artisan pdf:queue-work</code></span>';
                         }
 
                         $hint.removeClass('hidden').html(html);
@@ -2469,8 +2501,6 @@
                     }
 
                     // Load PHẦN 6: Mã 1 (Ý nghĩa tứ trụ) + Mã 2,3,4 (Dòng chảy năng lượng) từ API năng lượng trong lá số
-                    let phan6ImageMap = {};
-
                     function loadPhan6(params) {
                         const section = $('#phan6DongChaySection');
                         const ma1Content = $('#phan6Ma1Content');
@@ -2495,7 +2525,6 @@
                             },
                             success: function(res) {
                                 const data = (res && res.data) ? res.data : (res || {});
-                                phan6ImageMap = data.image_map || {};
                                 const items = (data.y_nghia_tu_tru || []).filter(function(item) {
                                     const s = (item.slug || '').toLowerCase();
                                     return s.indexOf('la_so_bat_tu') < 0 && s.indexOf('lá_số_bát') < 0
@@ -2521,10 +2550,6 @@
                                         if (item.title) {
                                             html += '<h5 class="font-semibold text-indigo-700 mb-2">' +
                                                 item.title + '</h5>';
-                                        }
-                                        if (item.image) {
-                                            html += '<img src="' + escapeHtml(item.image) +
-                                                '" class="max-w-full rounded-lg my-3 block shadow-sm" alt="Minh họa">';
                                         }
                                         if (item.content) {
                                             html += '<div class="text-gray-700">' +
@@ -2564,31 +2589,18 @@
                                     $('#phan6Ma4Container').show();
                                     section.show();
                                 }
-                                if (transitionPhan8 && (transitionPhan8.content || transitionPhan8.image)) {
+                                if (transitionPhan8 && transitionPhan8.content) {
                                     let tHtml = '<div class="border rounded-lg p-4 bg-amber-50 border-amber-200">';
                                     if (transitionPhan8.title) {
                                         tHtml += '<h5 class="font-semibold text-amber-800 mb-2">' +
                                             escapeHtml(transitionPhan8.title) + '</h5>';
                                     }
-                                    if (transitionPhan8.content) {
-                                        tHtml += '<div class="leading-relaxed whitespace-pre-line text-gray-700">' +
-                                            escapeHtml(transitionPhan8.content) + '</div>';
-                                    }
-                                    if (transitionPhan8.image) {
-                                        tHtml += '<img src="' + escapeHtml(transitionPhan8.image) +
-                                            '" class="max-w-full rounded-lg mt-3 block shadow-sm" alt="">';
-                                    }
+                                    tHtml += '<div class="leading-relaxed whitespace-pre-line text-gray-700">' +
+                                        escapeHtml(transitionPhan8.content) + '</div>';
                                     tHtml += '</div>';
                                     transitionContent.html(tHtml);
                                     transitionBox.show();
                                     section.show();
-                                }
-                                if (d || items.length > 0 || laSoBatTu || transitionPhan8) {
-                                    setTimeout(function() {
-                                        $('html, body').animate({
-                                            scrollTop: section.offset().top - 80
-                                        }, 600);
-                                    }, 500);
                                 }
                             }
                         });
@@ -3517,30 +3529,9 @@
 
                     function formatPhan6GioiThieu(content) {
                         if (!content) return '';
-                        const markerRe = /\[\[image:([^\]]+)\]\]/g;
-                        let html = '';
-                        let last = 0;
-                        let match;
-                        while ((match = markerRe.exec(content)) !== null) {
-                            const chunk = content.slice(last, match.index);
-                            if (chunk) {
-                                html += '<span class="whitespace-pre-line">' +
-                                    escapeHtml(chunk) + '</span>';
-                            }
-                            const key = match[1];
-                            const url = phan6ImageMap[key] ||
-                                ('/' + key.replace(/^\/+/, ''));
-                            html += '<img src="' + escapeHtml(url) +
-                                '" class="max-w-full rounded-lg my-3 block" alt="">';
-                            last = match.index + match[0].length;
-                        }
-                        const tail = content.slice(last);
-                        if (tail) {
-                            html += '<span class="whitespace-pre-line">' +
-                                escapeHtml(tail) + '</span>';
-                        }
+                        const stripped = String(content).replace(/\[\[image:[^\]]+\]\]/g, '');
 
-                        return html;
+                        return '<span class="whitespace-pre-line">' + escapeHtml(stripped) + '</span>';
                     }
 
                     /**
@@ -3548,7 +3539,7 @@
                      * (4) khối Thiên Can / Địa Chi từ coding + dòng chảy (không hiện dòng bảng mẫu Excel).
                      */
                     function renderPhan6GioiThieuBlock(gt, fallbackTitle) {
-                        if (!gt || (!gt.tieu_de && !gt.noi_dung && !gt.image)) return '';
+                        if (!gt || (!gt.tieu_de && !gt.noi_dung)) return '';
                         let html = '<div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-100 text-gray-700">';
                         const title = (gt.tieu_de && String(gt.tieu_de).trim()) || fallbackTitle || '';
                         if (title) {
@@ -3557,11 +3548,6 @@
                         if (gt.noi_dung) {
                             html += '<div class="mb-4 leading-relaxed text-gray-700">' +
                                 formatPhan6GioiThieu(gt.noi_dung) + '</div>';
-                        }
-                        if (gt.image) {
-                            html += '<img src="' + escapeHtml(gt.image) +
-                                '" class="max-w-full rounded-lg my-2 block shadow-sm mx-auto" ' +
-                                'alt="Minh họa vị trí và mối quan hệ trong tứ trụ">';
                         }
                         html += '</div>';
 
@@ -3574,7 +3560,7 @@
                         }
                         let html = '';
                         const gt = sectionData.gioi_thieu;
-                        if (gt && (gt.tieu_de || gt.noi_dung || gt.image)) {
+                        if (gt && (gt.tieu_de || gt.noi_dung)) {
                             html += renderPhan6GioiThieuBlock(gt, fallbackTitle);
                         } else if (fallbackTitle) {
                             html += '<h4 class="font-semibold text-indigo-700 mb-3">' + escapeHtml(fallbackTitle) + '</h4>';
@@ -4171,11 +4157,6 @@
                             refreshQuyenSectionsVisibility();
                         }, 3500);
 
-                        // Cuộn đến kết quả
-                        $('html, body').animate({
-                            scrollTop: $('#resultContainer').offset().top - 50
-                        }, 500);
-
                         // Điền dữ liệu Dương lịch
                         $('#yangli-year').text(params.y);
                         $('#yangli-month').text(params.m);
@@ -4231,7 +4212,7 @@
                                 if (key === 'hour' && (params.h === undefined || params.h === null || params
                                         .h === '')) return;
                                 $('#tang-can-' + key).append(
-                                    `<div style="text-align: center; padding-left: 5px; padding-right: 5px;"><p class="font-bold">${valueCanTang.can_tang}</p><p class="">${valueCanTang.menh}</p><p class="ten-gods">${valueCanTang.pho_tinh}</p></div>`
+                                    `<div class="tang-can-cell"><p class="font-bold">${valueCanTang.can_tang}</p><p>${valueCanTang.menh}</p><p class="ten-gods">${valueCanTang.pho_tinh}</p></div>`
                                 );
                             });
                         });

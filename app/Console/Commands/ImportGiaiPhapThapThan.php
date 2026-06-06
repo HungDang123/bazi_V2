@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\GiaiPhapThapThan;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -16,16 +17,14 @@ class ImportGiaiPhapThapThan extends Command
 
     public function handle(): int
     {
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 5 - II, III, IV, V, VI, VII- GIẢI PHÁP CHO TỪNG THẬP THẦN.xlsx');
-
-        if (! file_exists($filePath)) {
-            $filePath = base_path('database/PHẦN 5 - II, III, IV, V, VI, VII- GIẢI PHÁP CHO TỪNG THẬP THẦN.xlsx');
-        }
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 5 - II, III, IV, V, VI, VII- GIẢI PHÁP CHO TỪNG THẬP THẦN.xlsx'
+        );
 
         if (! file_exists($filePath)) {
             $this->error("File không tồn tại: {$filePath}");
-            $this->info('Đặt file tại thư mục gốc hoặc: php artisan import:giai-phap-thap-than <đường_dẫn_file>');
+            $this->info('Đặt file trong imports/ hoặc: php artisan import:giai-phap-thap-than <đường_dẫn_file>');
             return 1;
         }
 

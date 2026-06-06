@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\DinhViGocNhin;
+use App\Support\ImportPath;
 use App\Services\DocxTextService;
 use Illuminate\Console\Command;
 
@@ -16,16 +17,14 @@ class ImportDinhViGocNhin extends Command
 
     public function handle(): int
     {
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 3 - I- ĐỊNH VỊ VÀ GÓC NHÌN.docx');
-
-        if (! file_exists($filePath)) {
-            $filePath = base_path('database/PHẦN 3 - I- ĐỊNH VỊ VÀ GÓC NHÌN.docx');
-        }
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 3 - I- ĐỊNH VỊ VÀ GÓC NHÌN.docx'
+        );
 
         if (! file_exists($filePath)) {
             $this->error("File không tồn tại: {$filePath}");
-            $this->info('Đặt file DOCX tại thư mục gốc hoặc: php artisan import:dinh-vi-goc-nhin <đường_dẫn_file>');
+            $this->info('Đặt file DOCX trong imports/ hoặc: php artisan import:dinh-vi-goc-nhin <đường_dẫn_file>');
 
             return 1;
         }

@@ -28,6 +28,7 @@ class GenerateLaSoPdfJob implements ShouldQueue
     public function handle(LaSoPdfGeneratorService $generator): void
     {
         ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', '0');
 
         $export = LaSoPdfExport::query()->findOrFail($this->exportId);
         $statusCol = $this->quyen === 1 ? 'q1_status' : 'q2_status';

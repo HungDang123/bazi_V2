@@ -444,6 +444,13 @@ class Phan5KhiaCanhService
             return null;
         }
 
+        $resolved = Phan5AssetService::resolvePath($path);
+        if (! is_file($resolved) || filesize($resolved) === 0) {
+            return null;
+        }
+
+        Phan5AssetService::syncPublicMirror($path);
+
         return DocxTextService::publicUrlForMarkerPath($path);
     }
 

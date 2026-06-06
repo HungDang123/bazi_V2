@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\YNghiaTuTru;
+use App\Support\ImportPath;
 use App\Services\DocxTextService;
 use Illuminate\Console\Command;
 
@@ -23,16 +24,14 @@ class ImportYNghiaTuTru extends Command
 
     public function handle(): int
     {
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 6 - I- Ý NGHĨA TỨ TRỤ.docx');
-
-        if (! file_exists($filePath)) {
-            $filePath = base_path('database/PHẦN 6 - I- Ý NGHĨA TỨ TRỤ.docx');
-        }
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 6 - I- Ý NGHĨA TỨ TRỤ.docx'
+        );
 
         if (! file_exists($filePath)) {
             $this->error("File không tồn tại: {$filePath}");
-            $this->info('Đặt file DOCX tại thư mục gốc hoặc: php artisan import:y-nghia-tu-tru <đường_dẫn_file>');
+            $this->info('Đặt file DOCX trong imports/ hoặc: php artisan import:y-nghia-tu-tru <đường_dẫn_file>');
 
             return 1;
         }

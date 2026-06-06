@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\ThapThanTheoViTri;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -42,19 +43,13 @@ class ImportThapThanTheoViTri extends Command
         ini_set('memory_limit', '256M');
         ini_set('max_execution_time', '300');
 
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 5 - THẬP THẦN (New).xlsx');
+        $filePath = ImportPath::resolveFirst($this->argument('file'), [
+            'PHẦN 5 - THẬP THẦN (New).xlsx',
+            'PHẦN 5 - II, III, IV, V, VI, VII- THẬP THẦN THEO TỪNG VỊ TRÍ.xlsx',
+        ]);
 
-        if (! file_exists($filePath)) {
-            $filePath = base_path('PHẦN 5 - II, III, IV, V, VI, VII- THẬP THẦN THEO TỪNG VỊ TRÍ.xlsx');
-        }
-
-        if (! file_exists($filePath)) {
-            $filePath = base_path('database/PHẦN 5 - II, III, IV, V, VI, VII- THẬP THẦN THEO TỪNG VỊ TRÍ.xlsx');
-        }
-
-        if (! file_exists($filePath)) {
-            $this->error("File không tồn tại: {$filePath}");
+        if ($filePath === null) {
+            $this->error('File không tồn tại: '.ImportPath::file('PHẦN 5 - THẬP THẦN (New).xlsx'));
 
             return 1;
         }

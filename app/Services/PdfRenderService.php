@@ -67,6 +67,12 @@ class PdfRenderService
             return $value;
         }
 
+        $normalized = str_replace('\\', '/', $value);
+        // Tiêu đề UTM-Davida (NguHanhTitleRenderer) — PNG trong suốt, dùng trên nền tối Phần 8.
+        if (str_contains($normalized, '/pdf-cache/titles/') && preg_match('/\.png$/i', $normalized)) {
+            return $value;
+        }
+
         return PdfMergeService::optimizedRasterPath($value);
     }
 

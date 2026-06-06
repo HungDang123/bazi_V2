@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Phan7TamThe;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -16,12 +17,14 @@ class ImportPhan7TamThe extends Command
 
     public function handle(): int
     {
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 7 - BÀI HỌC CUỘC SỐNG.xlsx');
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHẦN 7 - BÀI HỌC CUỘC SỐNG.xlsx'
+        );
 
         if (! is_file($filePath)) {
             $this->error("File không tồn tại: {$filePath}");
-            $this->info('Đặt file tại thư mục gốc hoặc: php artisan import:phan7-tam-the <đường_dẫn_file>');
+            $this->info('Đặt file trong imports/ hoặc: php artisan import:phan7-tam-the <đường_dẫn_file>');
             return 1;
         }
 

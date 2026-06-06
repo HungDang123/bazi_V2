@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Hanh;
 use App\Models\HanhNoiDung;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -27,16 +28,14 @@ class ImportBoCucNguHanh extends Command
         ini_set('memory_limit', '256M');
         ini_set('max_execution_time', '300');
 
-        $filePath = $this->argument('file')
-            ?? base_path('database/bo_cuc_ngu_hanh.xlsx');
-
-        if (! file_exists($filePath)) {
-            $filePath = base_path('bo_cuc_ngu_hanh.xlsx');
-        }
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'bo_cuc_ngu_hanh.xlsx'
+        );
 
         if (! file_exists($filePath)) {
             $this->error("File không tồn tại: {$filePath}");
-            $this->info('Chạy: php artisan import:bo-cuc-ngu-hanh database/bo_cuc_ngu_hanh.xlsx');
+            $this->info('Chạy: php artisan import:bo-cuc-ngu-hanh imports/bo_cuc_ngu_hanh.xlsx');
             return 1;
         }
 

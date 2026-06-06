@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\DongChayGioiThieu;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -53,20 +54,14 @@ class ImportPhan8GioiThieu extends Command
     {
         ini_set('memory_limit', '1024M');
 
-        $filePath = $this->argument('file')
-            ?? base_path('PHẦN 8A.xlsx');
+        $filePath = ImportPath::resolveFirst($this->argument('file'), [
+            'PHẦN 8A.xlsx',
+            'PHẦN 8 - CODING LOGIC.xlsx',
+        ]);
 
-        if (! file_exists($filePath)) {
-            $filePath = base_path('PHẦN 8 - CODING LOGIC.xlsx');
-        }
-
-        if (! file_exists($filePath)) {
-            $filePath = base_path('database/PHẦN 8 - CODING LOGIC.xlsx');
-        }
-
-        if (! file_exists($filePath)) {
-            $this->error("File không tồn tại: {$filePath}");
-            $this->info('Đặt file tại thư mục gốc hoặc truyền đường dẫn: php artisan import:phan8-gioi-thieu <đường_dẫn>');
+        if ($filePath === null) {
+            $this->error('File không tồn tại: '.ImportPath::file('PHẦN 8A.xlsx'));
+            $this->info('Đặt file trong imports/ hoặc: php artisan import:phan8-gioi-thieu <đường_dẫn>');
             return 1;
         }
 

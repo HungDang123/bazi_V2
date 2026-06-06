@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\ChatLuongNhatChu;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -33,16 +34,14 @@ class ImportChatLuongNhatChu extends Command
         ini_set('memory_limit', '256M');
         ini_set('max_execution_time', '300');
 
-        $filePath = $this->argument('file')
-            ?? base_path('chat_luong_nhat_chu.xlsx');
-
-        if (! file_exists($filePath)) {
-            $filePath = base_path('database/chat_luong_nhat_chu.xlsx');
-        }
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'chat_luong_nhat_chu.xlsx'
+        );
 
         if (! file_exists($filePath)) {
             $this->error("File không tồn tại: {$filePath}");
-            $this->info('Chạy: php artisan import:chat-luong-nhat-chu chat_luong_nhat_chu.xlsx');
+            $this->info('Chạy: php artisan import:chat-luong-nhat-chu imports/chat_luong_nhat_chu.xlsx');
             return 1;
         }
 

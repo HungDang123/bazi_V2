@@ -277,6 +277,14 @@ class DocxTextService
         return '[[image:'.$relativePath.']]';
     }
 
+    /** Loại marker [[image:...]] khỏi nội dung (web/API Phần 6). */
+    public static function stripImageMarkers(string $text): string
+    {
+        $stripped = preg_replace('/\[\[image:[^\]]+\]\]/u', '', $text);
+
+        return trim($stripped ?? $text);
+    }
+
     public static function resolveImagePath(string $markerPath): string
     {
         $relative = str_replace('\\', '/', trim($markerPath));

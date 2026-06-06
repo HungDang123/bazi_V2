@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Phan6LaSoBatTu;
 use App\Models\YNghiaTuTru;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -18,7 +19,7 @@ class ImportPhan6LaSoBatTu extends Command
 
     public function handle(): int
     {
-        $path = $this->argument('file') ?? base_path('PHẦN 6.xlsx');
+        $path = ImportPath::resolve($this->argument('file'), 'PHẦN 6.xlsx');
         if (! file_exists($path)) {
             $this->error("Không tìm thấy: {$path}");
 

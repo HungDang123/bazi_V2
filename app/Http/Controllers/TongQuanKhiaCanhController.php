@@ -574,7 +574,58 @@ class TongQuanKhiaCanhController extends Controller
             return response()->json(['data' => null], 422);
         }
 
-        return response()->json(['data' => $data]);
+        return response()->json(['data' => $this->stripPhan6ImagesForWeb($data)]);
+    }
+
+    /**
+     * Bỏ ảnh khỏi payload Phần 6 cho web/API (PDF vẫn dùng buildPhan6ApiData đầy đủ).
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function stripPhan6ImagesForWeb(array $data): array
+    {
+        unset($data['image_map']);
+
+        if (isset($data['y_nghia_tu_tru']) && is_array($data['y_nghia_tu_tru'])) {
+            $data['y_nghia_tu_tru'] = array_map(function ($item): array {
+                if (! is_array($item)) {
+                    return [];
+                }
+                unset($item['image']);
+                if (isset($item['content'])) {
+                    $item['content'] = \App\Services\DocxTextService::stripImageMarkers((string) $item['content']);
+                }
+
+                return $item;
+            }, $data['y_nghia_tu_tru']);
+        }
+
+        if (isset($data['transition_phan8']) && is_array($data['transition_phan8'])) {
+            unset($data['transition_phan8']['image']);
+            if (isset($data['transition_phan8']['content'])) {
+                $data['transition_phan8']['content'] = \App\Services\DocxTextService::stripImageMarkers(
+                    (string) $data['transition_phan8']['content']
+                );
+            }
+        }
+
+        if (isset($data['dong_chay']) && is_array($data['dong_chay'])) {
+            foreach (['nam_thang', 'thang_ngay', 'ngay_gio'] as $sectionKey) {
+                if (! isset($data['dong_chay'][$sectionKey]['gioi_thieu'])
+                    || ! is_array($data['dong_chay'][$sectionKey]['gioi_thieu'])) {
+                    continue;
+                }
+                unset($data['dong_chay'][$sectionKey]['gioi_thieu']['image']);
+                $noiDung = $data['dong_chay'][$sectionKey]['gioi_thieu']['noi_dung'] ?? null;
+                if (is_string($noiDung)) {
+                    $data['dong_chay'][$sectionKey]['gioi_thieu']['noi_dung'] =
+                        \App\Services\DocxTextService::stripImageMarkers($noiDung);
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**

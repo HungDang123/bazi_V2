@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\SucKhoeHyKyThan;
+use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Str;
@@ -33,8 +34,10 @@ class ImportPhan5SucKhoe extends Command
         ini_set('memory_limit', '512M');
         ini_set('max_execution_time', '600');
 
-        $filePath = $this->argument('file') 
-            ?? base_path('PHAN5_V_SUC_KHOE.xlsx');
+        $filePath = ImportPath::resolve(
+            $this->argument('file'),
+            'PHAN5_V_SUC_KHOE.xlsx'
+        );
 
         if (! file_exists($filePath)) {
             $this->error("File không tồn tại: {$filePath}");

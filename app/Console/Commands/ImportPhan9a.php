@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Phan9aNgoaiLuc;
 use App\Models\Phan9aNoiLuc;
+use App\Support\ImportPath;
 use App\Services\DocxTextService;
 use App\Services\Phan9aService;
 use Illuminate\Console\Command;
@@ -26,7 +27,7 @@ class ImportPhan9a extends Command
             $this->info('Đã xóa dữ liệu PHẦN 9A cũ.');
         }
 
-        $xlsx = base_path('PHẦN 9A.xlsx');
+        $xlsx = ImportPath::resolve(null, 'PHẦN 9A.xlsx');
         if (! file_exists($xlsx)) {
             $this->error("Không tìm thấy: {$xlsx}");
 
@@ -35,8 +36,8 @@ class ImportPhan9a extends Command
 
         $count = 0;
         $count += $this->importNoiLucFromExcel($xlsx);
-        $count += $this->importIntroFromDocx(base_path('PHẦN 9A - I. NỘI LỰC TỰ THÂN.docx'));
-        $count += $this->importNgoaiLucFromDocx(base_path('PHẦN 9A - II. NGOẠI LỰC - VKB tự chủ.docx'));
+        $count += $this->importIntroFromDocx(ImportPath::resolve(null, 'PHẦN 9A - I. NỘI LỰC TỰ THÂN.docx'));
+        $count += $this->importNgoaiLucFromDocx(ImportPath::resolve(null, 'PHẦN 9A - II. NGOẠI LỰC - VKB tự chủ.docx'));
 
         $this->info("Hoàn thành PHẦN 9A! Tổng {$count} bản ghi.");
 
