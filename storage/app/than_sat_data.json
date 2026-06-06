@@ -1,0 +1,5756 @@
+{
+  "than_sat_rules": [
+    {
+      "id": 1,
+      "ten_than_sat": "Thiên Ất Quý Nhân",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Can năm sinh, Can ngày sinh tra ở các Địa Chi các trụ"
+    },
+    {
+      "id": 2,
+      "ten_than_sat": "Thái Cực Quý Nhân",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Can năm sinh, Can ngày sinh tra ở các Địa Chi các trụ"
+    },
+    {
+      "id": 3,
+      "ten_than_sat": "Thiên Đức Quý Nhân",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Dùng Chi tháng sinh tra ở các Thiên Can, Địa Chi khác trong tứ trụ"
+    },
+    {
+      "id": 4,
+      "ten_than_sat": "Nguyệt Đức Quý Nhân",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Dùng Chi tháng sinh tra ở các Thiên Can khác trong tứ trụ"
+    },
+    {
+      "id": 5,
+      "ten_than_sat": "Văn Xương Quý Nhân",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Dùng Can năm sinh tra các Địa Chi khác trong Tứ Trụ"
+    },
+    {
+      "id": 6,
+      "ten_than_sat": "Tam Kỳ Quý Nhân - Thiên Thượng Tam Kỳ",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Thiên Can của năm, tháng, ngày thỏa mãn điều kiện"
+    },
+    {
+      "id": 7,
+      "ten_than_sat": "Tam Kỳ Quý Nhân - Địa Hạ Tam Kỳ",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Thiên Can của năm, tháng, ngày thỏa mãn điều kiện"
+    },
+    {
+      "id": 8,
+      "ten_than_sat": "Tam Kỳ Quý Nhân - Nhân Trung Tam Kỳ",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Thiên Can của năm, tháng, ngày thỏa mãn điều kiện"
+    },
+    {
+      "id": 9,
+      "ten_than_sat": "Tướng Tinh",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh, Chi ngày sinh tra ở các Địa Chi khác trong tứ trụ"
+    },
+    {
+      "id": 10,
+      "ten_than_sat": "Học Đường",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Dùng nạp âm trụ năm sinh để tra Địa Chi ở các trụ"
+    },
+    {
+      "id": 11,
+      "ten_than_sat": "Từ Quán",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Dùng nạp âm trụ năm sinh để tra Địa Chi ở các trụ"
+    },
+    {
+      "id": 12,
+      "ten_than_sat": "Quốc Ấn",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Can năm và Can ngày tra ở Địa Chi các trụ"
+    },
+    {
+      "id": 13,
+      "ten_than_sat": "Kim Dư",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Can năm sinh, Can ngày sinh tra ở Địa Chi các trụ"
+    },
+    {
+      "id": 14,
+      "ten_than_sat": "Thiên Y",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Chi tháng sinh tra ở Địa Chi các trụ còn lại"
+    },
+    {
+      "id": 15,
+      "ten_than_sat": "Lộc Thần",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Can ngày sinh tra ở Địa Chi các trụ"
+    },
+    {
+      "id": 16,
+      "ten_than_sat": "Thiên Xá",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Dùng mùa sinh tra với trụ ngày sinh để tìm Thiên Xá"
+    },
+    {
+      "id": 17,
+      "ten_than_sat": "Âm Chú Dương Thụ",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Chi tháng tra ở Địa Chi các trụ còn lại"
+    },
+    {
+      "id": 18,
+      "ten_than_sat": "Kim Thần",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Dùng trụ ngày sinh và trụ giờ sinh để tìm ra Kim Thần"
+    },
+    {
+      "id": 19,
+      "ten_than_sat": "Hồng Loan",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh tra ở Địa Chi các trụ khác"
+    },
+    {
+      "id": 20,
+      "ten_than_sat": "Thiên Hỷ",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh tra ở Địa Chi các trụ khác"
+    },
+    {
+      "id": 21,
+      "ten_than_sat": "Phúc Tinh",
+      "loai_than_sat": "cat",
+      "phuong_phap_tra_cuu": "Các trụ có Thiên Can, Địa Chi Như sau sẽ có Phúc Tinh"
+    },
+    {
+      "id": 22,
+      "ten_than_sat": "Hoa Cái",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh và Chi ngày sinh tra ở Địa Chi khác trong tứ trụ"
+    },
+    {
+      "id": 23,
+      "ten_than_sat": "Dịch Mã",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh và Chi ngày sinh tra ở Địa Chi khác trong tứ trụ"
+    },
+    {
+      "id": 24,
+      "ten_than_sat": "Khôi Cương",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Dùng trụ ngày sinh để tìm Khôi Cương"
+    },
+    {
+      "id": 25,
+      "ten_than_sat": "Hồng Diễm",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Sử dụng Can năm sinh, Can ngày sinh tra ở Địa Chi các trụ"
+    },
+    {
+      "id": 26,
+      "ten_than_sat": "Dương Nhận",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Sử dụng Can ngày sinh tra ở địa Chi các trụ còn lại"
+    },
+    {
+      "id": 27,
+      "ten_than_sat": "Tai Sát",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh và Chi ngày sinh tra ở Địa Chi các trụ khác"
+    },
+    {
+      "id": 28,
+      "ten_than_sat": "Kiếp Sát",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh, Chi ngày sinh tra ở Địa Chi các trụ khác"
+    },
+    {
+      "id": 29,
+      "ten_than_sat": "Vong Thần",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh, Chi ngày sinh tra ở Địa Chi các trụ khác"
+    },
+    {
+      "id": 30,
+      "ten_than_sat": "Thiên La",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh, Chi ngày sinh tra ở Địa Chi các trụ còn lại"
+    },
+    {
+      "id": 31,
+      "ten_than_sat": "Địa Võng",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh, Chi ngày sinh tra ở Địa Chi các trụ còn lại"
+    },
+    {
+      "id": 32,
+      "ten_than_sat": "Thập Ác Đại Bại",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Trụ ngày sinh là một trong các tổ hợp sau sẽ xuất hiện"
+    },
+    {
+      "id": 33,
+      "ten_than_sat": "Cô Thần",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh tra ở các Địa Chi còn lại để xác định"
+    },
+    {
+      "id": 34,
+      "ten_than_sat": "Quả Tú",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh tra ở các Địa Chi còn lại để xác định"
+    },
+    {
+      "id": 35,
+      "ten_than_sat": "Âm Dương Sai Thố",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng trụ ngày để xác định"
+    },
+    {
+      "id": 36,
+      "ten_than_sat": "Tang Môn",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh tra ở các Địa Chi còn lại để xác định"
+    },
+    {
+      "id": 37,
+      "ten_than_sat": "Điếu Khách",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh tra ở các Địa Chi còn lại để xác định"
+    },
+    {
+      "id": 38,
+      "ten_than_sat": "Nguyên Thần - Dương nam Âm nữ",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Dựa vào âm dương, nam nữ tra và Địa Chi năm sinh"
+    },
+    {
+      "id": 39,
+      "ten_than_sat": "Nguyên Thần - Âm nam Dương nữ",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Dựa vào âm dương, nam nữ tra và Địa Chi năm sinh"
+    },
+    {
+      "id": 40,
+      "ten_than_sat": "Câu - Dương nam Âm nữ",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Dựa vào âm dương, nam nữ tra và Địa Chi năm sinh"
+    },
+    {
+      "id": 41,
+      "ten_than_sat": "Giảo - Dương nam Âm nữ",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Dựa vào âm dương, nam nữ tra và Địa Chi năm sinh"
+    },
+    {
+      "id": 42,
+      "ten_than_sat": "Câu - Âm nam Dương nữ",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Dựa vào âm dương, nam nữ tra và Địa Chi năm sinh"
+    },
+    {
+      "id": 43,
+      "ten_than_sat": "Giảo - Âm nam Dương nữ",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Dựa vào âm dương, nam nữ tra và Địa Chi năm sinh"
+    },
+    {
+      "id": 44,
+      "ten_than_sat": "Huyết Nhẫn",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm sinh tra ở các Địa Chi còn lại để xác định"
+    },
+    {
+      "id": 45,
+      "ten_than_sat": "Quan Phù",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử Dụng Chi năm sinh tra ở Địa Chi các trụ còn lại"
+    },
+    {
+      "id": 46,
+      "ten_than_sat": "Cách Góc",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Chi ngày sinh tra ở Địa Chi các trụ còn lại"
+    },
+    {
+      "id": 47,
+      "ten_than_sat": "Đào Hoa - Năm",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm hoặc Chi ngày tra ở cac Địa Chi còn lại"
+    },
+    {
+      "id": 48,
+      "ten_than_sat": "Đào Hoa - Ngày",
+      "loai_than_sat": "trung_tinh",
+      "phuong_phap_tra_cuu": "Sử dụng Chi năm hoặc Chi ngày tra ở cac Địa Chi còn lại"
+    },
+    {
+      "id": 49,
+      "ten_than_sat": "Không Vong",
+      "loai_than_sat": "hung",
+      "phuong_phap_tra_cuu": "Sử dụng Trụ ngày tra ở Địa Chi các trụ còn lại"
+    }
+  ],
+  "than_sat_rule_details": [
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Sửu, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Tý, Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Dậu, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Dậu, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Sửu, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Tý, Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Dần, Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Dần, Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Mão, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Mão, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Sửu, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Tý, Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Dậu, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Dậu, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Sửu, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Tý, Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Dần, Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Dần, Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Mão, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 1,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Mão, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Tý, Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Tý, Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Mão, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Mão, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Thìn, Tuất, Sửu, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Thìn, Tuất, Sửu, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Dần, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Dần, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Tỵ, Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Tỵ, Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Tý, Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Tý, Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Mão, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Mão, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Thìn, Tuất, Sửu, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Thìn, Tuất, Sửu, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Dần, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Dần, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Tỵ, Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 2,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Tỵ, Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Đinh",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Nhâm",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Tân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Giáp",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Quý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Bính",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Ất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 3,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Canh",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Bính",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Giáp",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Nhâm",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Canh",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Bính",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Giáp",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Nhâm",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Canh",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Bính",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Giáp",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Nhâm",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 4,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Canh",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 5,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 6,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Giáp, Mậu, Canh",
+      "vi_tri_tim_thay": "Thiên Thượng Tam Kỳ",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 6,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh, Mậu, Giáp",
+      "vi_tri_tim_thay": "Thiên Thượng Tam Kỳ",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 7,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất, Bính, Đinh",
+      "vi_tri_tim_thay": "Địa Hạ Tam Kỳ",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 7,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh, Bính, Ất",
+      "vi_tri_tim_thay": "Địa Hạ Tam Kỳ",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 8,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm, Quý, Tân",
+      "vi_tri_tim_thay": "Nhân Trung Tam Kỳ",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 8,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân, Quý, Nhâm",
+      "vi_tri_tim_thay": "Nhân Trung Tam Kỳ",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 9,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 10,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Mộc",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 10,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Hỏa",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 10,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Thổ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 10,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Kim",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 10,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Thủy",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 11,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Mộc",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 11,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Hỏa",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 11,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Thổ",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 11,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Kim",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 11,
+      "loai_tra_cuu": "nap_am",
+      "gia_tri_tra_cuu": "Thủy",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 12,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 13,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 14,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 15,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 16,
+      "loai_tra_cuu": "mua_sinh",
+      "gia_tri_tra_cuu": "Xuân",
+      "vi_tri_tim_thay": "Mậu Dần",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 16,
+      "loai_tra_cuu": "mua_sinh",
+      "gia_tri_tra_cuu": "Hạ",
+      "vi_tri_tim_thay": "Giáp Ngọ",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 16,
+      "loai_tra_cuu": "mua_sinh",
+      "gia_tri_tra_cuu": "Thu",
+      "vi_tri_tim_thay": "Mậu Thân",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 16,
+      "loai_tra_cuu": "mua_sinh",
+      "gia_tri_tra_cuu": "Đông",
+      "vi_tri_tim_thay": "Giáp Tý",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 17,
+      "loai_tra_cuu": "chi_thang",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 18,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất Sửu",
+      "vi_tri_tim_thay": "Kim Thần",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 18,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Kỷ Tỵ",
+      "vi_tri_tim_thay": "Kim Thần",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 18,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Dậu",
+      "vi_tri_tim_thay": "Kim Thần",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 18,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Ất Sửu",
+      "vi_tri_tim_thay": "Kim Thần",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 18,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Kỷ Tỵ",
+      "vi_tri_tim_thay": "Kim Thần",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 18,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Quý Dậu",
+      "vi_tri_tim_thay": "Kim Thần",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 19,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 20,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Giáp Dần",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Ất Sửu",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Bính Tý",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Đinh Dậu",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Mậu Thân",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Kỷ Mùi",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Canh Ngọ",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Tân Tỵ",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Nhâm Thìn",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_nam",
+      "gia_tri_tra_cuu": "Quý Mão",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "nam",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Giáp Dần",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Ất Sửu",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Bính Tý",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Đinh Dậu",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Mậu Thân",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Kỷ Mùi",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Canh Ngọ",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Tân Tỵ",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Nhâm Thìn",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_thang",
+      "gia_tri_tra_cuu": "Quý Mão",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "thang",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Giáp Dần",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất Sửu",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Tý",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Dậu",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Thân",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Kỷ Mùi",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Ngọ",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Tỵ",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Thìn",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Mão",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 3
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Giáp Dần",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Ất Sửu",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Bính Tý",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Đinh Dậu",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Mậu Thân",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Kỷ Mùi",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Canh Ngọ",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Tân Tỵ",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Nhâm Thìn",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 21,
+      "loai_tra_cuu": "tru_gio",
+      "gia_tri_tra_cuu": "Quý Mão",
+      "vi_tri_tim_thay": "Phúc Tinh",
+      "vi_tri_xuat_hien": "gio",
+      "thu_tu_uu_tien": 4
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 22,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 23,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 24,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Thìn",
+      "vi_tri_tim_thay": "Khôi Cương",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 24,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Thìn",
+      "vi_tri_tim_thay": "Khôi Cương",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 24,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Tuất",
+      "vi_tri_tim_thay": "Khôi Cương",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 24,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Tuất",
+      "vi_tri_tim_thay": "Khôi Cương",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_nam",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 25,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Giáp",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Ất",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Bính",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Đinh",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Mậu",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Kỷ",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Canh",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Tân",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Nhâm",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 26,
+      "loai_tra_cuu": "can_ngay",
+      "gia_tri_tra_cuu": "Quý",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 27,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 28,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 29,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 30,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 30,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 31,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 31,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 2
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Giáp Thìn",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất Tỵ",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Thân",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Hợi",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Tuất",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Kỷ Sửu",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Thìn",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Tỵ",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Thân",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 32,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Hợi",
+      "vi_tri_tim_thay": "Thập Ác Đại Bại",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 33,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 34,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Tý",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Sửu",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Dần",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Mão",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Thìn",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Tỵ",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Ngọ",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Mùi",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Thân",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Dậu",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Tuất",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 35,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Hợi",
+      "vi_tri_tim_thay": "Âm Dương Sai Thố",
+      "vi_tri_xuat_hien": "ngay",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 36,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 37,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 38,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 39,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 40,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 41,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 42,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 43,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 44,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 45,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dần",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Thìn",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Thân",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Tuất",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 46,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 47,
+      "loai_tra_cuu": "chi_nam",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tý",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Sửu",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dần",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mão",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thìn",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tỵ",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Ngọ",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Mùi",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Thân",
+      "vi_tri_tim_thay": "Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Dậu",
+      "vi_tri_tim_thay": "Ngọ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Tuất",
+      "vi_tri_tim_thay": "Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 48,
+      "loai_tra_cuu": "chi_ngay",
+      "gia_tri_tra_cuu": "Hợi",
+      "vi_tri_tim_thay": "Tý",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Giáp Tý",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất Sửu",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Dần",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Mão",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Thìn",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Kỷ Tỵ",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Ngọ",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Mùi",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Thân",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Dậu",
+      "vi_tri_tim_thay": "Tuất, Hợi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Giáp Tuất",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất Hợi",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Tý",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Sửu",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Dần",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Kỷ Mão",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Thìn",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Tỵ",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Ngọ",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Mùi",
+      "vi_tri_tim_thay": "Thân, Dậu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Giáp Thân",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất Dậu",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Tuất",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Hợi",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Tý",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Kỷ Sửu",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Dần",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Mão",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Thìn",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Tỵ",
+      "vi_tri_tim_thay": "Ngọ, Mùi",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Giáp Ngọ",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất Mùi",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Thân",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Dậu",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Tuất",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Kỷ Hợi",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Tý",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Sửu",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Dần",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Mão",
+      "vi_tri_tim_thay": "Thìn, Tỵ",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Giáp Thìn",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất Tỵ",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Ngọ",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Mùi",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Thân",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Kỷ Dậu",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Tuất",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Hợi",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Tý",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Sửu",
+      "vi_tri_tim_thay": "Dần, Mão",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Giáp Dần",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Ất Mão",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Bính Thìn",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Đinh Tỵ",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Mậu Ngọ",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Kỷ Mùi",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Canh Thân",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Tân Dậu",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Nhâm Tuất",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    },
+    {
+      "than_sat_rule_id": 49,
+      "loai_tra_cuu": "tru_ngay",
+      "gia_tri_tra_cuu": "Quý Hợi",
+      "vi_tri_tim_thay": "Tý, Sửu",
+      "vi_tri_xuat_hien": "multiple",
+      "thu_tu_uu_tien": 1
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @include('pdfs.partials.pdf-base-typography')
+        @page { margin: 0; padding: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        .page {
+            position: relative;
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        .page:last-child {
+            page-break-after: auto;
+        }
+
+        .bg-img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 210mm; height: 297mm;
+        }
+
+        .content-wrap {
+            position: absolute;
+            left: 22mm;
+            width: 166mm;
+            top: 26mm;
+            height: 248mm;
+            overflow: hidden;
+        }
+
+        .muc-label {
+            color: #6E0101;
+            font-weight: bold;
+            font-style: italic;
+            font-size: 12px;
+            margin-bottom: 3mm;
+        }
+
+        .para-text {
+            color: #1A1A1A;
+            font-size: 12px;
+            line-height: 100%;
+            margin-bottom: 3mm;
+        }
+
+        @include('pdfs.phan-5.partials.bat-tu-table-styles')
+    </style>
+</head>
+<body>
+
+@foreach ($pages ?? [] as $page)
+<div class="page">
+
+    <img class="bg-img" src="{{ $page['bgPath'] }}">
+
+    <div class="content-wrap">
+        @include('pdfs.phan-5.partials.paginated-blocks', [
+            'blocks' => $page['blocks'] ?? [],
+        ])
+    </div>
+
+</div>
+@endforeach
+
+</body>
+</html>

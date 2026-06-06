@@ -1,0 +1,50 @@
+version: '2.2'
+services:
+  dev-vkb-web:
+    build:
+      args:
+        user: vkbdev
+        uid: 1001
+      context: ./
+      dockerfile: dev.dockerfile
+    image: vkb-web
+    container_name: dev-vkb-web
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - devvkb
+  dev-nginx-admin:
+    image: nginx:1.17-alpine
+    container_name: dev-vkb-nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - ./:/var/www/
+      - ./docker/nginx/dev:/etc/nginx/conf.d
+    networks:
+      - devvkb
+  dev-mysql:
+    container_name: dev-vkb-mysql
+    image: mysql
+    restart: unless-stopped
+    tty: true
+    environment:
+      MYSQL_ROOT_PASSWORD: vkbdev
+      MYSQL_DATABASE: db_vkb
+      MYSQL_USER: vkbdev
+      MYSQL_PASSWORD: vkbdev
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - devvkb
+networks:
+  devvkb:
+    driver: bridge
+volumes:
+  mysql:
+  redis:

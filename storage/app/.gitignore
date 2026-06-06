@@ -1,0 +1,6 @@
+*
+!private/
+!public/
+!.gitignore
+!than_sat_data.json
+!CHI TIẾT 64 QUẺ.xlsx

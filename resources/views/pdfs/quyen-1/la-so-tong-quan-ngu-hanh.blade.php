@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        @include('pdfs.partials.pdf-base-typography')
+        @page { margin: 0; padding: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { width: 210mm; height: 297mm; }
+
+        .page {
+            position: relative;
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+        }
+
+        .bg-img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 210mm; height: 297mm;
+        }
+
+        .content-wrap {
+            position: absolute;
+            left: 28mm;
+            width: 154mm;
+            overflow: hidden;
+        }
+
+        .chapter-title {
+            color: #6E0101;
+            text-transform: uppercase;
+            border-bottom: 1px solid #C9A227;
+            padding-bottom: 2px;
+            margin-bottom: 6px;
+        }
+
+        .sub-title {
+            color: #333;
+            margin-top: 8px;
+            margin-bottom: 4px;
+        }
+
+        .sub-section:first-of-type .sub-title {
+            margin-top: 4px;
+        }
+
+        .para-text {
+            color: #1A1A1A;
+        }
+
+        .content-img {
+            display: block;
+            width: 154mm;
+            height: auto;
+            margin: 6px 0 8px;
+        }
+
+        .sub-section {
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <img class="bg-img" src="{{ $templatePath }}">
+
+    <div class="content-wrap" style="top: 66mm; height: 206mm;">
+
+        @if (!empty($chapterTitle))
+        <div class="chapter-title">{{ $chapterTitle }}</div>
+        @endif
+
+        @if (!empty($intro))
+        <div class="para-text">
+            @foreach ($intro as $para)
+                <p>{{ $para }}</p>
+            @endforeach
+        </div>
+        @endif
+
+        @foreach ($subSections ?? [] as $sub)
+        <div class="sub-section">
+            @if (!empty($sub['sub_title']))
+            <div class="sub-title">{{ $sub['sub_title'] }}</div>
+            @endif
+
+            @if (!empty($sub['content']))
+            <div class="para-text">
+                @foreach ($sub['content'] as $block)
+                    @if (($block['type'] ?? 'para') === 'image')
+                    <img class="content-img" src="{{ $block['path'] }}">
+                    @else
+                    <p>{{ $block['text'] ?? '' }}</p>
+                    @endif
+                @endforeach
+            </div>
+            @endif
+        </div>
+        @endforeach
+
+    </div>
+
+</div>
+</body>
+</html>

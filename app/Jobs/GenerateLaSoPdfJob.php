@@ -1,0 +1,93 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\LaSoPdfExport;
+use App\Services\LaSoPdfGeneratorService;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
+use Throwable;
+
+class GenerateLaSoPdfJob implements ShouldQueue
+{
+    use Queueable;
+
+    public int $timeout = 600;
+
+    public int $tries = 2;
+
+    /**
+     * @param  array<string, mixed>  $params
+     */
+    public function __construct(
+        public string $exportId,
+        public int $quyen,
+        public array $params
+    ) {}
+
+    public function handle(LaSoPdfGeneratorService $generator): void
+    {
+        ini_set('memory_limit', '512M');
+
+        $export = LaSoPdfExport::query()->findOrFail($this->exportId);
+        $statusCol = $this->quyen === 1 ? 'q1_status' : 'q2_status';
+        $pathCol   = $this->quyen === 1 ? 'q1_path' : 'q2_path';
+        $errorCol  = $this->quyen === 1 ? 'q1_error' : 'q2_error';
+        $readyCol  = $this->quyen === 1 ? 'q1_ready_at' : 'q2_ready_at';
+
+        $export->update([
+            $statusCol => LaSoPdfExport::STATUS_PROCESSING,
+            $errorCol  => null,
+        ]);
+
+        $outputPath = $export->quyenPath($this->quyen);
+
+        try {
+            if ($this->quyen === 1) {
+                $generator->generateQuyen1($this->params, $outputPath);
+            } else {
+                $generator->generateQuyen2($this->params, $outputPath);
+            }
+
+            if (! is_file($outputPath)) {
+                throw new \RuntimeException('File PDF không được tạo');
+            }
+
+            $export->update([
+                $statusCol => LaSoPdfExport::STATUS_READY,
+                $pathCol   => $outputPath,
+                $readyCol  => now(),
+                $errorCol  => null,
+            ]);
+        } catch (Throwable $e) {
+            if (is_file($outputPath)) {
+                @unlink($outputPath);
+            }
+
+            $export->update([
+                $statusCol => LaSoPdfExport::STATUS_FAILED,
+                $errorCol  => $e->getMessage(),
+            ]);
+
+            throw $e;
+        }
+    }
+
+    public function failed(?Throwable $exception): void
+    {
+        $export = LaSoPdfExport::query()->find($this->exportId);
+        if ($export === null) {
+            return;
+        }
+
+        $statusCol = $this->quyen === 1 ? 'q1_status' : 'q2_status';
+        $errorCol  = $this->quyen === 1 ? 'q1_error' : 'q2_error';
+
+        if ($export->{$statusCol} !== LaSoPdfExport::STATUS_READY) {
+            $export->update([
+                $statusCol => LaSoPdfExport::STATUS_FAILED,
+                $errorCol  => $exception?->getMessage() ?? 'Job thất bại',
+            ]);
+        }
+    }
+}
