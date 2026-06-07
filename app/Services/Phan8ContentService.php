@@ -7,18 +7,147 @@ class Phan8ContentService
     /**
      * @param  array<string, mixed>|null  $daiVan
      * @param  array<string, mixed>|null  $nienVan
+     * @param  array<string, mixed>|null  $nhungNam
+     * @param  array<string, mixed>|null  $duBao
      * @return array<int, array<string, mixed>>
      */
-    public static function buildAllPageSpecs(?array $daiVan, ?array $nienVan): array
-    {
-        $specs = [];
+    public static function buildAllPageSpecs(
+        ?array $daiVan,
+        ?array $nienVan,
+        string $phanBan = '8a',
+        ?array $nhungNam = null,
+        ?array $duBao = null
+    ): array {
+        if ($phanBan === '8b') {
+            $specs = [];
 
+            if (is_array($nienVan) && $nienVan !== []) {
+                $specs = array_merge(
+                    $specs,
+                    self::buildNienVanSpecs($nienVan, 'tiep_theo', 'Năm Tiếp Theo', 'Niên Vận Tiếp Theo')
+                );
+            }
+
+            if (is_array($duBao) && $duBao !== []) {
+                $specs = array_merge($specs, self::buildDuBaoKhiaCanhSpecs($duBao));
+            }
+
+            return $specs;
+        }
+
+        $specs = [];
         if (is_array($daiVan) && $daiVan !== []) {
             $specs = array_merge($specs, self::buildDaiVanSpecs($daiVan));
         }
 
-        if (is_array($nienVan) && $nienVan !== []) {
-            $specs = array_merge($specs, self::buildNienVanSpecs($nienVan));
+        if (is_array($nhungNam) && $nhungNam !== []) {
+            $specs = array_merge($specs, self::buildNhungNamChuYSpecs($nhungNam));
+        }
+
+        return $specs;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, array<string, mixed>>
+     */
+    protected static function buildDuBaoKhiaCanhSpecs(array $data): array
+    {
+        $items = is_array($data['items'] ?? null) ? $data['items'] : [];
+        $blocks = [['type' => 'chapter_title', 'text' => 'III. DỰ BÁO CÁC KHÍA CẠNH CUỘC SỐNG']];
+        $hasContent = false;
+
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $match = $item['match'] ?? null;
+            if (! is_array($match)) {
+                continue;
+            }
+
+            $noiDung = trim((string) ($match['noi_dung'] ?? ''));
+            if ($noiDung === '') {
+                continue;
+            }
+
+            $hasContent = true;
+            $title = trim((string) ($item['khia_canh'] ?? ''));
+            if ($title !== '') {
+                $blocks[] = ['type' => 'sub_title', 'text' => $title];
+            }
+
+            $dieuKien = trim((string) ($match['dieu_kien'] ?? ''));
+            if ($dieuKien !== '') {
+                $blocks[] = ['type' => 'para', 'text' => 'Điều kiện khớp: '.$dieuKien];
+            }
+
+            foreach (self::paragraphBlocks($noiDung) as $block) {
+                $blocks[] = $block;
+            }
+        }
+
+        if (! $hasContent) {
+            return [];
+        }
+
+        return [['type' => 'content', 'blocks' => $blocks]];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, array<string, mixed>>
+     */
+    protected static function buildNhungNamChuYSpecs(array $data): array
+    {
+        $daiVanBlocks = is_array($data['dai_van_blocks'] ?? null) ? $data['dai_van_blocks'] : [];
+        if ($daiVanBlocks === []) {
+            return [];
+        }
+
+        $specs = [];
+        $introBlocks = [['type' => 'chapter_title', 'text' => 'IV. NHỮNG NĂM CẦN CHÚ Ý']];
+
+        $ghiChuKhacXung = trim((string) ($data['ghi_chu_khac_xung'] ?? ''));
+        if ($ghiChuKhacXung !== '') {
+            $introBlocks[] = ['type' => 'sub_title', 'text' => 'Khắc + Xung'];
+            foreach (self::paragraphBlocks($ghiChuKhacXung) as $block) {
+                $introBlocks[] = $block;
+            }
+        }
+
+        $ghiChuTrung = trim((string) ($data['ghi_chu_trung'] ?? ''));
+        if ($ghiChuTrung !== '') {
+            $introBlocks[] = ['type' => 'sub_title', 'text' => 'Trùng Can Chi'];
+            foreach (self::paragraphBlocks($ghiChuTrung) as $block) {
+                $introBlocks[] = $block;
+            }
+        }
+
+        $specs[] = ['type' => 'content', 'blocks' => $introBlocks];
+
+        foreach ($daiVanBlocks as $block) {
+            if (! is_array($block)) {
+                continue;
+            }
+
+            $years = is_array($block['years'] ?? null) ? $block['years'] : [];
+            if ($years === []) {
+                continue;
+            }
+
+            usort($years, static function (array $a, array $b): int {
+                return ((int) ($a['nam'] ?? 0)) <=> ((int) ($b['nam'] ?? 0));
+            });
+
+            $specs[] = [
+                'type' => 'iv_table',
+                'data' => [
+                    'age' => $block['age'] ?? '',
+                    'years' => $years,
+                ],
+            ];
         }
 
         return $specs;
@@ -138,15 +267,19 @@ class Phan8ContentService
      * @param  array<string, mixed>  $nienVan
      * @return array<int, array<string, mixed>>
      */
-    protected static function buildNienVanSpecs(array $nienVan): array
-    {
+    protected static function buildNienVanSpecs(
+        array $nienVan,
+        string $itemKey = 'hien_tai',
+        string $subtitle = 'Năm Hiện Tại',
+        string $labelPrefix = 'Niên Vận Hiện Tại'
+    ): array {
         $specs = [];
-        $hienTai = $nienVan['hien_tai'] ?? null;
-        if (! is_array($hienTai)) {
+        $item = $nienVan[$itemKey] ?? null;
+        if (! is_array($item)) {
             return $specs;
         }
 
-        $year = (int) ($hienTai['nam_number'] ?? date('Y'));
+        $year = (int) ($item['nam_number'] ?? date('Y'));
         $nvCodingBg = Phan8AssetService::nienVanCodingBgPath();
 
         // LBTV-577 là trang bìa mục II. Niên Vận (hình trang trí toàn trang,
@@ -154,7 +287,7 @@ class Phan8ContentService
         $specs[] = [
             'type' => 'nien_van_cover',
             'title' => 'NIÊN VẬN '.$year,
-            'subtitle' => 'Năm Hiện Tại',
+            'subtitle' => $subtitle,
         ];
 
         // Phần ý nghĩa + tóm tắt đưa sang trang nội dung thường (giống Đại Vận)
@@ -171,11 +304,11 @@ class Phan8ContentService
 
         $introBlocks[] = [
             'type' => 'para',
-            'text' => 'Niên Vận Hiện Tại: Năm '.$year
-                .' – Thiên Can: '.($hienTai['thien_can'] ?? '—')
-                .' ('.($hienTai['thap_than_thien_can'] ?? '—').')'
-                .' | Địa Chi: '.($hienTai['dia_chi'] ?? '—')
-                .' ('.($hienTai['thap_than_dia_chi'] ?? '—').')',
+            'text' => $labelPrefix.': Năm '.$year
+                .' – Thiên Can: '.($item['thien_can'] ?? '—')
+                .' ('.($item['thap_than_thien_can'] ?? '—').')'
+                .' | Địa Chi: '.($item['dia_chi'] ?? '—')
+                .' ('.($item['thap_than_dia_chi'] ?? '—').')',
         ];
 
         $specs[] = ['type' => 'content', 'blocks' => $introBlocks];
@@ -189,7 +322,7 @@ class Phan8ContentService
 
         $itemIndex = 1;
         foreach ($truMap as $key => [$truLabel, $labelTc, $labelDc]) {
-            $tru = $hienTai[$key] ?? null;
+            $tru = $item[$key] ?? null;
             if (! is_array($tru) || ! Phan8TruSectionService::hasDisplayContent($tru)) {
                 continue;
             }

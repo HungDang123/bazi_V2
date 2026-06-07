@@ -10,18 +10,16 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class ImportPhan7BaiHoc extends Command
 {
     protected $signature = 'import:phan7-bai-hoc
-        {file? : Đường dẫn file PHẦN 7 - BÀI HỌC CUỘC SỐNG.xlsx}
+        {file? : Đường dẫn file PHẦN 7 - II. BÀI HỌC CUỘC SỐNG VÀ SỰ CHUYỂN HÓA.xlsx}
         {--fresh : Xóa dữ liệu cũ trước khi import}';
 
-    protected $description = 'Import PHẦN 7 - Sheets 2-7 (II đến VII) từ file Excel vào bảng phan7_bai_hoc';
-
-    private const THAP_THAN_NAMES = ['PHỤ MẪU', 'QUAN QUỶ', 'THÊ TÀI', 'TỬ TÔN', 'HUYNH ĐỆ'];
+    protected $description = 'Import PHẦN 7 - Mục II (Bài học cuộc sống và sự chuyển hóa) từ file Excel vào bảng phan7_bai_hoc';
 
     public function handle(): int
     {
         $filePath = ImportPath::resolve(
             $this->argument('file'),
-            'PHẦN 7 - BÀI HỌC CUỘC SỐNG.xlsx'
+            'PHẦN 7 - II. BÀI HỌC CUỘC SỐNG VÀ SỰ CHUYỂN HÓA.xlsx'
         );
 
         if (! is_file($filePath)) {
@@ -43,90 +41,54 @@ class ImportPhan7BaiHoc extends Command
 
             $totalInserted = 0;
 
-            // Sheets 2-7 = index 1 đến 6
-            for ($sheetIdx = 1; $sheetIdx <= 6; $sheetIdx++) {
-                $sheet = $spreadsheet->getSheet($sheetIdx);
-                $phan = trim((string) $sheet->getTitle());
-                $highestRow = $sheet->getHighestRow();
+            foreach ($spreadsheet->getAllSheets() as $sheet) {
+                $sheetTitle = trim((string) $sheet->getTitle());
+                $thapThan = $this->parseThapThan($sheetTitle);
 
-                if ($highestRow < 2) {
+                if ($thapThan === null) {
+                    $this->warn("Bỏ qua sheet không nhận dạng được: '{$sheetTitle}'");
                     continue;
                 }
 
-                // Row 1: Tổng Quan
-                $b1 = trim((string) $sheet->getCell('B1')->getCalculatedValue());
-                $e1 = $this->getCellE($sheet, 1);
-                if ($b1 !== '' || $e1 !== '') {
-                    Phan7BaiHoc::create([
-                        'phan' => $phan,
-                        'loai' => $b1 !== '' ? $b1 : 'Tổng Quan',
-                        'thap_than' => null,
-                        'gioi_tinh' => null,
-                        'ten_truong_hop' => null,
-                        'noi_dung' => $e1,
-                        'thu_tu' => 1,
-                    ]);
-                    $totalInserted++;
-                }
+                $this->info("  Đang xử lý sheet: {$sheetTitle} → {$thapThan}");
 
-                // Row 2: Nguyên tắc cốt lõi
-                $b2 = trim((string) $sheet->getCell('B2')->getCalculatedValue());
-                $e2 = $this->getCellE($sheet, 2);
-                if ($b2 !== '' || $e2 !== '') {
-                    Phan7BaiHoc::create([
-                        'phan' => $phan,
-                        'loai' => $b2 !== '' ? $b2 : 'Nguyên tắc cốt lõi',
-                        'thap_than' => null,
-                        'gioi_tinh' => null,
-                        'ten_truong_hop' => null,
-                        'noi_dung' => $e2,
-                        'thu_tu' => 2,
-                    ]);
-                    $totalInserted++;
-                }
+                $highestRow = $sheet->getHighestRow();
+                $currentTruongHop = null;
+                $currentTieuDe = null;
+                $thuTu = 1;
 
-                // Rows 3+: Các trường hợp (Thập Thần + ten_truong_hop + noi_dung)
-                $currentThapThan = null;
-                $currentGioiTinh = null;
-                $thuTu = 3;
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    $colA = trim((string) $sheet->getCell('A' . $row)->getCalculatedValue());
+                    $colB = trim((string) $sheet->getCell('B' . $row)->getCalculatedValue());
+                    $colC = trim((string) $sheet->getCell('C' . $row)->getCalculatedValue());
 
-                for ($row = 3; $row <= $highestRow; $row++) {
-                    $b = trim((string) $sheet->getCell('B' . $row)->getCalculatedValue());
-                    $c = trim((string) $sheet->getCell('C' . $row)->getCalculatedValue());
-                    $d = trim((string) $sheet->getCell('D' . $row)->getCalculatedValue());
-                    $e = $this->getCellE($sheet, $row);
-
-                    if ($c !== '') {
-                        $currentThapThan = $this->parseThapThan($c);
-                        $currentGioiTinh = $this->parseGioiTinh($c);
+                    // Carry-forward: cập nhật ten_truong_hop và tieu_de khi có giá trị mới
+                    if ($colA !== '') {
+                        $currentTruongHop = $colA;
+                        $currentTieuDe = null;
+                    }
+                    if ($colB !== '') {
+                        $currentTieuDe = $colB;
                     }
 
-                    // Chỉ tạo bản ghi khi có nội dung (D hoặc E)
-                    if ($d === '' && $e === '') {
+                    // Chỉ tạo bản ghi khi có nội dung ở cột C
+                    if ($colC === '' || $currentTruongHop === null) {
                         continue;
                     }
 
-                    $loai = $b !== '' ? $b : 'Các trường hợp';
-                    if ($loai !== 'Các trường hợp' && $loai !== 'Cách trường hợp') {
-                        // Hàng đầu của block "Các trường hợp"
-                        $loai = 'Các trường hợp';
-                    }
-
                     Phan7BaiHoc::create([
-                        'phan' => $phan,
-                        'loai' => 'Các trường hợp',
-                        'thap_than' => $currentThapThan,
-                        'gioi_tinh' => $currentGioiTinh,
-                        'ten_truong_hop' => $d !== '' ? $d : null,
-                        'noi_dung' => $e,
-                        'thu_tu' => $thuTu,
+                        'thap_than'      => $thapThan,
+                        'ten_truong_hop' => $currentTruongHop,
+                        'tieu_de'        => $currentTieuDe,
+                        'noi_dung'       => $colC,
+                        'thu_tu'         => $thuTu,
                     ]);
                     $totalInserted++;
                     $thuTu++;
                 }
             }
 
-            $this->info("Import thành công {$totalInserted} mục từ Sheets 2-7 vào phan7_bai_hoc.");
+            $this->info("Import thành công {$totalInserted} dòng vào phan7_bai_hoc.");
             return 0;
         } catch (\Throwable $e) {
             $this->error('Lỗi: ' . $e->getMessage());
@@ -137,30 +99,23 @@ class ImportPhan7BaiHoc extends Command
         }
     }
 
-    private function getCellE($sheet, int $row): string
+    /**
+     * Parse tên Thập Thần từ tiêu đề sheet.
+     * VD: "1. HUYNH ĐỆ" → "HUYNH ĐỆ", "2. TỬ TÔN" → "TỬ TÔN"
+     */
+    private function parseThapThan(string $sheetTitle): ?string
     {
-        $val = $sheet->getCell('E' . $row)->getCalculatedValue();
-        return is_string($val) ? trim($val) : (string) $val;
-    }
+        // Bỏ số thứ tự đầu "1. ", "2. " ...
+        $name = preg_replace('/^\d+\.\s*/', '', $sheetTitle);
+        $name = trim((string) $name);
 
-    private function parseThapThan(string $c): ?string
-    {
-        foreach (self::THAP_THAN_NAMES as $name) {
-            if (mb_strpos($c, $name) !== false) {
-                return $name;
+        $known = ['HUYNH ĐỆ', 'TỬ TÔN', 'THÊ TÀI', 'QUAN QUỶ', 'PHỤ MẪU'];
+        foreach ($known as $k) {
+            if (mb_strtoupper($name) === $k || mb_strpos(mb_strtoupper($sheetTitle), $k) !== false) {
+                return $k;
             }
         }
-        return null;
-    }
 
-    private function parseGioiTinh(string $c): ?string
-    {
-        if (mb_strpos($c, 'GIỚI TÍNH: NAM') !== false) {
-            return 'NAM';
-        }
-        if (mb_strpos($c, 'GIỚI TÍNH: NỮ') !== false) {
-            return 'NỮ';
-        }
         return null;
     }
 }

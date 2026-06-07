@@ -9,6 +9,7 @@ class Phan8AssetService
         return resource_path('views/pdfs/phan-8');
     }
 
+    /** Bìa Phần 8A — «DỰ BÁO ĐẠI VẬN» (chỉ Quyển 1). */
     public static function coverImagePath(): string
     {
         return self::resourceDir().'/bia-phan-8.png';

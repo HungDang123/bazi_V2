@@ -10,16 +10,16 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class ImportPhan7TamThe extends Command
 {
     protected $signature = 'import:phan7-tam-the
-        {file? : Đường dẫn file PHẦN 7 - BÀI HỌC CUỘC SỐNG.xlsx}
+        {file? : Đường dẫn file PHẦN 7 - I.xlsx}
         {--fresh : Xóa dữ liệu cũ trước khi import}';
 
-    protected $description = 'Import PHẦN 7 - Sheet 1 (I. XÁC ĐỊNH TÂM THẾ) từ file Excel vào bảng phan7_tam_the';
+    protected $description = 'Import PHẦN 7 - Mục I (Sự vận hành của 5 trung tâm năng lượng) từ file Excel vào bảng phan7_tam_the';
 
     public function handle(): int
     {
         $filePath = ImportPath::resolve(
             $this->argument('file'),
-            'PHẦN 7 - BÀI HỌC CUỘC SỐNG.xlsx'
+            'PHẦN 7 - I.xlsx'
         );
 
         if (! is_file($filePath)) {
@@ -38,47 +38,47 @@ class ImportPhan7TamThe extends Command
             $reader = IOFactory::createReader('Xlsx');
             $reader->setReadDataOnly(true);
             $spreadsheet = $reader->load($filePath);
-            $sheet = $spreadsheet->getSheet(0);
-
-            $highestRow = $sheet->getHighestRow();
-            if ($highestRow < 1) {
-                $this->warn('Sheet 1 không có dữ liệu.');
-                return 0;
-            }
 
             $count = 0;
-            for ($row = 1; $row <= min(3, $highestRow); $row++) {
-                $loai = trim((string) $sheet->getCell('B' . $row)->getCalculatedValue());
-                $thapThan = trim((string) $sheet->getCell('C' . $row)->getCalculatedValue());
-                $tenTruongHop = trim((string) $sheet->getCell('D' . $row)->getCalculatedValue());
-                $noiDung = $sheet->getCell('E' . $row)->getCalculatedValue();
-                $noiDung = is_string($noiDung) ? trim($noiDung) : (string) $noiDung;
+            $thuTu = 1;
 
-                if ($loai === '' && $noiDung === '') {
-                    continue;
-                }
-                if ($loai === '') {
-                    $loai = 'Tổng Quan';
-                }
+            // Sheet 1 (index 0) → đầu Mục I; Sheet 2 (index 1) → cuối Phần 7 (sau Mục II)
+            foreach ($spreadsheet->getAllSheets() as $sheetIndex => $sheet) {
+                $highestRow = $sheet->getHighestRow();
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    $noiDung = trim((string) $sheet->getCell('A' . $row)->getCalculatedValue());
 
-                Phan7TamThe::updateOrCreate(
-                    [
-                        'thu_tu' => $row,
-                    ],
-                    [
-                        'loai' => $loai,
-                        'thap_than' => $thapThan !== '' ? $thapThan : null,
-                        'ten_truong_hop' => $tenTruongHop !== '' ? $tenTruongHop : null,
-                        'noi_dung' => $noiDung,
-                    ]
-                );
-                $count++;
+                    if ($noiDung === '') {
+                        continue;
+                    }
+
+                    // Phát hiện placeholder ảnh → chuyển thành [image]
+                    $imagePath = null;
+                    if (mb_strpos($noiDung, '[CHÈN') !== false || mb_strpos($noiDung, '[IMAGE]') !== false || mb_strpos($noiDung, '[image]') !== false) {
+                        $noiDung = '[image]';
+                        $imagePath = 'images/phan-7/ngu-hanh-ban-menh.png';
+                    }
+
+                    Phan7TamThe::updateOrCreate(
+                        ['thu_tu' => $thuTu],
+                        [
+                            'sheet_index' => $sheetIndex,
+                            'noi_dung' => $noiDung,
+                            'image' => $imagePath,
+                        ]
+                    );
+                    $count++;
+                    $thuTu++;
+                }
             }
 
-            $this->info("Import thành công {$count} mục từ Sheet 1 (I. XÁC ĐỊNH TÂM THẾ) vào phan7_tam_the.");
+            $this->info("Import thành công {$count} dòng từ PHẦN 7 - I.xlsx vào phan7_tam_the.");
             return 0;
         } catch (\Throwable $e) {
             $this->error('Lỗi: ' . $e->getMessage());
+            if ($this->output->isVerbose()) {
+                $this->error($e->getTraceAsString());
+            }
             return 1;
         }
     }

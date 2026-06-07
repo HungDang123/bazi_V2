@@ -10,11 +10,13 @@ use App\Services\HanhNoiDungService;
 use App\Services\Phan3PdfPaginator;
 use App\Services\Phan5PdfService;
 use App\Services\Phan6PdfService;
+use App\Services\Phan7MucIIPdfService;
 use App\Services\Phan7PdfService;
 use App\Services\Phan8PdfService;
 use App\Services\Phan9PdfService;
 use App\Services\Phan9aService;
 use App\Services\PdfDownloadService;
+use App\Services\PdfFooterService;
 use App\Services\PdfMergeService;
 use App\Services\PdfRenderService;
 use App\Services\PdfStaticPageCache;
@@ -250,10 +252,12 @@ class PdfExportController extends Controller
             3
         );
 
+        $contentBg = $pdfDir . '/page-content-bg.png';
+
         if (! empty($phan3FromSub3['subSections'])) {
             $page20Path = $tempDir . '/q1p20-' . $uid . '.pdf';
             $pdfsToMerge[] = PdfViewCache::saveView('pdfs.quyen-1.la-so-tong-quan-ngu-hanh-tiep', array_merge([
-                'templatePath' => $pdfDir . '/page-20-bg.png',
+                'templatePath' => $contentBg,
             ], $phan3FromSub3), $page20Path, $phan3Salt);
             $tempFiles[] = $page20Path;
         }
@@ -264,8 +268,8 @@ class PdfExportController extends Controller
 
         $phan3BocucPages = Phan3PdfPaginator::paginateBocucSection(
             $phan3SectionII,
-            $pdfDir . '/page-21-bg.png',
-            $pdfDir . '/page-22-bg.png'
+            $contentBg,
+            $contentBg
         );
 
         $page21Path = $tempDir . '/q1p21-' . $uid . '.pdf';
@@ -278,8 +282,8 @@ class PdfExportController extends Controller
         if (! empty($batTuData)) {
             $clncPages = ChatLuongNhatChuService::buildPdfPages(
                 ChatLuongNhatChuService::buildFromBatTu($batTuData),
-                $pdfDir . '/page-22-bg.png',
-                $pdfDir . '/page-22-bg.png'
+                $contentBg,
+                $contentBg
             );
 
             if ($clncPages !== []) {
@@ -296,8 +300,8 @@ class PdfExportController extends Controller
         $nguHanhPages = HanhNoiDungService::buildPdfPages(
             $nguHanhDong,
             $pdfDir . '/ngu-hanh',
-            $pdfDir . '/page-20-bg.png',
-            $pdfDir . '/page-22-bg.png'
+            $contentBg,
+            $contentBg
         );
 
         $page22Path = null;
@@ -370,14 +374,14 @@ class PdfExportController extends Controller
             $tempFiles[]   = $pagePhan6Path;
         }
 
-        // ── PHẦN 8: bìa + Đại Vận + Niên Vận ─────────────────────────────────
+        // ── PHẦN 8 (8A): bìa + Đại Vận + IV. Những năm cần chú ý ─────────────
         self::appendStaticPage(
             $pdfsToMerge,
             Phan8PdfService::coverImagePath(),
             'Q1 phan8-bia'
         );
 
-        foreach (Phan8PdfService::buildPdfPages($req) as $idx => $phan8Page) {
+        foreach (Phan8PdfService::buildPdfPages($req, '8a') as $idx => $phan8Page) {
             $pagePhan8Path = $tempDir . '/q1p-phan8-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan8Page['view'], $phan8Page['data'], $pagePhan8Path);
             $pdfsToMerge[] = $pagePhan8Path;
@@ -435,15 +439,30 @@ class PdfExportController extends Controller
             }
         }
 
-        // ── Merge ─────────────────────────────────────────────────────────────
-        $merged = PdfMergeService::mergeMultiple($pdfsToMerge, $finalPath);
+        // ── Merge + footer (banner 08.png, số trang, tên người nhập) ─────────
+        $mergedTemp = $tempDir.'/merged-q1-'.$uid.'.pdf';
+        $merged = PdfMergeService::mergeMultiple($pdfsToMerge, $mergedTemp);
 
         foreach ($tempFiles as $tmp) {
             @unlink($tmp);
         }
 
-        if (! $merged || ! file_exists($finalPath)) {
+        if (! $merged || ! file_exists($mergedTemp)) {
             throw new \RuntimeException('Merge PDF Quyển 1 thất bại');
+        }
+
+        $fullName = trim((string) $req->input('full_name', ''));
+        if (! PdfFooterService::applyToMergedPdf($mergedTemp, $finalPath, $fullName)) {
+            Log::warning('Gắn footer PDF Quyển 1 thất bại — xuất PDF không footer', [
+                'uid' => $uid,
+                'full_name' => $fullName,
+            ]);
+            @copy($mergedTemp, $finalPath);
+        }
+        @unlink($mergedTemp);
+
+        if (! file_exists($finalPath)) {
+            throw new \RuntimeException('Gắn footer PDF Quyển 1 thất bại');
         }
     }
 
@@ -714,7 +733,7 @@ class PdfExportController extends Controller
         $pdfsToMerge[] = $page21Path;
         $tempFiles[]     = $page21Path;
 
-        // ── PHẦN 7: 11 trang tĩnh theo thứ tự đọc (537 → 166 → … → 557) ─────
+        // ── PHẦN 7: bìa + Mục I (tĩnh) ─────────────────────────────────────────
         $phan7Pages = Phan7PdfService::staticPagePaths();
         $phan7Bundle = PdfStaticPageCache::resolveBundle(Phan7PdfService::bundleCacheKey(), $phan7Pages);
         if ($phan7Bundle !== null) {
@@ -725,14 +744,18 @@ class PdfExportController extends Controller
             }
         }
 
-        // ── PHẦN 8: bìa + Đại Vận + Niên Vận (y hệt Q1) ──────────────────────
-        self::appendStaticPage(
-            $pdfsToMerge,
-            Phan8PdfService::coverImagePath(),
-            'Q2 phan8-bia'
-        );
+        // ── PHẦN 7 MỤC II: nội dung động (blade) ────────────────────────────────
+        $phan7Muc2Spec = Phan7MucIIPdfService::buildContentPageSpec($req);
+        if ($phan7Muc2Spec !== null) {
+            $pagePhan7Muc2Path = $tempDir . '/q2p-phan7-muc2-' . $uid . '.pdf';
+            PdfRenderService::saveView($phan7Muc2Spec['view'], $phan7Muc2Spec['data'], $pagePhan7Muc2Path);
+            $pdfsToMerge[] = $pagePhan7Muc2Path;
+            $tempFiles[]   = $pagePhan7Muc2Path;
+        }
 
-        foreach (Phan8PdfService::buildPdfPages($req) as $idx => $phan8Page) {
+        // ── PHẦN 8 (8B): Niên Vận tiếp theo + III. Dự báo khía cạnh ─────────
+        // Không dùng bia-phan-8.png (ghi «DỰ BÁO ĐẠI VẬN» — chỉ dành cho 8A / Q1).
+        foreach (Phan8PdfService::buildPdfPages($req, '8b') as $idx => $phan8Page) {
             $pagePhan8Path = $tempDir . '/q2p-phan8-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan8Page['view'], $phan8Page['data'], $pagePhan8Path);
             $pdfsToMerge[] = $pagePhan8Path;
@@ -771,15 +794,30 @@ class PdfExportController extends Controller
             }
         }
 
-        // ── Merge ─────────────────────────────────────────────────────────────
-        $merged = PdfMergeService::mergeMultiple($pdfsToMerge, $finalPath);
+        // ── Merge + footer (banner 08.png, số trang, tên người nhập) ─────────
+        $mergedTemp = $tempDir.'/merged-q2-'.$uid.'.pdf';
+        $merged = PdfMergeService::mergeMultiple($pdfsToMerge, $mergedTemp);
 
         foreach ($tempFiles as $tmp) {
             @unlink($tmp);
         }
 
-        if (! $merged || ! file_exists($finalPath)) {
+        if (! $merged || ! file_exists($mergedTemp)) {
             throw new \RuntimeException('Merge PDF Quyển 2 thất bại');
+        }
+
+        $fullName = trim((string) $req->input('full_name', ''));
+        if (! PdfFooterService::applyToMergedPdf($mergedTemp, $finalPath, $fullName)) {
+            Log::warning('Gắn footer PDF Quyển 2 thất bại — xuất PDF không footer', [
+                'uid' => $uid,
+                'full_name' => $fullName,
+            ]);
+            @copy($mergedTemp, $finalPath);
+        }
+        @unlink($mergedTemp);
+
+        if (! file_exists($finalPath)) {
+            throw new \RuntimeException('Gắn footer PDF Quyển 2 thất bại');
         }
     }
 

@@ -5,6 +5,57 @@ namespace App\Services;
 class Phan6ContentService
 {
     /**
+     * Bỏ ảnh khỏi payload Phần 6 (web/API + PDF nội dung; giữ bìa Phần 6).
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public static function stripImagesFromApiData(array $data): array
+    {
+        unset($data['image_map']);
+
+        if (isset($data['y_nghia_tu_tru']) && is_array($data['y_nghia_tu_tru'])) {
+            $data['y_nghia_tu_tru'] = array_map(function ($item): array {
+                if (! is_array($item)) {
+                    return [];
+                }
+                unset($item['image']);
+                if (isset($item['content'])) {
+                    $item['content'] = DocxTextService::stripImageMarkers((string) $item['content']);
+                }
+
+                return $item;
+            }, $data['y_nghia_tu_tru']);
+        }
+
+        if (isset($data['transition_phan8']) && is_array($data['transition_phan8'])) {
+            unset($data['transition_phan8']['image']);
+            if (isset($data['transition_phan8']['content'])) {
+                $data['transition_phan8']['content'] = DocxTextService::stripImageMarkers(
+                    (string) $data['transition_phan8']['content']
+                );
+            }
+        }
+
+        if (isset($data['dong_chay']) && is_array($data['dong_chay'])) {
+            foreach (['nam_thang', 'thang_ngay', 'ngay_gio'] as $sectionKey) {
+                if (! isset($data['dong_chay'][$sectionKey]['gioi_thieu'])
+                    || ! is_array($data['dong_chay'][$sectionKey]['gioi_thieu'])) {
+                    continue;
+                }
+                unset($data['dong_chay'][$sectionKey]['gioi_thieu']['image']);
+                $noiDung = $data['dong_chay'][$sectionKey]['gioi_thieu']['noi_dung'] ?? null;
+                if (is_string($noiDung)) {
+                    $data['dong_chay'][$sectionKey]['gioi_thieu']['noi_dung'] =
+                        DocxTextService::stripImageMarkers($noiDung);
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      * @return array<int, array<string, mixed>>
      */

@@ -1574,8 +1574,8 @@
                     </div>
                     <div id="phan6TransitionContainer" class="mt-6" style="display: none;">
                         <div id="phan6TransitionContent" class="text-sm text-gray-700"></div>
-                    </div>
                 </div>
+            </div>
             </div>
 
             </div><!-- /quyenCuon1Panel -->
@@ -1604,6 +1604,7 @@
                 <div id="phan7BaiHocContent" class="bg-white rounded-lg shadow-lg p-6 space-y-6">
                     <div id="phan7TamThe" class="space-y-4"></div>
                     <div id="phan7Phan27" class="space-y-6"></div>
+                    <div id="phan7TamTheCuoi" class="space-y-4"></div>
                 </div>
             </div>
 
@@ -1679,8 +1680,8 @@
                 </h3>
                 <div class="bg-white rounded-lg shadow-lg p-6 space-y-6">
 
-                    {{-- Ý nghĩa Niên Vận (cuốn 1) --}}
-                    <div id="phan8NienVanYNghia" data-phan8-quyen="1" class="text-sm text-gray-700 whitespace-pre-line bg-amber-50 border border-amber-200 rounded-lg p-4" style="display: none;"></div>
+                    {{-- Ý nghĩa Niên Vận (cuốn 2 / 8B) --}}
+                    <div id="phan8NienVanYNghia" data-phan8-quyen="2" class="text-sm text-gray-700 whitespace-pre-line bg-amber-50 border border-amber-200 rounded-lg p-4" style="display: none;"></div>
 
                     {{-- Năm hiện tại — CUỐN 1 --}}
                     <div id="phan8HienTaiSection" data-phan8-quyen="1" style="display: none;" class="space-y-4">
@@ -1956,7 +1957,12 @@
                         return parseInt($panel.data('quyen'), 10) === activeQuyenCuon;
                     }
                     if ($el.closest('#phan8Group').length) {
-                        return true;
+                        const phan8Quyen = $el.data('phan8-quyen');
+                        if (phan8Quyen !== undefined && phan8Quyen !== null && phan8Quyen !== '') {
+                            return parseInt(phan8Quyen, 10) === activeQuyenCuon;
+                        }
+                        // #phan8NienVanSection: không có data-phan8-quyen — do refreshPhan8QuyenVisibility quản lý
+                        return false;
                     }
                     return false;
                 }
@@ -1966,6 +1972,9 @@
                     $('#quyenCuon2Panel').toggleClass('is-hidden', activeQuyenCuon !== 2);
                     $('.quyen-section').not('.quyen-shared').each(function() {
                         const $el = $(this);
+                        if ($el.closest('#phan8Group').length && !$el.data('phan8-quyen')) {
+                            return;
+                        }
                         if (isQuyenSectionAllowed($el)) {
                             if ($el.data('quyen-was-shown')) {
                                 $el.show();
@@ -1974,6 +1983,7 @@
                             $el.hide();
                         }
                     });
+                    refreshPhan8QuyenVisibility();
                 }
 
                 function mountPhan9Section() {
@@ -2002,8 +2012,8 @@
 
                 /**
                  * Phân cuốn Phần 8:
-                 * Cuốn 1 — Đại Vận, Niên Vận hiện tại, IV. Năm cần chú ý
-                 * Cuốn 2 — III. Dự báo khía cạnh, Niên Vận tiếp theo
+                 * Cuốn 1 (8A) — Đại Vận, IV. Năm cần chú ý
+                 * Cuốn 2 (8B) — Niên Vận tiếp theo, III. Dự báo khía cạnh
                  */
                 function refreshPhan8QuyenVisibility() {
                     const isCuon1 = activeQuyenCuon === 1;
@@ -2024,12 +2034,7 @@
                     if ($nvSection.data('quyen-was-shown')) {
                         const $yNghia = $('#phan8NienVanYNghia');
                         if ($yNghia.data('has-content')) {
-                            $yNghia.toggle(isCuon1);
-                        }
-
-                        const $hienTai = $('#phan8HienTaiSection');
-                        if ($hienTai.data('has-content')) {
-                            $hienTai.toggle(isCuon1);
+                            $yNghia.toggle(isCuon2);
                         }
 
                         const $tiepTheo = $('#phan8TiepTheoSection');
@@ -2037,8 +2042,7 @@
                             $tiepTheo.toggle(isCuon2);
                         }
 
-                        const anyNv = (isCuon1 && ($yNghia.is(':visible') || $hienTai.is(':visible'))) ||
-                            (isCuon2 && $tiepTheo.is(':visible'));
+                        const anyNv = isCuon2 && ($yNghia.is(':visible') || $tiepTheo.is(':visible'));
                         $nvSection.toggle(anyNv);
                     }
                 }
@@ -2817,7 +2821,7 @@
                         });
                     }
 
-                    // Load PHẦN 8: Niên Vận – mối quan hệ TC/ĐC Niên Vận (năm HT + tiếp theo) với 4 Trụ
+                    // Load PHẦN 8: Niên Vận – 8A (cuốn 1: hiện tại) + 8B (cuốn 2: tiếp theo)
                     function loadPhan8NienVan(params) {
                         const section = $('#phan8NienVanSection');
                         $('#phan8NienVanYNghia').hide().empty();
@@ -2827,107 +2831,104 @@
                         $('#phan8HienTaiNamContent,#phan8HienTaiThangContent,#phan8HienTaiNgayContent,#phan8HienTaiGioContent').empty();
                         $('#phan8TiepTheoNamContent,#phan8TiepTheoThangContent,#phan8TiepTheoNgayContent,#phan8TiepTheoGioContent').empty();
                         $('#phan8HienTaiGioiThieu,#phan8TiepTheoGioiThieu').hide();
+                        $('#phan8HienTaiSection').removeData('has-content');
+                        $('#phan8TiepTheoSection').removeData('has-content');
+
+                        function renderNienVanItem(itemData, prefix, labelSuffix) {
+                            if (!itemData) return;
+                            const infoEl    = $('#' + prefix + 'Info');
+                            const sectionEl = $('#' + prefix + 'Section');
+                            const gtEl      = $('#' + prefix + 'GioiThieu');
+
+                            infoEl.html(
+                                '<strong>Niên Vận ' + labelSuffix + ':</strong> Năm ' + (itemData.nam_number || '—') + ' – ' +
+                                '<strong>Thiên Can:</strong> ' + (itemData.thien_can || '—') +
+                                ' (' + (itemData.thap_than_thien_can || '—') + ')' +
+                                ' &nbsp;|&nbsp; ' +
+                                '<strong>Địa Chi:</strong> ' + (itemData.dia_chi || '—') +
+                                ' (' + (itemData.thap_than_dia_chi || '—') + ')'
+                            );
+
+                            gtEl.hide().empty();
+
+                            var hasAny = false;
+                            var truMap = [
+                                ['nam',   'Thiên Can – Niên Vận – Trụ Năm',   'Địa Chi – Niên Vận – Trụ Năm'],
+                                ['thang', 'Thiên Can – Niên Vận – Trụ Tháng', 'Địa Chi – Niên Vận – Trụ Tháng'],
+                                ['ngay',  'Thiên Can – Niên Vận – Trụ Ngày',  'Địa Chi – Niên Vận – Trụ Ngày'],
+                                ['gio',   'Thiên Can – Niên Vận – Trụ Giờ',   'Địa Chi – Niên Vận – Trụ Giờ'],
+                            ];
+                            truMap.forEach(function(t) {
+                                var key     = t[0];
+                                var labelTC = t[1];
+                                var labelDC = t[2];
+                                var truData = itemData[key];
+                                var capKey  = key.charAt(0).toUpperCase() + key.slice(1);
+                                var truSec  = $('#' + prefix + capKey + 'Section');
+                                var truCont = $('#' + prefix + capKey + 'Content');
+
+                                truSec.hide();
+                                truCont.empty();
+                                if (!truData) return;
+
+                                var html = '';
+                                var introText = (truData.gioi_thieu && truData.gioi_thieu.noi_dung) ?
+                                    String(truData.gioi_thieu.noi_dung) : '';
+
+                                if (introText) {
+                                    html += '<div class="text-sm text-gray-700 whitespace-pre-line bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3">' +
+                                                $('<div>').text(introText).html() +
+                                            '</div>';
+                                }
+
+                                var tcBlocks = Array.isArray(truData.thien_can) ? truData.thien_can : (truData.thien_can ? [truData.thien_can] : []);
+                                var dcBlocks = Array.isArray(truData.dia_chi)   ? truData.dia_chi   : (truData.dia_chi   ? [truData.dia_chi]   : []);
+                                tcBlocks.forEach(function(block) {
+                                    if (block && block.moi_quan_he) html += renderCodingLogicBlock(block, labelTC, false);
+                                });
+                                dcBlocks.forEach(function(block) {
+                                    if (block && block.moi_quan_he) html += renderCodingLogicBlock(block, labelDC, true);
+                                });
+
+                                if (html) {
+                                    truCont.html(html);
+                                    truSec.show();
+                                    hasAny = true;
+                                }
+                            });
+
+                            if (hasAny) {
+                                sectionEl.data('has-content', true).show();
+                            } else {
+                                sectionEl.removeData('has-content');
+                            }
+                        }
+
+                        function finishNienVanLoad() {
+                            section.data('quyen-was-shown', true).show();
+                            refreshPhan8QuyenVisibility();
+                        }
 
                         $.ajax({
                             url: '/api/phan-8/nien-van',
                             method: 'GET',
                             dataType: 'json',
-                            data: params,
+                            data: Object.assign({}, params, { phan_ban: '8b' }),
                             error: function(xhr, status, err) {
-                                console.error('loadPhan8NienVan API error:', status, err);
+                                console.error('loadPhan8NienVan 8b API error:', status, err);
+                                finishNienVanLoad();
                             },
                             success: function(res) {
                                 const data = (res && res.data) ? res.data : null;
-                                if (!data) return;
-
-                                section.data('quyen-was-shown', true).show();
-
-                                // Giới thiệu Niên Vận (một lần, cuốn 1) — không trùng với block Hiện tại
-                                const $yNghia = $('#phan8NienVanYNghia');
-                                $yNghia.removeData('has-content').hide().empty();
-                                if (data.y_nghia && data.y_nghia.noi_dung) {
-                                    $yNghia.text(data.y_nghia.noi_dung).data('has-content', true);
-                                }
-
-                                // Helper render một năm (hien_tai hoặc tiep_theo)
-                                function renderNienVanItem(itemData, prefix, labelSuffix) {
-                                    if (!itemData) return;
-                                    const infoEl    = $('#' + prefix + 'Info');
-                                    const sectionEl = $('#' + prefix + 'Section');
-                                    const gtEl      = $('#' + prefix + 'GioiThieu');
-
-                                    infoEl.html(
-                                        '<strong>Niên Vận ' + labelSuffix + ':</strong> Năm ' + (itemData.nam_number || '—') + ' – ' +
-                                        '<strong>Thiên Can:</strong> ' + (itemData.thien_can || '—') +
-                                        ' (' + (itemData.thap_than_thien_can || '—') + ')' +
-                                        ' &nbsp;|&nbsp; ' +
-                                        '<strong>Địa Chi:</strong> ' + (itemData.dia_chi || '—') +
-                                        ' (' + (itemData.thap_than_dia_chi || '—') + ')'
-                                    );
-
-                                    gtEl.hide().empty();
-
-                                    var hasAny = false;
-                                    var truMap = [
-                                        ['nam',   'Thiên Can – Niên Vận – Trụ Năm',   'Địa Chi – Niên Vận – Trụ Năm'],
-                                        ['thang', 'Thiên Can – Niên Vận – Trụ Tháng', 'Địa Chi – Niên Vận – Trụ Tháng'],
-                                        ['ngay',  'Thiên Can – Niên Vận – Trụ Ngày',  'Địa Chi – Niên Vận – Trụ Ngày'],
-                                        ['gio',   'Thiên Can – Niên Vận – Trụ Giờ',   'Địa Chi – Niên Vận – Trụ Giờ'],
-                                    ];
-                                    truMap.forEach(function(t) {
-                                        var key     = t[0];
-                                        var labelTC = t[1];
-                                        var labelDC = t[2];
-                                        var truData = itemData[key];
-                                        var capKey  = key.charAt(0).toUpperCase() + key.slice(1);
-                                        var truSec  = $('#' + prefix + capKey + 'Section');
-                                        var truCont = $('#' + prefix + capKey + 'Content');
-
-                                        truSec.hide();
-                                        truCont.empty();
-                                        if (!truData) return;
-
-                                        var html = '';
-                                        var introText = (truData.gioi_thieu && truData.gioi_thieu.noi_dung) ?
-                                            String(truData.gioi_thieu.noi_dung) : '';
-
-                                        if (introText) {
-                                            html += '<div class="text-sm text-gray-700 whitespace-pre-line bg-gray-50 border border-gray-200 rounded-lg p-3 mb-3">' +
-                                                        $('<div>').text(introText).html() +
-                                                    '</div>';
-                                        }
-
-                                        var tcBlocks = Array.isArray(truData.thien_can) ? truData.thien_can : (truData.thien_can ? [truData.thien_can] : []);
-                                        var dcBlocks = Array.isArray(truData.dia_chi)   ? truData.dia_chi   : (truData.dia_chi   ? [truData.dia_chi]   : []);
-                                        tcBlocks.forEach(function(block) {
-                                            if (block && block.moi_quan_he) html += renderCodingLogicBlock(block, labelTC, false);
-                                        });
-                                        dcBlocks.forEach(function(block) {
-                                            if (block && block.moi_quan_he) html += renderCodingLogicBlock(block, labelDC, true);
-                                        });
-
-                                        if (html) {
-                                            truCont.html(html);
-                                            truSec.show();
-                                            hasAny = true;
-                                        }
-                                    });
-
-                                    if (hasAny) {
-                                        sectionEl.data('has-content', true).show();
-                                    } else {
-                                        sectionEl.removeData('has-content');
+                                if (data) {
+                                    const $yNghia = $('#phan8NienVanYNghia');
+                                    $yNghia.removeData('has-content').hide().empty();
+                                    if (data.y_nghia && data.y_nghia.noi_dung) {
+                                        $yNghia.text(data.y_nghia.noi_dung).data('has-content', true);
                                     }
+                                    renderNienVanItem(data.tiep_theo, 'phan8TiepTheo', 'Tiếp Theo');
                                 }
-
-                                $('#phan8HienTaiSection').removeData('has-content');
-                                $('#phan8TiepTheoSection').removeData('has-content');
-                                $('#phan8HienTaiGioiThieu,#phan8TiepTheoGioiThieu').hide().empty();
-
-                                renderNienVanItem(data.hien_tai,  'phan8HienTai',  'Hiện Tại');
-                                renderNienVanItem(data.tiep_theo, 'phan8TiepTheo', 'Tiếp Theo');
-
-                                refreshPhan8QuyenVisibility();
+                                finishNienVanLoad();
                             }
                         });
                     }
@@ -2943,7 +2944,7 @@
                             url: '/api/phan-8/du-bao-khia-canh',
                             method: 'GET',
                             dataType: 'json',
-                            data: params,
+                            data: Object.assign({}, params, { phan_ban: '8b' }),
                             error: function(xhr, status, err) {
                                 console.error('loadPhan8DuBaoKhiaCanh API error:', status, err);
                             },
@@ -3375,51 +3376,71 @@
                         });
                     }
 
+                    function renderPhan7TamTheBlock(item) {
+                        let html = '<div class="border-l-4 border-indigo-200 pl-4 py-2">';
+                        if (item.noi_dung === '[image]' && item.image) {
+                            html += '<img src="' + escapeHtml(item.image) + '" alt="Biểu đồ ngũ hành bản mệnh" class="max-w-full rounded-lg my-2" />';
+                        } else {
+                            const nd = escapeHtml(item.noi_dung || '');
+                            if (!nd) { return ''; }
+                            html += '<div class="text-gray-700 whitespace-pre-line">' + nd + '</div>';
+                        }
+                        html += '</div>';
+                        return html;
+                    }
+
                     function renderPhan7BaiHoc(data) {
-                        const tamTheEl = $('#phan7TamThe');
-                        const phan27El = $('#phan7Phan27');
-                        tamTheEl.empty();
-                        phan27El.empty();
+                        const muc1El = $('#phan7TamThe');
+                        const muc2El = $('#phan7Phan27');
+                        const muc1CuoiEl = $('#phan7TamTheCuoi');
+                        muc1El.empty();
+                        muc2El.empty();
+                        muc1CuoiEl.empty();
                         if (!data) return;
-                        if (data.tam_the && data.tam_the.length > 0) {
-                            data.tam_the.forEach(function(item) {
-                                const loai = escapeHtml(item.loai || '');
-                                const ten = escapeHtml(item.ten_truong_hop || '');
-                                const nd = escapeHtml(item.noi_dung || '');
-                                let html = '<div class="border-l-4 border-indigo-200 pl-4 py-2">';
-                                if (loai) html += '<div class="font-semibold text-indigo-700 mb-1">' + loai +
-                                    '</div>';
-                                if (ten) html += '<div class="text-sm text-gray-600 mb-1">' + ten + '</div>';
-                                html += '<div class="text-gray-700 whitespace-pre-line">' + nd + '</div></div>';
-                                tamTheEl.append(html);
+
+                        // Mục I – sheet 1: PHẦN 7 - I.xlsx
+                        if (data.muc_1 && data.muc_1.length > 0) {
+                            data.muc_1.forEach(function(item) {
+                                const html = renderPhan7TamTheBlock(item);
+                                if (html) muc1El.append(html);
                             });
                         }
-                        if (data.phan_2_7 && data.phan_2_7.length > 0) {
-                            data.phan_2_7.forEach(function(part) {
-                                const phan = escapeHtml(part.phan || '');
-                                const tq = part.tong_quan && part.tong_quan.noi_dung ? escapeHtml(part.tong_quan
-                                    .noi_dung) : '';
-                                const nt = part.nguyen_tac && part.nguyen_tac.noi_dung ? escapeHtml(part.nguyen_tac
-                                    .noi_dung) : '';
-                                const cases = part.cac_truong_hop || [];
+
+                        // Mục II: nội dung theo % Thập Thần từ PHẦN 7 - II.xlsx
+                        if (data.muc_2 && data.muc_2.length > 0) {
+                            data.muc_2.forEach(function(entry) {
+                                const thapThan = escapeHtml(entry.thap_than || '');
+                                const tenTruongHop = escapeHtml(entry.ten_truong_hop || '');
+                                const entryImage = entry.image || null;
+                                const noiDungList = entry.noi_dung || [];
                                 let html = '<div class="border rounded-lg p-4 bg-gray-50">';
-                                html += '<h4 class="font-semibold text-indigo-700 mb-3">' + phan + '</h4>';
-                                if (tq) html += '<div class="mb-3 text-gray-700 whitespace-pre-line">' + tq +
-                                    '</div>';
-                                if (nt) html += '<div class="mb-3 text-gray-700 whitespace-pre-line">' + nt +
-                                    '</div>';
-                                cases.forEach(function(c) {
-                                    const tt = escapeHtml(c.ten_truong_hop || '');
-                                    const nd = escapeHtml(c.noi_dung || '');
-                                    if (!nd) return;
+                                html += '<h4 class="font-semibold text-indigo-700 mb-1">' + thapThan + '</h4>';
+                                if (tenTruongHop) html += '<div class="text-sm text-gray-600 mb-3 italic">' + tenTruongHop + '</div>';
+                                noiDungList.forEach(function(block) {
+                                    const tieuDe = escapeHtml(block.tieu_de || '');
+                                    const lines = block.lines || [];
+                                    const isBanChat = tieuDe.indexOf('Bản chất') !== -1 || tieuDe.indexOf('a.') === 0;
                                     html += '<div class="mt-3 pl-3 border-l-2 border-indigo-100">';
-                                    if (tt) html += '<div class="font-medium text-gray-800 mb-1">' + tt +
-                                        '</div>';
-                                    html += '<div class="text-gray-700 whitespace-pre-line text-sm">' + nd +
-                                        '</div></div>';
+                                    if (tieuDe) html += '<div class="font-medium text-gray-800 mb-1">' + tieuDe + '</div>';
+                                    lines.forEach(function(line) {
+                                        html += '<div class="text-gray-700 whitespace-pre-line text-sm">' + escapeHtml(line) + '</div>';
+                                    });
+                                    // Hiển thị ảnh minh họa ngay dưới mục "a. Bản chất năng lượng"
+                                    if (isBanChat && entryImage) {
+                                        html += '<img src="' + escapeHtml(entryImage) + '" alt="' + thapThan + '" class="max-w-full rounded-lg mt-3" />';
+                                    }
+                                    html += '</div>';
                                 });
                                 html += '</div>';
-                                phan27El.append(html);
+                                muc2El.append(html);
+                            });
+                        }
+
+                        // Sheet 2 – Đoạn nối: cuối Phần 7 (sau Mục II)
+                        if (data.muc_1_cuoi && data.muc_1_cuoi.length > 0) {
+                            data.muc_1_cuoi.forEach(function(item) {
+                                const html = renderPhan7TamTheBlock(item);
+                                if (html) muc1CuoiEl.append(html);
                             });
                         }
                     }
@@ -3433,7 +3454,7 @@
                             dataType: 'json',
                             data: params,
                             success: function(res) {
-                                if (res && (res.tam_the || res.phan_2_7)) {
+                                if (res && (res.muc_1 || res.muc_2 || res.muc_1_cuoi)) {
                                     renderPhan7BaiHoc(res);
                                     section.show();
                                 }
@@ -4155,6 +4176,7 @@
                         switchQuyenCuon(1);
                         setTimeout(function() {
                             refreshQuyenSectionsVisibility();
+                            refreshPhan8QuyenVisibility();
                         }, 3500);
 
                         // Điền dữ liệu Dương lịch

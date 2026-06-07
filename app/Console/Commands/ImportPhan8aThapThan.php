@@ -40,13 +40,13 @@ class ImportPhan8aThapThan extends Command
     {
         ini_set('memory_limit', '512M');
 
-        $filePath = ImportPath::resolve(
-            $this->argument('file'),
-            'PHẦN 8A - THẬP THẦN (New).xlsx'
-        );
+        $filePath = ImportPath::resolveFirst($this->argument('file'), [
+            'PHẦN 8 - THẬP THẦN (New).xlsx',
+            'PHẦN 8A - THẬP THẦN (New).xlsx',
+        ]);
 
-        if (! file_exists($filePath)) {
-            $this->error("File không tồn tại: {$filePath}");
+        if ($filePath === null || ! is_file($filePath)) {
+            $this->error('File không tồn tại: PHẦN 8 - THẬP THẦN (New).xlsx');
 
             return 1;
         }

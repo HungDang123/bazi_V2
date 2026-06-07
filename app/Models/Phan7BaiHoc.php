@@ -12,11 +12,9 @@ class Phan7BaiHoc extends Model
     protected $table = 'phan7_bai_hoc';
 
     protected $fillable = [
-        'phan',
-        'loai',
         'thap_than',
-        'gioi_tinh',
         'ten_truong_hop',
+        'tieu_de',
         'noi_dung',
         'thu_tu',
     ];
@@ -25,34 +23,30 @@ class Phan7BaiHoc extends Model
         'thu_tu' => 'integer',
     ];
 
-    /** Tên các phần (sheets) theo thứ tự */
-    public const PHAN_ORDER = [
-        'II. XÁC ĐỊNH SỰ NGHIỆP',
-        'III. TÀI CHÍNH',
-        'IV. TÌNH DUYÊN',
-        'V. SỨC KHOẺ',
-        'VI. PHÁT TRIỂN BẢN THÂN',
-        'VII. KẾT NỐI XÃ HỘI',
+    /** Tên các Thập Thần theo thứ tự sheet */
+    public const THAP_THAN_ORDER = [
+        'HUYNH ĐỆ',
+        'TỬ TÔN',
+        'THÊ TÀI',
+        'QUAN QUỶ',
+        'PHỤ MẪU',
     ];
 
-    /**
-     * Lấy toàn bộ theo phần, nhóm theo loại và thập thần.
-     */
-    public static function getByPhan(string $phan): \Illuminate\Database\Eloquent\Collection
+    public static function getByThapThan(string $thapThan): \Illuminate\Database\Eloquent\Collection
     {
-        return static::where('phan', $phan)->orderBy('thu_tu')->orderBy('id')->get();
+        return static::where('thap_than', $thapThan)
+            ->orderBy('thu_tu')
+            ->orderBy('id')
+            ->get();
     }
 
-    /**
-     * Lấy tất cả theo thứ tự phần.
-     */
-    public static function getAllGroupedByPhan(): array
+    public static function getAllGroupedByThapThan(): array
     {
-        $all = static::orderBy('phan')->orderBy('thu_tu')->orderBy('id')->get();
+        $all = static::orderBy('thap_than')->orderBy('thu_tu')->orderBy('id')->get();
 
         $grouped = [];
         foreach ($all as $row) {
-            $grouped[$row->phan][] = $row->toArray();
+            $grouped[$row->thap_than][] = $row->toArray();
         }
         return $grouped;
     }

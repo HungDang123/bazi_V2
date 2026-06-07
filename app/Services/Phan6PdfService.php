@@ -27,6 +27,7 @@ class Phan6PdfService
             return null;
         }
 
+        $data = Phan6ContentService::stripImagesFromApiData($data);
         $blocks = Phan6ContentService::buildAllBlocks($data);
         if ($blocks === []) {
             return null;

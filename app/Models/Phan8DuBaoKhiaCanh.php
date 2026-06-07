@@ -12,6 +12,7 @@ class Phan8DuBaoKhiaCanh extends Model
     protected $table = 'phan8_du_bao_khia_canh';
 
     protected $fillable = [
+        'phan_ban',
         'khia_canh',
         'gioi_tinh',
         'dieu_kien',

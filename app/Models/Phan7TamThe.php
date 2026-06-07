@@ -12,22 +12,22 @@ class Phan7TamThe extends Model
     protected $table = 'phan7_tam_the';
 
     protected $fillable = [
-        'loai',
-        'thap_than',
-        'ten_truong_hop',
+        'sheet_index',
         'noi_dung',
+        'image',
         'thu_tu',
     ];
 
     protected $casts = [
+        'sheet_index' => 'integer',
         'thu_tu' => 'integer',
     ];
 
-    /**
-     * Lấy toàn bộ nội dung sheet 1 (I. XÁC ĐỊNH TÂM THẾ) theo thứ tự.
-     */
-    public static function getAllOrdered(): \Illuminate\Database\Eloquent\Collection
+    public static function getAllOrdered(int $sheetIndex = 0): \Illuminate\Database\Eloquent\Collection
     {
-        return static::orderBy('thu_tu')->orderBy('id')->get();
+        return static::where('sheet_index', $sheetIndex)
+            ->orderBy('thu_tu')
+            ->orderBy('id')
+            ->get();
     }
 }

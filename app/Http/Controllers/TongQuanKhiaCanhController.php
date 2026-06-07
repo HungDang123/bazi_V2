@@ -574,58 +574,7 @@ class TongQuanKhiaCanhController extends Controller
             return response()->json(['data' => null], 422);
         }
 
-        return response()->json(['data' => $this->stripPhan6ImagesForWeb($data)]);
-    }
-
-    /**
-     * Bỏ ảnh khỏi payload Phần 6 cho web/API (PDF vẫn dùng buildPhan6ApiData đầy đủ).
-     *
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    private function stripPhan6ImagesForWeb(array $data): array
-    {
-        unset($data['image_map']);
-
-        if (isset($data['y_nghia_tu_tru']) && is_array($data['y_nghia_tu_tru'])) {
-            $data['y_nghia_tu_tru'] = array_map(function ($item): array {
-                if (! is_array($item)) {
-                    return [];
-                }
-                unset($item['image']);
-                if (isset($item['content'])) {
-                    $item['content'] = \App\Services\DocxTextService::stripImageMarkers((string) $item['content']);
-                }
-
-                return $item;
-            }, $data['y_nghia_tu_tru']);
-        }
-
-        if (isset($data['transition_phan8']) && is_array($data['transition_phan8'])) {
-            unset($data['transition_phan8']['image']);
-            if (isset($data['transition_phan8']['content'])) {
-                $data['transition_phan8']['content'] = \App\Services\DocxTextService::stripImageMarkers(
-                    (string) $data['transition_phan8']['content']
-                );
-            }
-        }
-
-        if (isset($data['dong_chay']) && is_array($data['dong_chay'])) {
-            foreach (['nam_thang', 'thang_ngay', 'ngay_gio'] as $sectionKey) {
-                if (! isset($data['dong_chay'][$sectionKey]['gioi_thieu'])
-                    || ! is_array($data['dong_chay'][$sectionKey]['gioi_thieu'])) {
-                    continue;
-                }
-                unset($data['dong_chay'][$sectionKey]['gioi_thieu']['image']);
-                $noiDung = $data['dong_chay'][$sectionKey]['gioi_thieu']['noi_dung'] ?? null;
-                if (is_string($noiDung)) {
-                    $data['dong_chay'][$sectionKey]['gioi_thieu']['noi_dung'] =
-                        \App\Services\DocxTextService::stripImageMarkers($noiDung);
-                }
-            }
-        }
-
-        return $data;
+        return response()->json(['data' => \App\Services\Phan6ContentService::stripImagesFromApiData($data)]);
     }
 
     /**
@@ -808,7 +757,8 @@ class TongQuanKhiaCanhController extends Controller
 
     /**
      * API riêng PHẦN 7: Bài học cuộc sống.
-     * Phần 1 (Tâm thế) luôn trả đủ. Phần 2–7 chỉ trả "Các trường hợp" theo % Thập Thần (natal).
+     * Mục I: trả toàn bộ nội dung từ phan7_tam_the (PHẦN 7 - I.xlsx).
+     * Mục II: lọc nội dung phan7_bai_hoc theo % Thập Thần (natal) của từng người.
      */
     public function baiHocCuocSong(Request $req): JsonResponse
     {
@@ -837,7 +787,7 @@ class TongQuanKhiaCanhController extends Controller
         $minute = isset($validated['minute']) && $validated['minute'] !== null ? (int) $validated['minute'] : null;
         $g = (string) $validated['g'];
 
-        $result = $this->bazi->calc($fullName, $y, $m, $d, $h, $minute, $g, needStrength: false);
+        $result = $this->bazi->calc($fullName, $y, $m, $d, $h, $minute, $g, needStrength: true);
         $bieuDoNguHanh = $result['bieu_do_ngu_hanh'] ?? [];
         $diemLucThanAgg = [];
         $rowsNguHanh = is_array($bieuDoNguHanh) ? $bieuDoNguHanh : [];
@@ -859,94 +809,85 @@ class TongQuanKhiaCanhController extends Controller
             $diemLucThan[$lucThan] = (int) round(($agg['sum'] ?? 0) / $count);
         }
 
-        $tamThe = Phan7TamThe::getAllOrdered()->map(fn ($r) => [
-            'loai' => $r->loai,
-            'thap_than' => $r->thap_than,
-            'ten_truong_hop' => $r->ten_truong_hop,
+        $mapTamTheRow = static fn ($r) => [
+            'thu_tu'   => $r->thu_tu,
             'noi_dung' => $r->noi_dung,
-        ])->all();
+            'image'    => $r->image ? asset($r->image) : null,
+        ];
 
-        $phan27 = [];
-        foreach (Phan7BaiHoc::PHAN_ORDER as $phan) {
-            $rows = Phan7BaiHoc::getByPhan($phan);
-            $tongQuan = null;
-            $nguyenTac = null;
-            // Để mỗi Thập Thần (và giới tính, nếu cần) chỉ lấy 1 trường hợp – ưu tiên bucket cao hơn
-            $cacTruongHopByKey = [];
+        // ── Mục I: sheet 1 của PHẦN 7 - I.xlsx ──
+        $muc1 = Phan7TamThe::getAllOrdered(0)->map($mapTamTheRow)->all();
 
+        // ── Đoạn nối (sheet 2): hiển thị cuối Phần 7, sau Mục II ──
+        $muc1Cuoi = Phan7TamThe::getAllOrdered(1)->map($mapTamTheRow)->all();
+
+        // ── Mục II: lọc phan7_bai_hoc theo % Thập Thần ──
+        $mapThapThanToLucThan = [
+            'HUYNH ĐỆ' => 'Huynh Đệ',
+            'TỬ TÔN'   => 'Tử Tôn',
+            'QUAN QUỶ' => 'Quan Quỷ',
+            'THÊ TÀI'  => 'Thê Tài',
+            'PHỤ MẪU'  => 'Phụ Mẫu',
+        ];
+
+        // Ảnh minh họa cho từng Thập Thần (hiện dưới mục a. Bản chất năng lượng)
+        $mapThapThanToImage = [
+            'HUYNH ĐỆ' => asset('images/phan-7/huynh-de.png'),
+            'TỬ TÔN'   => asset('images/phan-7/tu-ton.png'),
+            'QUAN QUỶ' => asset('images/phan-7/quan-quy.png'),
+            'THÊ TÀI'  => asset('images/phan-7/the-tai.png'),
+            'PHỤ MẪU'  => asset('images/phan-7/phu-mau.png'),
+        ];
+
+        $muc2 = [];
+        foreach (Phan7BaiHoc::THAP_THAN_ORDER as $thapThan) {
+            $lucThanKey = $mapThapThanToLucThan[$thapThan] ?? null;
+            $diem = $lucThanKey !== null ? ($diemLucThan[$lucThanKey] ?? 0) : 0;
+
+            $rows = Phan7BaiHoc::getByThapThan($thapThan);
+
+            // Tìm ten_truong_hop khớp với bucket % của người dùng
+            $matchedTruongHop = null;
             foreach ($rows as $r) {
-                if ($r->loai === 'Tổng Quan') {
-                    $tongQuan = ['noi_dung' => $r->noi_dung];
-                } elseif ($r->loai === 'Nguyên tắc cốt lõi') {
-                    $nguyenTac = ['noi_dung' => $r->noi_dung];
-                } elseif ($r->loai === 'Các trường hợp' || $r->loai === 'Cách trường hợp') {
-                    $bucket = $this->parseBucketFromTenTruongHop($r->ten_truong_hop ?? '');
-                    if ($bucket === null) {
-                        continue;
-                    }
-                    $thapThan = trim((string) ($r->thap_than ?? ''));
-                    $mapThapThanToLucThan = [
-                        'HUYNH ĐỆ' => 'Huynh Đệ',
-                        'TỬ TÔN' => 'Tử Tôn',
-                        'QUAN QUỶ' => 'Quan Quỷ',
-                        'THÊ TÀI' => 'Thê Tài',
-                        'PHỤ MẪU' => 'Phụ Mẫu',
-                    ];
-                    $lucThanKey = $mapThapThanToLucThan[$thapThan] ?? null;
-                    if ($lucThanKey === null) {
-                        continue;
-                    }
-                    $diem = $diemLucThan[$lucThanKey] ?? 0;
-                    if ($diem < $bucket['min'] || $diem > $bucket['max']) {
-                        continue;
-                    }
-
-                    $gioiTinhRecord = $r->gioi_tinh ? trim((string) $r->gioi_tinh) : null;
-                    if ($phan === 'IV. TÌNH DUYÊN') {
-                        $gioiTinhUser = $g === 'male' ? 'NAM' : 'NỮ';
-                        if ($gioiTinhRecord !== null && $gioiTinhRecord !== '' && $gioiTinhRecord !== $gioiTinhUser) {
-                            continue;
-                        }
-                    }
-                    // Key: theo Thập Thần + (giới tính nếu là phần Tình duyên)
-                    $key = $thapThan . '|' . ($phan === 'IV. TÌNH DUYÊN' ? ($gioiTinhRecord ?: 'ALL') : 'ALL');
-                    $currentMax = $cacTruongHopByKey[$key]['bucket_max'] ?? null;
-                    // Ưu tiên bucket có max lớn hơn (điều kiện cao hơn)
-                    if ($currentMax === null || $bucket['max'] > $currentMax) {
-                        $cacTruongHopByKey[$key] = [
-                            'bucket_max' => $bucket['max'],
-                            'item' => [
-                                'thap_than' => $r->thap_than,
-                                'ten_truong_hop' => $r->ten_truong_hop,
-                                'noi_dung' => $r->noi_dung,
-                            ],
-                        ];
-                    }
+                $bucket = $this->parseBucketFromTenTruongHop($r->ten_truong_hop ?? '');
+                if ($bucket !== null && $diem >= $bucket['min'] && $diem <= $bucket['max']) {
+                    $matchedTruongHop = $r->ten_truong_hop;
+                    break;
                 }
             }
-            $cacTruongHop = array_values(array_map(
-                static fn (array $v): array => $v['item'],
-                $cacTruongHopByKey
-            ));
-            if ($tongQuan === null) {
-                $first = $rows->firstWhere('loai', 'Tổng Quan');
-                $tongQuan = $first ? ['noi_dung' => $first->noi_dung] : ['noi_dung' => ''];
+
+            if ($matchedTruongHop === null) {
+                continue;
             }
-            if ($nguyenTac === null) {
-                $first = $rows->firstWhere('loai', 'Nguyên tắc cốt lõi');
-                $nguyenTac = $first ? ['noi_dung' => $first->noi_dung] : ['noi_dung' => ''];
+
+            // Lấy tất cả dòng thuộc trường hợp khớp, group theo tieu_de
+            $matchedRows = $rows->filter(fn ($r) => $r->ten_truong_hop === $matchedTruongHop);
+            $grouped = [];
+            foreach ($matchedRows as $r) {
+                $tieuDe = $r->tieu_de ?? '';
+                $grouped[$tieuDe][] = $r->noi_dung;
             }
-            $phan27[] = [
-                'phan' => $phan,
-                'tong_quan' => $tongQuan,
-                'nguyen_tac' => $nguyenTac,
-                'cac_truong_hop' => $cacTruongHop,
+
+            $noiDungList = [];
+            foreach ($grouped as $tieuDe => $lines) {
+                $noiDungList[] = [
+                    'tieu_de' => $tieuDe,
+                    'lines'   => $lines,
+                ];
+            }
+
+            $muc2[] = [
+                'thap_than'      => $thapThan,
+                'ten_truong_hop' => $matchedTruongHop,
+                'image'          => $mapThapThanToImage[$thapThan] ?? null,
+                'noi_dung'       => $noiDungList,
             ];
         }
 
         return response()->json([
-            'tam_the' => $tamThe,
-            'phan_2_7' => $phan27,
+            'muc_1'      => $muc1,
+            'muc_2'      => $muc2,
+            'muc_1_cuoi' => $muc1Cuoi,
         ]);
     }
 
@@ -1119,6 +1060,7 @@ class TongQuanKhiaCanhController extends Controller
     public function nienVan(Request $req): JsonResponse
     {
         $unknowBirthtime = $req->input('uknow_birthdate') == 1;
+        $phanBan = $req->input('phan_ban') === '8b' ? '8b' : '8a';
         $rules = [
             'full_name'       => 'nullable|string|max:255',
             'y'               => 'required|numeric|min:1940|max:2031',
@@ -1126,6 +1068,7 @@ class TongQuanKhiaCanhController extends Controller
             'd'               => 'required|numeric|min:1|max:31',
             'g'               => 'required|string|in:male,female',
             'uknow_birthdate' => 'nullable|in:0,1',
+            'phan_ban'        => 'nullable|string|in:8a,8b',
         ];
         if (! $unknowBirthtime) {
             $rules['h']      = 'required|numeric|min:0|max:23';
@@ -1187,13 +1130,20 @@ class TongQuanKhiaCanhController extends Controller
         }
 
         // --- Lấy nội dung giới thiệu ---
-        $gioiThieuAll = DongChayGioiThieu::whereIn('tru_loai', [
-            'nien_van_y_nghia',
-            'nien_van_hien_tai', 'nien_van_hien_tai_tru_nam', 'nien_van_hien_tai_tru_thang',
-            'nien_van_hien_tai_tru_ngay', 'nien_van_hien_tai_tru_gio',
-            'nien_van_tiep_theo', 'nien_van_tiep_theo_tru_nam', 'nien_van_tiep_theo_tru_thang',
-            'nien_van_tiep_theo_tru_ngay', 'nien_van_tiep_theo_tru_gio',
-        ])->get()->keyBy('tru_loai');
+        $gioiThieuKeys = $phanBan === '8b'
+            ? [
+                'nien_van_8b_y_nghia',
+                'nien_van_8b_tiep_theo_tru_nam', 'nien_van_8b_tiep_theo_tru_thang',
+                'nien_van_8b_tiep_theo_tru_ngay', 'nien_van_8b_tiep_theo_tru_gio',
+            ]
+            : [
+                'nien_van_y_nghia',
+                'nien_van_hien_tai', 'nien_van_hien_tai_tru_nam', 'nien_van_hien_tai_tru_thang',
+                'nien_van_hien_tai_tru_ngay', 'nien_van_hien_tai_tru_gio',
+                'nien_van_tiep_theo', 'nien_van_tiep_theo_tru_nam', 'nien_van_tiep_theo_tru_thang',
+                'nien_van_tiep_theo_tru_ngay', 'nien_van_tiep_theo_tru_gio',
+            ];
+        $gioiThieuAll = DongChayGioiThieu::whereIn('tru_loai', $gioiThieuKeys)->get()->keyBy('tru_loai');
 
         $getGt = static function (string $key) use ($gioiThieuAll): ?array {
             $row = $gioiThieuAll->get($key);
@@ -1312,6 +1262,27 @@ class TongQuanKhiaCanhController extends Controller
                 'gio'   => $buildTru($thienCanGio,   $thapThanGio,   $diaChiGio,   $canTangGio,   'Trụ Giờ',   $gioiThieuPrefix . '_tru_gio'),
             ];
         };
+
+        if ($phanBan === '8b') {
+            $yNghia = $getGt('nien_van_8b_y_nghia');
+            if ($yNghia !== null && $nvTiepTheo !== null) {
+                $nd = $replaceNvPlaceholders(
+                    $yNghia['noi_dung'],
+                    (int) ($nvTiepTheo['nam'] ?? 0)
+                );
+                $yNghia['noi_dung'] = $this->renumberPhan8DisplayLabels($nd);
+            }
+
+            return response()->json([
+                'data' => [
+                    'y_nghia'   => $yNghia,
+                    'hien_tai'  => null,
+                    'tiep_theo' => Phan8TruSectionService::normalizeNienVanItem(
+                        $buildNienVanItem($nvTiepTheo, 'nien_van_8b_tiep_theo')
+                    ),
+                ],
+            ]);
+        }
 
         $yNghia = $getGt('nien_van_y_nghia');
         if ($yNghia !== null && $nvHienTai !== null) {
@@ -1441,6 +1412,7 @@ class TongQuanKhiaCanhController extends Controller
     public function duBaoKhiaCanh(Request $req): JsonResponse
     {
         $unknowBirthtime = $req->input('uknow_birthdate') == 1;
+        $phanBan = $req->input('phan_ban') === '8b' ? '8b' : '8a';
         $rules = [
             'full_name'       => 'nullable|string|max:255',
             'y'               => 'required|numeric|min:1940|max:2031',
@@ -1448,6 +1420,7 @@ class TongQuanKhiaCanhController extends Controller
             'd'               => 'required|numeric|min:1|max:31',
             'g'               => 'required|string|in:male,female',
             'uknow_birthdate' => 'nullable|in:0,1',
+            'phan_ban'        => 'nullable|string|in:8a,8b',
         ];
         if (! $unknowBirthtime) {
             $rules['h']      = 'required|numeric|min:0|max:23';
@@ -1466,13 +1439,16 @@ class TongQuanKhiaCanhController extends Controller
         $minute    = isset($validated['minute']) && $validated['minute'] !== null ? (int) $validated['minute'] : null;
         $g         = (string) $validated['g'];
 
-        $result = $this->bazi->calc($fullName, $y, $m, $d, $h, $minute, $g, needStrength: false);
+        $yDetail = $phanBan === '8b' ? ((int) date('Y') + 1) : null;
+        $needStrength = $phanBan === '8b';
+        $result = $this->bazi->calc($fullName, $y, $m, $d, $h, $minute, $g, $yDetail, $needStrength);
         if (empty($result) || empty($result['bieu_do_ngu_hanh'] ?? null)) {
             return response()->json(['data' => ['items' => []]]);
         }
 
         $lucThanScores = $this->buildLucThanNienVanScores((array) ($result['bieu_do_ngu_hanh'] ?? []));
         $records = Phan8DuBaoKhiaCanh::query()
+            ->where('phan_ban', $phanBan)
             ->orderBy('khia_canh')
             ->orderBy('thu_tu')
             ->get();
@@ -2000,26 +1976,37 @@ class TongQuanKhiaCanhController extends Controller
 
     /**
      * Parse khoảng % từ ten_truong_hop. Trả về ['min' => int, 'max' => int] hoặc null.
+     * Hỗ trợ cả format cũ và format mới ("từ 30% đến dưới 60%", "từ dưới 30%", "từ trên 80%").
      */
     protected function parseBucketFromTenTruongHop(string $tenTruongHop): ?array
     {
         $t = $tenTruongHop;
+
+        // 0%: "bị khuyết 0%"
         if (mb_strpos($t, 'bị khuyết') !== false && mb_strpos($t, '0%') !== false) {
             return ['min' => 0, 'max' => 0];
         }
-        if (mb_strpos($t, 'dưới 30%') !== false) {
-            return ['min' => 1, 'max' => 29];
-        }
-        if (mb_strpos($t, 'từ 30% đến 60%') !== false) {
-            // 60% sẽ ưu tiên nhóm 60–80%, nên nhóm này chỉ tới 59%
-            return ['min' => 30, 'max' => 59];
-        }
-        if (mb_strpos($t, 'từ 60% đến 80%') !== false) {
-            return ['min' => 60, 'max' => 80];
-        }
+
+        // trên 80%: kiểm tra trước để tránh nhầm với "dưới 80%"
         if (mb_strpos($t, 'trên 80%') !== false) {
             return ['min' => 81, 'max' => 100];
         }
+
+        // 60–80%: "từ 60% đến dưới 80%" hoặc "từ 60% đến 80%"
+        if (mb_strpos($t, '60%') !== false && mb_strpos($t, '80%') !== false) {
+            return ['min' => 60, 'max' => 80];
+        }
+
+        // 30–60%: "từ 30% đến dưới 60%" hoặc "từ 30% đến 60%"
+        if (mb_strpos($t, '30%') !== false && (mb_strpos($t, '60%') !== false || mb_strpos($t, 'dưới 60') !== false)) {
+            return ['min' => 30, 'max' => 59];
+        }
+
+        // dưới 30%: "từ dưới 30%" hoặc "dưới 30%"
+        if (mb_strpos($t, 'dưới 30%') !== false || mb_strpos($t, '30%') !== false) {
+            return ['min' => 1, 'max' => 29];
+        }
+
         return null;
     }
 

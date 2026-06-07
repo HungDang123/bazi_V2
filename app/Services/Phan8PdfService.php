@@ -15,23 +15,39 @@ class Phan8PdfService
     /**
      * @return array<int, array{view: string, data: array<string, mixed>}>
      */
-    public static function buildPdfPages(Request $req): array
+    public static function buildPdfPages(Request $req, string $phanBan = '8a'): array
     {
         $controller = app(TongQuanKhiaCanhController::class);
+        $phanBan = $phanBan === '8b' ? '8b' : '8a';
 
-        $daiVanRes = $controller->daiVan($req);
-        $daiVan = $daiVanRes->getData(true)['data'] ?? null;
+        $daiVan = null;
+        $nienVan = null;
+        $nhungNam = null;
+        $duBao = null;
 
-        $nienVanRes = $controller->nienVan($req);
-        $nienVan = $nienVanRes->getData(true)['data'] ?? null;
+        if ($phanBan === '8a') {
+            $daiVanRes = $controller->daiVan($req);
+            $daiVan = $daiVanRes->getData(true)['data'] ?? null;
 
-        if (! is_array($daiVan) && ! is_array($nienVan)) {
-            return [];
+            $nhungNamRes = $controller->nhungNamCanChuY($req);
+            $nhungNam = $nhungNamRes->getData(true)['data'] ?? null;
+        } else {
+            $req8b = $req->duplicate();
+            $req8b->merge(['phan_ban' => '8b']);
+
+            $nienVanRes = $controller->nienVan($req8b);
+            $nienVan = $nienVanRes->getData(true)['data'] ?? null;
+
+            $duBaoRes = $controller->duBaoKhiaCanh($req8b);
+            $duBao = $duBaoRes->getData(true)['data'] ?? null;
         }
 
         $pageSpecs = Phan8ContentService::buildAllPageSpecs(
             is_array($daiVan) ? $daiVan : null,
-            is_array($nienVan) ? $nienVan : null
+            is_array($nienVan) ? $nienVan : null,
+            $phanBan,
+            is_array($nhungNam) ? $nhungNam : null,
+            is_array($duBao) ? $duBao : null
         );
 
         if ($pageSpecs === []) {
@@ -41,14 +57,17 @@ class Phan8PdfService
         $pdfPages = [];
         $bufType = null;
         $bufBlocks = [];
+        $ivTableBuf = [];
 
         foreach ($pageSpecs as $spec) {
             $type = $spec['type'] ?? 'content';
 
             if ($type === 'nien_van_cover') {
                 self::appendTextPages($pdfPages, $bufType, $bufBlocks);
+                self::flushIvTables($pdfPages, $ivTableBuf);
                 $bufType = null;
                 $bufBlocks = [];
+                $ivTableBuf = [];
 
                 $pdfPages[] = [
                     'view' => 'pdfs.phan-8.la-so-phan-8-nien-van-cover',
@@ -64,8 +83,10 @@ class Phan8PdfService
 
             if ($type === 'coding') {
                 self::appendTextPages($pdfPages, $bufType, $bufBlocks);
+                self::flushIvTables($pdfPages, $ivTableBuf);
                 $bufType = null;
                 $bufBlocks = [];
+                $ivTableBuf = [];
 
                 $codingPages = Phan8CodingPaginator::paginate($spec['data'] ?? []);
                 if ($codingPages === []) {
@@ -76,6 +97,19 @@ class Phan8PdfService
                     'view' => 'pdfs.phan-8.la-so-phan-8-coding',
                     'data' => ['pages' => $codingPages],
                 ];
+
+                continue;
+            }
+
+            if ($type === 'iv_table') {
+                self::appendTextPages($pdfPages, $bufType, $bufBlocks);
+                $bufType = null;
+                $bufBlocks = [];
+
+                $tableData = $spec['data'] ?? null;
+                if (is_array($tableData) && ($tableData['years'] ?? []) !== []) {
+                    $ivTableBuf[] = $tableData;
+                }
 
                 continue;
             }
@@ -97,8 +131,35 @@ class Phan8PdfService
         }
 
         self::appendTextPages($pdfPages, $bufType, $bufBlocks);
+        self::flushIvTables($pdfPages, $ivTableBuf);
 
         return $pdfPages;
+    }
+
+    /** Max iv_table rows per PDF page (each table ~50–55 mm tall on A4). */
+    private const IV_TABLES_PER_PAGE = 4;
+
+    /**
+     * Batch accumulated iv_table data into pages (multiple tables per page).
+     *
+     * @param  array<int, array{view: string, data: array<string, mixed>}>  $pdfPages
+     * @param  array<int, array<string, mixed>>  $ivTableBuf
+     */
+    private static function flushIvTables(array &$pdfPages, array $ivTableBuf): void
+    {
+        if ($ivTableBuf === []) {
+            return;
+        }
+
+        foreach (array_chunk($ivTableBuf, self::IV_TABLES_PER_PAGE) as $group) {
+            $pdfPages[] = [
+                'view' => 'pdfs.phan-8.la-so-phan-8-iv-table',
+                'data' => [
+                    'bgPath' => Phan8AssetService::contentBgPath(),
+                    'tables' => $group,
+                ],
+            ];
+        }
     }
 
     /**
