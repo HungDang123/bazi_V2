@@ -177,7 +177,7 @@ class PdfFooterService
             mkdir($cacheDir, 0755, true);
         }
 
-        $cacheKey = hash('sha256', 'badge-v2|'.$displayPage.'|'.self::RENDER_BANNER_PX);
+        $cacheKey = hash('sha256', 'badge-v3|'.$displayPage.'|'.self::RENDER_BANNER_PX);
         $cachePath = $cacheDir.'/'.$cacheKey.'.png';
         if (file_exists($cachePath)) {
             return $cachePath;
@@ -239,7 +239,7 @@ class PdfFooterService
             mkdir($cacheDir, 0755, true);
         }
 
-        $cacheKey = hash('sha256', 'name-imagick-v1|'.$displayName.'|'.self::NAME_FONT_PX);
+        $cacheKey = hash('sha256', 'name-imagick-v2|'.$displayName.'|'.self::NAME_FONT_PX);
         $cachePath = $cacheDir.'/'.$cacheKey.'.png';
         if (file_exists($cachePath)) {
             return $cachePath;
@@ -444,7 +444,7 @@ class PdfFooterService
 
         $svg = self::svgBadgePath();
         if (file_exists($svg) && class_exists(\Imagick::class)) {
-            $cacheKey = 'svg-transparent-v1-'.self::RENDER_BANNER_PX.'-'.filemtime($svg);
+            $cacheKey = 'svg-transparent-v2-'.self::RENDER_BANNER_PX.'-'.filemtime($svg);
             $cachePath = $cacheDir.'/'.$cacheKey.'.png';
             if (file_exists($cachePath)) {
                 return $cachePath;
