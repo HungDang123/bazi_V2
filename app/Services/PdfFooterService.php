@@ -138,7 +138,9 @@ class PdfFooterService
 
         $displayName = trim($fullName) !== '' ? mb_strtoupper(trim($fullName), 'UTF-8') : '';
 
-        $namePath = $displayName !== '' ? self::renderNameStrip($displayName) : null;
+        // Trang đầu tiên có footer (displayPage=1) thường nền tối → chữ trắng
+        $whiteText = ($displayPage === self::FIRST_DISPLAY_PAGE_NUMBER);
+        $namePath  = $displayName !== '' ? self::renderNameStrip($displayName, $whiteText) : null;
         $nameWmm  = 0.0;
         $nameHmm  = 0.0;
         if ($namePath !== null && file_exists($namePath)) {
@@ -220,10 +222,11 @@ class PdfFooterService
     }
 
     /**
-     * Tên HOA → transparent PNG dùng Imagick (hỗ trợ UTF-8/Vietnamese, không có nền thừa).
-     * Scale cao như badge (RENDER_BANNER_PX / BANNER_WIDTH_MM px/mm) để sắc khi in.
+     * Tên HOA → PNG dùng Imagick.
+     * $whiteText=true  → chữ trắng, nền trong suốt (trang nền tối).
+     * $whiteText=false → chữ đen, nền cream opaque (trang nền sáng).
      */
-    private static function renderNameStrip(string $displayName): ?string
+    private static function renderNameStrip(string $displayName, bool $whiteText = false): ?string
     {
         if (! class_exists(\Imagick::class) || ! class_exists(\ImagickDraw::class)) {
             return self::renderNameStripGd($displayName);
@@ -239,7 +242,8 @@ class PdfFooterService
             mkdir($cacheDir, 0755, true);
         }
 
-        $cacheKey = hash('sha256', 'name-imagick-v2|'.$displayName.'|'.self::NAME_FONT_PX);
+        $variant  = $whiteText ? 'white' : 'dark';
+        $cacheKey = hash('sha256', 'name-imagick-v4|'.$variant.'|'.$displayName.'|'.self::NAME_FONT_PX);
         $cachePath = $cacheDir.'/'.$cacheKey.'.png';
         if (file_exists($cachePath)) {
             return $cachePath;
@@ -249,19 +253,20 @@ class PdfFooterService
             $draw = new \ImagickDraw();
             $draw->setFont($font);
             $draw->setFontSize(self::NAME_FONT_PX);
-            $draw->setFillColor(new \ImagickPixel('rgba(10,10,10,1)'));
+            $draw->setFillColor(new \ImagickPixel($whiteText ? 'rgb(255,255,255)' : 'rgb(10,10,10)'));
             $draw->setTextAntialias(true);
 
-            $metrics = (new \Imagick())->queryFontMetrics($draw, $displayName, false);
-            $textW   = (int) ceil($metrics['textWidth'] ?? (strlen($displayName) * self::NAME_FONT_PX * 0.6));
-            $textH   = (int) ceil(($metrics['ascender'] ?? self::NAME_FONT_PX) + abs($metrics['descender'] ?? 0));
-            $padX    = 8;
-            $padY    = 6;
-            $canvasW = $textW + $padX * 2;
-            $canvasH = $textH + $padY * 2;
+            $probe   = new \Imagick();
+            $metrics = $probe->queryFontMetrics($draw, $displayName, false);
+            $probe->destroy();
+            $textW = (int) ceil($metrics['textWidth'] ?? (strlen($displayName) * self::NAME_FONT_PX * 0.6));
+            $textH = (int) ceil(($metrics['ascender'] ?? self::NAME_FONT_PX) + abs($metrics['descender'] ?? 0));
+            $padX  = 16;
+            $padY  = 10;
 
             $img = new \Imagick();
-            $img->newImage($canvasW, $canvasH, new \ImagickPixel('none'));
+            // Cả hai variant đều dùng transparent PNG32 (giống badge SVG — FPDF xử lý đúng)
+            $img->newImage($textW + $padX * 2, $textH + $padY * 2, new \ImagickPixel('none'));
             $img->setImageFormat('png32');
             $img->setImageAlphaChannel(\Imagick::ALPHACHANNEL_SET);
 

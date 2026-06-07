@@ -185,15 +185,23 @@ class PdfExportController extends Controller
         $pdfsToMerge[] = $page14Path;
         $tempFiles[]     = $page14Path;
 
-        // ── Trang 15: blade la-so-dai-van (Đại Vận + Niên Vận) ───────────────
+        // ── Trang 15: blade la-so-dai-van (Đại Vận) ─────────────────────────
         $page15Path = $tempDir . '/q1p15-' . $uid . '.pdf';
         PdfRenderService::saveView('pdfs.quyen-2.la-so-dai-van', [
             'templatePath' => $q2Dir . '/page-13-bg.png',
             'bangDaiVan'   => $bangDaiVan,
-            'nienVan'      => $nienVan,
         ], $page15Path);
         $pdfsToMerge[] = $page15Path;
         $tempFiles[]     = $page15Path;
+
+        // ── Trang 15b: blade la-so-nien-van (Niên Vận) ───────────────────────
+        $page15bPath = $tempDir . '/q1p15b-' . $uid . '.pdf';
+        PdfRenderService::saveView('pdfs.quyen-2.la-so-nien-van', [
+            'templatePath' => $q2Dir . '/page-13-bg.png',
+            'nienVan'      => $nienVan,
+        ], $page15bPath);
+        $pdfsToMerge[] = $page15bPath;
+        $tempFiles[]     = $page15bPath;
 
         // ── Trang 16: blade la-so-chat-luong (Radar ngũ hành + Thập Thần) ────
         $page16Path   = $tempDir . '/q1p16-' . $uid . '.pdf';
@@ -649,15 +657,23 @@ class PdfExportController extends Controller
         $pdfsToMerge[] = $page12Path;
         $tempFiles[]     = $page12Path;
 
-        // ── Trang 13: la-so-dai-van (Đại Vận + Niên Vận) ────────────────────
+        // ── Trang 13: la-so-dai-van (Đại Vận) ───────────────────────────────
         $page13Path = $tempDir . '/p13-' . $uid . '.pdf';
         PdfRenderService::saveView('pdfs.quyen-2.la-so-dai-van', [
             'templatePath' => $pdfDir . '/page-13-bg.png',
             'bangDaiVan'   => $bangDaiVan,
-            'nienVan'      => $nienVan,
         ], $page13Path);
         $pdfsToMerge[] = $page13Path;
         $tempFiles[]     = $page13Path;
+
+        // ── Trang 13b: la-so-nien-van (Niên Vận) ────────────────────────────
+        $page13bPath = $tempDir . '/p13b-' . $uid . '.pdf';
+        PdfRenderService::saveView('pdfs.quyen-2.la-so-nien-van', [
+            'templatePath' => $pdfDir . '/page-13-bg.png',
+            'nienVan'      => $nienVan,
+        ], $page13bPath);
+        $pdfsToMerge[] = $page13bPath;
+        $tempFiles[]     = $page13bPath;
 
         // ── Trang 14: la-so-chat-luong ───────────────────────────────────────
         $page14Path   = $tempDir . '/p14-' . $uid . '.pdf';
