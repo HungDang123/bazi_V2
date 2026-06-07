@@ -14,11 +14,11 @@ class PdfFooterService
     /** ~20px/mm để badge sắc khi in PDF */
     private const RENDER_BANNER_PX = 660;
 
-    private const PAGE_NUMBER_FONT_PT = 13;
+    private const PAGE_NUMBER_FONT_PX = 72;
 
-    private const NAME_FONT_PX = 16;
+    private const NAME_FONT_PX = 48;
 
-    private const NAME_RENDER_SCALE = 3;
+    private const NAME_GAP_PX = 14;
 
     public const FIRST_FOOTER_PAGE = 3;
 
@@ -102,7 +102,8 @@ class PdfFooterService
     }
 
     /**
-     * Vẽ footer trực tiếp bằng FPDF (tránh PNG alpha — FPDF không hỗ trợ trong suốt).
+     * Dán một ảnh footer hoàn chỉnh (badge + số trang + tên đã bake bằng GD).
+     * FPDF không vẽ chữ đè lên ảnh ổn định — gộp hết vào một PNG opaque.
      */
     private static function drawFooterOnPage(
         Fpdi $pdf,
@@ -112,47 +113,154 @@ class PdfFooterService
         string $fullName,
         string $opaqueBanner
     ): void {
-        $bannerInfo = @getimagesize($opaqueBanner);
-        if ($bannerInfo === false) {
+        $stripPath = self::renderFooterStrip($displayPage, $fullName, $opaqueBanner);
+        if ($stripPath === null || ! file_exists($stripPath)) {
             return;
         }
 
-        $bannerWmm = self::BANNER_WIDTH_MM;
-        $bannerHmm = $bannerWmm * ($bannerInfo[1] / max(1, $bannerInfo[0]));
-        $nameGapMm = 1.4;
-        $nameHmm = 5.0;
+        $stripInfo = @getimagesize($stripPath);
+        if ($stripInfo === false) {
+            return;
+        }
 
-        $nameImage = $fullName !== '' ? self::renderNameImage($fullName) : null;
-        if ($nameImage !== null) {
-            $nameInfo = @getimagesize($nameImage);
-            if (is_array($nameInfo) && $nameInfo[0] > 0) {
-                $nameHmm = max(4.0, min(7.0, $bannerWmm * ($nameInfo[1] / $nameInfo[0])));
+        $stripWmm = self::BANNER_WIDTH_MM;
+        $stripHmm = $stripWmm * ($stripInfo[1] / max(1, $stripInfo[0]));
+        $x = ($pageW - $stripWmm) / 2;
+        $y = $pageH - self::BOTTOM_MARGIN_MM - $stripHmm;
+
+        $pdf->Image(self::fpdfImagePath($stripPath), $x, $y, $stripWmm, $stripHmm, 'PNG');
+    }
+
+    /** Footer hoàn chỉnh: badge + số trang trắng + tên HOA đen. */
+    private static function renderFooterStrip(int $displayPage, string $fullName, string $bannerPath): ?string
+    {
+        if (! function_exists('imagecreatefrompng') || ! function_exists('imagettftext')) {
+            return null;
+        }
+
+        $fullName = trim($fullName);
+        $cacheDir = storage_path('app/pdf-cache/footer-strips');
+        if (! is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+
+        $cacheKey = hash('sha256', 'v9|'.$displayPage.'|'.$fullName.'|'.self::RENDER_BANNER_PX);
+        $cachePath = $cacheDir.'/'.$cacheKey.'.png';
+        if (file_exists($cachePath)) {
+            return $cachePath;
+        }
+
+        $banner = @imagecreatefrompng($bannerPath);
+        if ($banner === false) {
+            return null;
+        }
+
+        $bannerW = imagesx($banner);
+        $bannerH = imagesy($banner);
+
+        $boldFont = PdfFontService::boldFontPath();
+        $regularFont = PdfFontService::regularFontPath() ?: $boldFont;
+        if ($boldFont === '' || $regularFont === '') {
+            imagedestroy($banner);
+
+            return null;
+        }
+
+        $nameH = 0;
+        $nameCanvas = null;
+        if ($fullName !== '') {
+            $nameCanvas = self::renderNameCanvas(mb_strtoupper($fullName, 'UTF-8'), $regularFont);
+            if ($nameCanvas !== null) {
+                $nameH = imagesy($nameCanvas) + self::NAME_GAP_PX;
             }
         }
 
-        $totalHmm = $bannerHmm + ($nameImage !== null ? $nameGapMm + $nameHmm : 0);
-        $x = ($pageW - $bannerWmm) / 2;
-        $y = $pageH - self::BOTTOM_MARGIN_MM - $totalHmm;
+        $totalH = $bannerH + $nameH;
+        $canvas = imagecreatetruecolor($bannerW, $totalH);
+        imagesavealpha($canvas, false);
+        $cream = imagecolorallocate($canvas, 252, 250, 245);
+        imagefill($canvas, 0, 0, $cream);
 
-        $imageType = str_ends_with(strtolower($opaqueBanner), '.jpg') ? 'JPEG' : 'PNG';
-        $pdf->Image($opaqueBanner, $x, $y, $bannerWmm, $bannerHmm, $imageType);
+        imagecopy($canvas, $banner, 0, 0, 0, 0, $bannerW, $bannerH);
+        imagedestroy($banner);
 
-        $pdf->SetFont('Helvetica', 'B', self::PAGE_NUMBER_FONT_PT);
-        $pdf->SetTextColor(255, 255, 255);
-        $pdf->SetXY($x, $y + ($bannerHmm / 2) - 2.2);
-        $pdf->Cell($bannerWmm, 5, (string) $displayPage, 0, 0, 'C');
+        self::drawCenteredText(
+            $canvas,
+            (string) $displayPage,
+            $boldFont,
+            self::PAGE_NUMBER_FONT_PX,
+            (int) round($bannerW / 2),
+            (int) round($bannerH / 2),
+            imagecolorallocate($canvas, 255, 255, 255)
+        );
 
-        if ($nameImage !== null && file_exists($nameImage)) {
-            $nameInfo = getimagesize($nameImage);
-            if (is_array($nameInfo) && $nameInfo[0] > 0 && $nameInfo[1] > 0) {
-                $nameWmm = $nameHmm * ($nameInfo[0] / $nameInfo[1]);
-                $nameWmm = min($pageW - 16, $nameWmm);
-                $nameX = ($pageW - $nameWmm) / 2;
-                $nameY = $y + $bannerHmm + $nameGapMm;
-                $nameType = str_ends_with(strtolower($nameImage), '.jpg') ? 'JPEG' : 'PNG';
-                $pdf->Image($nameImage, $nameX, $nameY, $nameWmm, $nameHmm, $nameType);
-            }
+        if ($nameCanvas !== null) {
+            $nameW = imagesx($nameCanvas);
+            $nameImgH = imagesy($nameCanvas);
+            $nameX = (int) round(($bannerW - $nameW) / 2);
+            $nameY = $bannerH + self::NAME_GAP_PX;
+            imagecopy($canvas, $nameCanvas, $nameX, $nameY, 0, 0, $nameW, $nameImgH);
+            imagedestroy($nameCanvas);
         }
+
+        imagepng($canvas, $cachePath, 6);
+        imagedestroy($canvas);
+
+        return file_exists($cachePath) ? $cachePath : null;
+    }
+
+    private static function renderNameCanvas(string $displayName, string $font): ?\GdImage
+    {
+        $box = imagettfbbox(self::NAME_FONT_PX, 0, $font, $displayName);
+        if (! is_array($box)) {
+            return null;
+        }
+
+        $textW = $box[2] - $box[0];
+        $textH = $box[1] - $box[7];
+        $padX = 8;
+        $padY = 4;
+        $canvasW = $textW + $padX * 2;
+        $canvasH = $textH + $padY * 2;
+
+        $canvas = imagecreatetruecolor($canvasW, $canvasH);
+        imagesavealpha($canvas, false);
+        $cream = imagecolorallocate($canvas, 252, 250, 245);
+        $black = imagecolorallocate($canvas, 10, 10, 10);
+        imagefill($canvas, 0, 0, $cream);
+
+        $textX = (int) ($padX - $box[0]);
+        $textY = (int) ($padY + $textH);
+        imagettftext($canvas, self::NAME_FONT_PX, 0, $textX, $textY, $black, $font, $displayName);
+
+        return $canvas;
+    }
+
+    private static function drawCenteredText(
+        \GdImage $canvas,
+        string $text,
+        string $font,
+        int $fontSize,
+        int $centerX,
+        int $centerY,
+        int $color
+    ): void {
+        $box = imagettfbbox($fontSize, 0, $font, $text);
+        if (! is_array($box)) {
+            return;
+        }
+
+        $textW = $box[2] - $box[0];
+        $textH = $box[1] - $box[7];
+        $x = (int) ($centerX - ($textW / 2) - $box[0]);
+        $y = (int) ($centerY + ($textH / 2) - $box[1]);
+
+        imagettftext($canvas, $fontSize, 0, $x, $y, $color, $font, $text);
+    }
+
+    private static function fpdfImagePath(string $path): string
+    {
+        return str_replace('\\', '/', $path);
     }
 
     /**
@@ -308,62 +416,6 @@ class PdfFooterService
 
         imagepng($flat, $cachePath, 6);
         imagedestroy($flat);
-
-        return file_exists($cachePath) ? $cachePath : null;
-    }
-
-    /** Render tên HOA thành ảnh opaque (chữ đen, nền kem). */
-    public static function renderNameImage(string $fullName): ?string
-    {
-        if (! function_exists('imagettftext')) {
-            return null;
-        }
-
-        $font = PdfFontService::boldFontPath() ?: PdfFontService::regularFontPath();
-        if ($font === '') {
-            return null;
-        }
-
-        $displayName = mb_strtoupper(trim($fullName), 'UTF-8');
-        if ($displayName === '') {
-            return null;
-        }
-
-        $cacheDir = storage_path('app/pdf-cache/footer-assets');
-        if (! is_dir($cacheDir)) {
-            mkdir($cacheDir, 0755, true);
-        }
-
-        $fontSize = self::NAME_FONT_PX * self::NAME_RENDER_SCALE;
-        $cachePath = $cacheDir.'/name-'.hash('sha256', 'v8|'.$displayName.'|'.$fontSize).'.png';
-        if (file_exists($cachePath)) {
-            return $cachePath;
-        }
-
-        $box = imagettfbbox($fontSize, 0, $font, $displayName);
-        if (! is_array($box)) {
-            return null;
-        }
-
-        $textW = $box[2] - $box[0];
-        $textH = $box[1] - $box[7];
-        $padX = 6;
-        $padY = 4;
-        $canvasW = $textW + $padX * 2;
-        $canvasH = $textH + $padY * 2;
-
-        $canvas = imagecreatetruecolor($canvasW, $canvasH);
-        imagesavealpha($canvas, false);
-        $cream = imagecolorallocate($canvas, 252, 250, 245);
-        $black = imagecolorallocate($canvas, 10, 10, 10);
-        imagefill($canvas, 0, 0, $cream);
-
-        $textX = $padX - $box[0];
-        $textY = $padY + $textH;
-        imagettftext($canvas, $fontSize, 0, (int) $textX, (int) $textY, $black, $font, $displayName);
-
-        imagepng($canvas, $cachePath, 6);
-        imagedestroy($canvas);
 
         return file_exists($cachePath) ? $cachePath : null;
     }
