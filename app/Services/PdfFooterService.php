@@ -7,22 +7,32 @@ use setasign\Fpdi\Fpdi;
 
 class PdfFooterService
 {
-    public const BANNER_WIDTH_MM = 33.0;
+    public const BANNER_WIDTH_MM = 42.0;
 
     public const BOTTOM_MARGIN_MM = 7.0;
 
-    /** ~20px/mm để badge sắc khi in PDF */
+    /** 20px/mm — badge 33mm = 660px */
     private const RENDER_BANNER_PX = 660;
 
     private const PAGE_NUMBER_FONT_PX = 72;
 
     private const NAME_FONT_PX = 48;
 
-    private const NAME_GAP_PX = 14;
+    /** 1.4mm @ 20px/mm */
+    private const NAME_GAP_PX = 28;
+
+    private const PAGE_LETTER_SPACING_PX = 4;
+
+    private const NAME_LETTER_SPACING_PX = 3;
 
     public const FIRST_FOOTER_PAGE = 3;
 
     public const FIRST_DISPLAY_PAGE_NUMBER = 1;
+
+    public static function svgBadgePath(): string
+    {
+        return resource_path('views/pdfs/partials/footer-badge.svg');
+    }
 
     public static function bannerPath(): string
     {
@@ -102,8 +112,7 @@ class PdfFooterService
     }
 
     /**
-     * Dán một ảnh footer hoàn chỉnh (badge + số trang + tên đã bake bằng GD).
-     * FPDF không vẽ chữ đè lên ảnh ổn định — gộp hết vào một PNG opaque.
+     * Đặt badge (SVG → Imagick transparent PNG) + tên (Imagick transparent PNG) lên trang PDF.
      */
     private static function drawFooterOnPage(
         Fpdi $pdf,
@@ -113,38 +122,62 @@ class PdfFooterService
         string $fullName,
         string $opaqueBanner
     ): void {
-        $stripPath = self::renderFooterStrip($displayPage, $fullName, $opaqueBanner);
-        if ($stripPath === null || ! file_exists($stripPath)) {
+        $badgePath = self::renderBadgeStrip($displayPage, $opaqueBanner);
+        if ($badgePath === null || ! file_exists($badgePath)) {
             return;
         }
 
-        $stripInfo = @getimagesize($stripPath);
-        if ($stripInfo === false) {
+        $badgeInfo = @getimagesize($badgePath);
+        if ($badgeInfo === false) {
             return;
         }
 
-        $stripWmm = self::BANNER_WIDTH_MM;
-        $stripHmm = $stripWmm * ($stripInfo[1] / max(1, $stripInfo[0]));
-        $x = ($pageW - $stripWmm) / 2;
-        $y = $pageH - self::BOTTOM_MARGIN_MM - $stripHmm;
+        $badgeWmm = self::BANNER_WIDTH_MM;
+        $badgeHmm = $badgeWmm * ($badgeInfo[1] / max(1, $badgeInfo[0]));
+        $badgeX   = ($pageW - $badgeWmm) / 2;
 
-        $pdf->Image(self::fpdfImagePath($stripPath), $x, $y, $stripWmm, $stripHmm, 'PNG');
+        $displayName = trim($fullName) !== '' ? mb_strtoupper(trim($fullName), 'UTF-8') : '';
+
+        $namePath = $displayName !== '' ? self::renderNameStrip($displayName) : null;
+        $nameWmm  = 0.0;
+        $nameHmm  = 0.0;
+        if ($namePath !== null && file_exists($namePath)) {
+            $nameInfo = @getimagesize($namePath);
+            if (is_array($nameInfo) && $nameInfo[0] > 0 && $nameInfo[1] > 0) {
+                // scale theo cùng px/mm như badge (RENDER_BANNER_PX / BANNER_WIDTH_MM)
+                $pxPerMm = self::RENDER_BANNER_PX / self::BANNER_WIDTH_MM;
+                $nameWmm = $nameInfo[0] / $pxPerMm;
+                $nameHmm = $nameInfo[1] / $pxPerMm;
+                $nameWmm = min($pageW - 10, $nameWmm);
+            }
+        }
+
+        $gapMm    = 1.8;
+        $totalHmm = $badgeHmm + ($namePath !== null ? $gapMm + $nameHmm : 0.0);
+        $badgeY   = $pageH - self::BOTTOM_MARGIN_MM - $totalHmm;
+
+        $pdf->Image(self::fpdfImagePath($badgePath), $badgeX, $badgeY, $badgeWmm, $badgeHmm, 'PNG');
+
+        if ($namePath !== null && $nameWmm > 0 && $nameHmm > 0) {
+            $nameX = ($pageW - $nameWmm) / 2;
+            $nameY = $badgeY + $badgeHmm + $gapMm;
+            $pdf->Image(self::fpdfImagePath($namePath), $nameX, $nameY, $nameWmm, $nameHmm, 'PNG');
+        }
     }
 
-    /** Footer hoàn chỉnh: badge + số trang trắng + tên HOA đen. */
-    private static function renderFooterStrip(int $displayPage, string $fullName, string $bannerPath): ?string
+    /** Badge PNG (tên badge gốc + số trang) — chỉ rộng bằng badge, không có nền trắng thừa. */
+    private static function renderBadgeStrip(int $displayPage, string $bannerPath): ?string
     {
         if (! function_exists('imagecreatefrompng') || ! function_exists('imagettftext')) {
             return null;
         }
 
-        $fullName = trim($fullName);
         $cacheDir = storage_path('app/pdf-cache/footer-strips');
         if (! is_dir($cacheDir)) {
             mkdir($cacheDir, 0755, true);
         }
 
-        $cacheKey = hash('sha256', 'v9|'.$displayPage.'|'.$fullName.'|'.self::RENDER_BANNER_PX);
+        $cacheKey = hash('sha256', 'badge-v2|'.$displayPage.'|'.self::RENDER_BANNER_PX);
         $cachePath = $cacheDir.'/'.$cacheKey.'.png';
         if (file_exists($cachePath)) {
             return $cachePath;
@@ -157,60 +190,118 @@ class PdfFooterService
 
         $bannerW = imagesx($banner);
         $bannerH = imagesy($banner);
-
         $boldFont = PdfFontService::boldFontPath();
-        $regularFont = PdfFontService::regularFontPath() ?: $boldFont;
-        if ($boldFont === '' || $regularFont === '') {
+        if ($boldFont === '') {
             imagedestroy($banner);
 
             return null;
         }
 
-        $nameH = 0;
-        $nameCanvas = null;
-        if ($fullName !== '') {
-            $nameCanvas = self::renderNameCanvas(mb_strtoupper($fullName, 'UTF-8'), $regularFont);
-            if ($nameCanvas !== null) {
-                $nameH = imagesy($nameCanvas) + self::NAME_GAP_PX;
-            }
-        }
+        // Giữ alpha channel của SVG (nền trong suốt)
+        imagealphablending($banner, true);
+        imagesavealpha($banner, true);
 
-        $totalH = $bannerH + $nameH;
-        $canvas = imagecreatetruecolor($bannerW, $totalH);
-        imagesavealpha($canvas, false);
-        $cream = imagecolorallocate($canvas, 252, 250, 245);
-        imagefill($canvas, 0, 0, $cream);
-
-        imagecopy($canvas, $banner, 0, 0, 0, 0, $bannerW, $bannerH);
-        imagedestroy($banner);
-
-        self::drawCenteredText(
-            $canvas,
+        $white = imagecolorallocatealpha($banner, 255, 255, 255, 0);
+        self::drawCenteredSpacedText(
+            $banner,
             (string) $displayPage,
             $boldFont,
             self::PAGE_NUMBER_FONT_PX,
             (int) round($bannerW / 2),
             (int) round($bannerH / 2),
-            imagecolorallocate($canvas, 255, 255, 255)
+            $white,
+            self::PAGE_LETTER_SPACING_PX
         );
 
-        if ($nameCanvas !== null) {
-            $nameW = imagesx($nameCanvas);
-            $nameImgH = imagesy($nameCanvas);
-            $nameX = (int) round(($bannerW - $nameW) / 2);
-            $nameY = $bannerH + self::NAME_GAP_PX;
-            imagecopy($canvas, $nameCanvas, $nameX, $nameY, 0, 0, $nameW, $nameImgH);
-            imagedestroy($nameCanvas);
-        }
-
-        imagepng($canvas, $cachePath, 6);
-        imagedestroy($canvas);
+        imagepng($banner, $cachePath, 6);
+        imagedestroy($banner);
 
         return file_exists($cachePath) ? $cachePath : null;
     }
 
-    private static function renderNameCanvas(string $displayName, string $font): ?\GdImage
+    /**
+     * Tên HOA → transparent PNG dùng Imagick (hỗ trợ UTF-8/Vietnamese, không có nền thừa).
+     * Scale cao như badge (RENDER_BANNER_PX / BANNER_WIDTH_MM px/mm) để sắc khi in.
+     */
+    private static function renderNameStrip(string $displayName): ?string
     {
+        if (! class_exists(\Imagick::class) || ! class_exists(\ImagickDraw::class)) {
+            return self::renderNameStripGd($displayName);
+        }
+
+        $font = PdfFontService::boldFontPath() ?: PdfFontService::regularFontPath();
+        if ($font === '') {
+            return null;
+        }
+
+        $cacheDir = storage_path('app/pdf-cache/footer-strips');
+        if (! is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+
+        $cacheKey = hash('sha256', 'name-imagick-v1|'.$displayName.'|'.self::NAME_FONT_PX);
+        $cachePath = $cacheDir.'/'.$cacheKey.'.png';
+        if (file_exists($cachePath)) {
+            return $cachePath;
+        }
+
+        try {
+            $draw = new \ImagickDraw();
+            $draw->setFont($font);
+            $draw->setFontSize(self::NAME_FONT_PX);
+            $draw->setFillColor(new \ImagickPixel('rgba(10,10,10,1)'));
+            $draw->setTextAntialias(true);
+
+            $metrics = (new \Imagick())->queryFontMetrics($draw, $displayName, false);
+            $textW   = (int) ceil($metrics['textWidth'] ?? (strlen($displayName) * self::NAME_FONT_PX * 0.6));
+            $textH   = (int) ceil(($metrics['ascender'] ?? self::NAME_FONT_PX) + abs($metrics['descender'] ?? 0));
+            $padX    = 8;
+            $padY    = 6;
+            $canvasW = $textW + $padX * 2;
+            $canvasH = $textH + $padY * 2;
+
+            $img = new \Imagick();
+            $img->newImage($canvasW, $canvasH, new \ImagickPixel('none'));
+            $img->setImageFormat('png32');
+            $img->setImageAlphaChannel(\Imagick::ALPHACHANNEL_SET);
+
+            $draw->setGravity(\Imagick::GRAVITY_CENTER);
+            $img->annotateImage($draw, 0, 0, 0, $displayName);
+
+            $img->writeImage($cachePath);
+            $img->destroy();
+
+            return file_exists($cachePath) ? $cachePath : null;
+        } catch (\Throwable $e) {
+            Log::warning('PdfFooterService renderNameStrip Imagick thất bại', ['error' => $e->getMessage()]);
+
+            return self::renderNameStripGd($displayName);
+        }
+    }
+
+    /** Fallback: render tên bằng GD (opaque cream bg). */
+    private static function renderNameStripGd(string $displayName): ?string
+    {
+        if (! function_exists('imagettftext')) {
+            return null;
+        }
+
+        $font = PdfFontService::boldFontPath() ?: PdfFontService::regularFontPath();
+        if ($font === '') {
+            return null;
+        }
+
+        $cacheDir = storage_path('app/pdf-cache/footer-strips');
+        if (! is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+
+        $cacheKey = hash('sha256', 'name-gd-v2|'.$displayName.'|'.self::NAME_FONT_PX);
+        $cachePath = $cacheDir.'/'.$cacheKey.'.png';
+        if (file_exists($cachePath)) {
+            return $cachePath;
+        }
+
         $box = imagettfbbox(self::NAME_FONT_PX, 0, $font, $displayName);
         if (! is_array($box)) {
             return null;
@@ -219,43 +310,120 @@ class PdfFooterService
         $textW = $box[2] - $box[0];
         $textH = $box[1] - $box[7];
         $padX = 8;
-        $padY = 4;
+        $padY = 6;
         $canvasW = $textW + $padX * 2;
         $canvasH = $textH + $padY * 2;
 
         $canvas = imagecreatetruecolor($canvasW, $canvasH);
         imagesavealpha($canvas, false);
-        $cream = imagecolorallocate($canvas, 252, 250, 245);
+        imagefill($canvas, 0, 0, imagecolorallocate($canvas, 252, 250, 245));
         $black = imagecolorallocate($canvas, 10, 10, 10);
-        imagefill($canvas, 0, 0, $cream);
-
         $textX = (int) ($padX - $box[0]);
         $textY = (int) ($padY + $textH);
         imagettftext($canvas, self::NAME_FONT_PX, 0, $textX, $textY, $black, $font, $displayName);
 
-        return $canvas;
+        imagepng($canvas, $cachePath, 6);
+        imagedestroy($canvas);
+
+        return file_exists($cachePath) ? $cachePath : null;
     }
 
-    private static function drawCenteredText(
+    /** @return array<int, string> */
+    private static function splitChars(string $text): array
+    {
+        $chars = preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY);
+
+        return is_array($chars) ? $chars : [$text];
+    }
+
+    private static function spacedTextWidth(string $text, string $font, int $fontSize, int $letterSpacingPx): float
+    {
+        $chars = self::splitChars($text);
+        $width = 0.0;
+
+        foreach ($chars as $index => $char) {
+            $box = imagettfbbox($fontSize, 0, $font, $char);
+            if (! is_array($box)) {
+                continue;
+            }
+
+            $width += ($box[2] - $box[0]);
+            if ($index < count($chars) - 1) {
+                $width += $letterSpacingPx;
+            }
+        }
+
+        return $width;
+    }
+
+    private static function drawCenteredSpacedText(
         \GdImage $canvas,
         string $text,
         string $font,
         int $fontSize,
         int $centerX,
         int $centerY,
-        int $color
+        int $color,
+        int $letterSpacingPx = 0
     ): void {
-        $box = imagettfbbox($fontSize, 0, $font, $text);
-        if (! is_array($box)) {
+        $chars = self::splitChars($text);
+        if ($chars === []) {
             return;
         }
 
-        $textW = $box[2] - $box[0];
-        $textH = $box[1] - $box[7];
-        $x = (int) ($centerX - ($textW / 2) - $box[0]);
-        $y = (int) ($centerY + ($textH / 2) - $box[1]);
+        $totalW = self::spacedTextWidth($text, $font, $fontSize, $letterSpacingPx);
+        $cursorX = $centerX - ($totalW / 2);
 
-        imagettftext($canvas, $fontSize, 0, $x, $y, $color, $font, $text);
+        foreach ($chars as $index => $char) {
+            $box = imagettfbbox($fontSize, 0, $font, $char);
+            if (! is_array($box)) {
+                continue;
+            }
+
+            $x = (int) round($cursorX - $box[0]);
+            $y = (int) round($centerY - (($box[7] + $box[1]) / 2));
+            imagettftext($canvas, $fontSize, 0, $x, $y, $color, $font, $char);
+
+            $cursorX += ($box[2] - $box[0]);
+            if ($index < count($chars) - 1) {
+                $cursorX += $letterSpacingPx;
+            }
+        }
+    }
+
+    private static function drawTopCenteredSpacedText(
+        \GdImage $canvas,
+        string $text,
+        string $font,
+        int $fontSize,
+        int $centerX,
+        int $topY,
+        int $color,
+        int $letterSpacingPx = 0
+    ): void {
+        $chars = self::splitChars($text);
+        if ($chars === []) {
+            return;
+        }
+
+        $totalW = self::spacedTextWidth($text, $font, $fontSize, $letterSpacingPx);
+        $cursorX = $centerX - ($totalW / 2);
+
+        foreach ($chars as $index => $char) {
+            $box = imagettfbbox($fontSize, 0, $font, $char);
+            if (! is_array($box)) {
+                continue;
+            }
+
+            $x = (int) round($cursorX - $box[0]);
+            $y = (int) round($topY - $box[7]);
+            imagettftext($canvas, $fontSize, 0, $x, $y, $color, $font, $char);
+
+            $cursorX += ($box[2] - $box[0]);
+            if ($index < count($chars) - 1) {
+                $cursorX += $letterSpacingPx;
+            }
+        }
     }
 
     private static function fpdfImagePath(string $path): string
@@ -264,107 +432,51 @@ class PdfFooterService
     }
 
     /**
-     * Badge footer sắc nét (vẽ vector GD).
-     * 08.png gốc chỉ 70×22px — upscale sẽ luôn mờ nên vẽ lại theo màu LBTV.
+     * Rasterize SVG badge → PNG với nền TRONG SUỐT (transparent).
+     * FPDF/FPDI hỗ trợ PNG-32 alpha — badge nổi trên nền trang, không che nội dung.
      */
     public static function opaqueBannerPath(): ?string
     {
-        $sharp = self::sharpBannerPath();
-        if ($sharp !== null) {
-            return $sharp;
-        }
-
-        return self::legacyUpscaledBannerPath();
-    }
-
-    private static function sharpBannerPath(): ?string
-    {
-        if (! function_exists('imagecreatetruecolor')) {
-            return null;
-        }
-
         $cacheDir = storage_path('app/pdf-cache/footer-assets');
         if (! is_dir($cacheDir)) {
             mkdir($cacheDir, 0755, true);
         }
 
-        $cachePath = $cacheDir.'/banner-sharp-v1-'.self::RENDER_BANNER_PX.'.png';
-        if (file_exists($cachePath)) {
-            return $cachePath;
+        $svg = self::svgBadgePath();
+        if (file_exists($svg) && class_exists(\Imagick::class)) {
+            $cacheKey = 'svg-transparent-v1-'.self::RENDER_BANNER_PX.'-'.filemtime($svg);
+            $cachePath = $cacheDir.'/'.$cacheKey.'.png';
+            if (file_exists($cachePath)) {
+                return $cachePath;
+            }
+
+            try {
+                $im = new \Imagick();
+                $im->setBackgroundColor(new \ImagickPixel('none'));
+                $im->setResolution(300, 300);
+                $im->readImage('svg:'.$svg);
+                $im->setImageFormat('png32');
+                $im->setImageAlphaChannel(\Imagick::ALPHACHANNEL_SET);
+
+                $srcW = $im->getImageWidth();
+                $targetW = self::RENDER_BANNER_PX;
+                $targetH = max(1, (int) round($im->getImageHeight() * ($targetW / max(1, $srcW))));
+                $im->resizeImage($targetW, $targetH, \Imagick::FILTER_LANCZOS, 1);
+                $im->writeImage($cachePath);
+                $im->destroy();
+
+                if (file_exists($cachePath)) {
+                    return $cachePath;
+                }
+            } catch (\Throwable $e) {
+                Log::warning('PdfFooterService: SVG→PNG thất bại', ['error' => $e->getMessage()]);
+            }
         }
 
-        $w = self::RENDER_BANNER_PX;
-        $h = max(40, (int) round($w * (22 / 70)));
-
-        $img = imagecreatetruecolor($w, $h);
-        imagesavealpha($img, false);
-
-        $cream = imagecolorallocate($img, 252, 250, 245);
-        $maroon = imagecolorallocate($img, 110, 1, 1);
-        $gold = imagecolorallocate($img, 201, 162, 39);
-        $goldDark = imagecolorallocate($img, 145, 105, 28);
-        $goldLight = imagecolorallocate($img, 228, 195, 95);
-
-        imagefill($img, 0, 0, $cream);
-
-        $capW = (int) round($w * 0.14);
-        $lineY1 = (int) round($h * 0.10);
-        $lineY2 = (int) round($h * 0.90);
-        $bodyTop = (int) round($h * 0.20);
-        $bodyBot = (int) round($h * 0.80);
-
-        imagefilledrectangle($img, $capW, $bodyTop, $w - $capW, $bodyBot, $maroon);
-
-        $lineH = max(2, (int) round($h * 0.05));
-        imagefilledrectangle($img, 0, $lineY1, $w, $lineY1 + $lineH, $gold);
-        imagefilledrectangle($img, 0, $lineY2 - $lineH, $w, $lineY2, $gold);
-
-        self::drawBannerCap($img, 0, $h, $capW, $gold, $goldDark, $goldLight, true);
-        self::drawBannerCap($img, $w - $capW, $h, $capW, $gold, $goldDark, $goldLight, false);
-
-        imagepng($img, $cachePath, 6);
-        imagedestroy($img);
-
-        return file_exists($cachePath) ? $cachePath : null;
+        return self::legacyUpscaledBannerPath();
     }
 
-    private static function drawBannerCap(
-        \GdImage $img,
-        int $x,
-        int $h,
-        int $capW,
-        int $gold,
-        int $goldDark,
-        int $goldLight,
-        bool $isLeft
-    ): void {
-        $cy = (int) round($h / 2);
-        $spineX = $isLeft ? $x + (int) round($capW * 0.72) : $x + (int) round($capW * 0.28);
-        $spineW = max(3, (int) round($capW * 0.10));
-
-        imagefilledrectangle($img, $spineX - (int) ($spineW / 2), (int) round($h * 0.12), $spineX + (int) ($spineW / 2), (int) round($h * 0.88), $goldDark);
-
-        $curls = [
-            ['rx' => 0.42, 'ry' => 0.34, 'ox' => 0.18, 'oy' => 0.30],
-            ['rx' => 0.34, 'ry' => 0.28, 'ox' => 0.34, 'oy' => 0.52],
-            ['rx' => 0.28, 'ry' => 0.24, 'ox' => 0.12, 'oy' => 0.68],
-        ];
-
-        foreach ($curls as $i => $curl) {
-            $rx = (int) round($capW * $curl['rx']);
-            $ry = (int) round($h * $curl['ry']);
-            $cx = $isLeft
-                ? $x + (int) round($capW * $curl['ox'])
-                : $x + $capW - (int) round($capW * $curl['ox']);
-            $cy2 = (int) round($h * $curl['oy']);
-            $color = $i === 1 ? $goldLight : $gold;
-            imagefilledellipse($img, $cx, $cy2, $rx, $ry, $color);
-        }
-
-        imagefilledellipse($img, $spineX, $cy, (int) round($capW * 0.22), (int) round($h * 0.55), $gold);
-    }
-
-    /** Fallback: upscale 08.png nếu GD vector thất bại. */
+    /** Fallback: upscale 08.png bằng GD nếu SVG/Imagick không dùng được. */
     private static function legacyUpscaledBannerPath(): ?string
     {
         $source = self::bannerPath();

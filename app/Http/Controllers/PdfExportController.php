@@ -406,7 +406,7 @@ class PdfExportController extends Controller
         // ── Kết bài: 562 → 563 → 564 → 566 → … → 581 (theo stt tên ảnh) ─────
         $phan9Dir      = resource_path('views/pdfs/phan-9');
         $q1AppendixDir = resource_path('views/pdfs/q2-appendix');
-        $ketBaiBundle  = PdfStaticPageCache::resolveBundle('q1-ket-bai-v1', [
+        $ketBaiBundle  = PdfStaticPageCache::resolveBundle('q1-ket-bai-v3', [
             $q1AppendixDir . '/page-562.png',
             $q1AppendixDir . '/page-563.png',
             $q1AppendixDir . '/page-564.png',
@@ -415,9 +415,8 @@ class PdfExportController extends Controller
             $phan9Dir . '/page-568.png',
             $phan9Dir . '/page-569.png',
             $q1AppendixDir . '/page-572.png',
-            $phan9Dir . '/page-573.png',
-            $phan9Dir . '/page-580.png',
-            $q1AppendixDir . '/page-581.png',
+            $phan9Dir . '/page-572.png',
+            $phan9Dir . '/page-581.png',
         ]);
         if ($ketBaiBundle !== null) {
             $pdfsToMerge[] = $ketBaiBundle;
@@ -431,11 +430,10 @@ class PdfExportController extends Controller
                 [$phan9Dir, 'page-568.png'],
                 [$phan9Dir, 'page-569.png'],
                 [$q1AppendixDir, 'page-572.png'],
-                [$phan9Dir, 'page-573.png'],
-                [$phan9Dir, 'page-580.png'],
-                [$q1AppendixDir, 'page-581.png'],
+                [$phan9Dir, 'page-572.png'],
+                [$phan9Dir, 'page-581.png'],
             ] as [$dir, $fname]) {
-                self::appendStaticPage($pdfsToMerge, $dir . '/' . $fname, "q1-ket-bai-$fname");
+                self::appendStaticPage($pdfsToMerge, $dir . '/' . $fname, "q1-ket-bai-{$dir}-$fname");
             }
         }
 
