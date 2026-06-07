@@ -26,16 +26,16 @@
             transform: translate(-50%, -50%);
             color: #FFFFFF;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 17px;
             letter-spacing: 0.2mm;
             white-space: nowrap;
         }
 
         .footer-name {
-            margin-top: 1.2mm;
-            color: #1A1A1A;
-            font-size: 12px;
-            font-weight: normal;
+            margin-top: 1.4mm;
+            color: #0A0A0A;
+            font-size: 16px;
+            font-weight: bold;
             letter-spacing: 0.15mm;
             text-transform: uppercase;
             text-align: center;

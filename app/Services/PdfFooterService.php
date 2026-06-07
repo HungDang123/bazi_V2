@@ -11,11 +11,14 @@ class PdfFooterService
 
     public const BOTTOM_MARGIN_MM = 7.0;
 
-    private const RENDER_BANNER_PX = 330;
+    /** ~20px/mm để badge sắc khi in PDF */
+    private const RENDER_BANNER_PX = 660;
 
-    private const PAGE_NUMBER_FONT_PT = 10;
+    private const PAGE_NUMBER_FONT_PT = 13;
 
-    private const NAME_FONT_PX = 12;
+    private const NAME_FONT_PX = 16;
+
+    private const NAME_RENDER_SCALE = 3;
 
     public const FIRST_FOOTER_PAGE = 3;
 
@@ -116,14 +119,14 @@ class PdfFooterService
 
         $bannerWmm = self::BANNER_WIDTH_MM;
         $bannerHmm = $bannerWmm * ($bannerInfo[1] / max(1, $bannerInfo[0]));
-        $nameGapMm = 1.2;
-        $nameHmm = 3.8;
+        $nameGapMm = 1.4;
+        $nameHmm = 5.0;
 
         $nameImage = $fullName !== '' ? self::renderNameImage($fullName) : null;
         if ($nameImage !== null) {
             $nameInfo = @getimagesize($nameImage);
             if (is_array($nameInfo) && $nameInfo[0] > 0) {
-                $nameHmm = max(3.0, min(5.5, $bannerWmm * ($nameInfo[1] / $nameInfo[0])));
+                $nameHmm = max(4.0, min(7.0, $bannerWmm * ($nameInfo[1] / $nameInfo[0])));
             }
         }
 
@@ -136,8 +139,8 @@ class PdfFooterService
 
         $pdf->SetFont('Helvetica', 'B', self::PAGE_NUMBER_FONT_PT);
         $pdf->SetTextColor(255, 255, 255);
-        $pdf->SetXY($x, $y + ($bannerHmm / 2) - 2.0);
-        $pdf->Cell($bannerWmm, 4, (string) $displayPage, 0, 0, 'C');
+        $pdf->SetXY($x, $y + ($bannerHmm / 2) - 2.2);
+        $pdf->Cell($bannerWmm, 5, (string) $displayPage, 0, 0, 'C');
 
         if ($nameImage !== null && file_exists($nameImage)) {
             $nameInfo = getimagesize($nameImage);
@@ -152,11 +155,23 @@ class PdfFooterService
         }
     }
 
-    /** PNG/JPEG banner 08.png đã phẳng (không alpha) cho FPDF. */
+    /**
+     * Badge footer sắc nét (vẽ vector GD).
+     * 08.png gốc chỉ 70×22px — upscale sẽ luôn mờ nên vẽ lại theo màu LBTV.
+     */
     public static function opaqueBannerPath(): ?string
     {
-        $source = self::bannerPath();
-        if (! file_exists($source)) {
+        $sharp = self::sharpBannerPath();
+        if ($sharp !== null) {
+            return $sharp;
+        }
+
+        return self::legacyUpscaledBannerPath();
+    }
+
+    private static function sharpBannerPath(): ?string
+    {
+        if (! function_exists('imagecreatetruecolor')) {
             return null;
         }
 
@@ -165,13 +180,98 @@ class PdfFooterService
             mkdir($cacheDir, 0755, true);
         }
 
-        $cachePath = $cacheDir.'/banner-opaque-'.self::RENDER_BANNER_PX.'-'.filemtime($source).'.jpg';
+        $cachePath = $cacheDir.'/banner-sharp-v1-'.self::RENDER_BANNER_PX.'.png';
         if (file_exists($cachePath)) {
             return $cachePath;
         }
 
-        if (! function_exists('imagecreatefromstring')) {
+        $w = self::RENDER_BANNER_PX;
+        $h = max(40, (int) round($w * (22 / 70)));
+
+        $img = imagecreatetruecolor($w, $h);
+        imagesavealpha($img, false);
+
+        $cream = imagecolorallocate($img, 252, 250, 245);
+        $maroon = imagecolorallocate($img, 110, 1, 1);
+        $gold = imagecolorallocate($img, 201, 162, 39);
+        $goldDark = imagecolorallocate($img, 145, 105, 28);
+        $goldLight = imagecolorallocate($img, 228, 195, 95);
+
+        imagefill($img, 0, 0, $cream);
+
+        $capW = (int) round($w * 0.14);
+        $lineY1 = (int) round($h * 0.10);
+        $lineY2 = (int) round($h * 0.90);
+        $bodyTop = (int) round($h * 0.20);
+        $bodyBot = (int) round($h * 0.80);
+
+        imagefilledrectangle($img, $capW, $bodyTop, $w - $capW, $bodyBot, $maroon);
+
+        $lineH = max(2, (int) round($h * 0.05));
+        imagefilledrectangle($img, 0, $lineY1, $w, $lineY1 + $lineH, $gold);
+        imagefilledrectangle($img, 0, $lineY2 - $lineH, $w, $lineY2, $gold);
+
+        self::drawBannerCap($img, 0, $h, $capW, $gold, $goldDark, $goldLight, true);
+        self::drawBannerCap($img, $w - $capW, $h, $capW, $gold, $goldDark, $goldLight, false);
+
+        imagepng($img, $cachePath, 6);
+        imagedestroy($img);
+
+        return file_exists($cachePath) ? $cachePath : null;
+    }
+
+    private static function drawBannerCap(
+        \GdImage $img,
+        int $x,
+        int $h,
+        int $capW,
+        int $gold,
+        int $goldDark,
+        int $goldLight,
+        bool $isLeft
+    ): void {
+        $cy = (int) round($h / 2);
+        $spineX = $isLeft ? $x + (int) round($capW * 0.72) : $x + (int) round($capW * 0.28);
+        $spineW = max(3, (int) round($capW * 0.10));
+
+        imagefilledrectangle($img, $spineX - (int) ($spineW / 2), (int) round($h * 0.12), $spineX + (int) ($spineW / 2), (int) round($h * 0.88), $goldDark);
+
+        $curls = [
+            ['rx' => 0.42, 'ry' => 0.34, 'ox' => 0.18, 'oy' => 0.30],
+            ['rx' => 0.34, 'ry' => 0.28, 'ox' => 0.34, 'oy' => 0.52],
+            ['rx' => 0.28, 'ry' => 0.24, 'ox' => 0.12, 'oy' => 0.68],
+        ];
+
+        foreach ($curls as $i => $curl) {
+            $rx = (int) round($capW * $curl['rx']);
+            $ry = (int) round($h * $curl['ry']);
+            $cx = $isLeft
+                ? $x + (int) round($capW * $curl['ox'])
+                : $x + $capW - (int) round($capW * $curl['ox']);
+            $cy2 = (int) round($h * $curl['oy']);
+            $color = $i === 1 ? $goldLight : $gold;
+            imagefilledellipse($img, $cx, $cy2, $rx, $ry, $color);
+        }
+
+        imagefilledellipse($img, $spineX, $cy, (int) round($capW * 0.22), (int) round($h * 0.55), $gold);
+    }
+
+    /** Fallback: upscale 08.png nếu GD vector thất bại. */
+    private static function legacyUpscaledBannerPath(): ?string
+    {
+        $source = self::bannerPath();
+        if (! file_exists($source) || ! function_exists('imagecreatefromstring')) {
             return null;
+        }
+
+        $cacheDir = storage_path('app/pdf-cache/footer-assets');
+        if (! is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+
+        $cachePath = $cacheDir.'/banner-legacy-'.self::RENDER_BANNER_PX.'-'.filemtime($source).'.png';
+        if (file_exists($cachePath)) {
+            return $cachePath;
         }
 
         $blob = @file_get_contents($source);
@@ -190,21 +290,23 @@ class PdfFooterService
         $srcH = imagesy($img);
         $targetW = self::RENDER_BANNER_PX;
         $targetH = max(1, (int) round($srcH * ($targetW / max(1, $srcW))));
-        $scaled = imagescale($img, $targetW, $targetH);
-        imagedestroy($img);
 
-        if ($scaled === false) {
-            return null;
-        }
+        $scaled = imagecreatetruecolor($targetW, $targetH);
+        imagesavealpha($scaled, true);
+        imagealphablending($scaled, false);
+        $transparent = imagecolorallocatealpha($scaled, 0, 0, 0, 127);
+        imagefill($scaled, 0, 0, $transparent);
+        imagealphablending($scaled, true);
+        imagecopyresampled($scaled, $img, 0, 0, 0, 0, $targetW, $targetH, $srcW, $srcH);
+        imagedestroy($img);
 
         $flat = imagecreatetruecolor($targetW, $targetH);
         imagesavealpha($flat, false);
-        $cream = imagecolorallocate($flat, 252, 250, 245);
-        imagefill($flat, 0, 0, $cream);
-        self::copyWithAlpha($flat, $scaled, 0, 0);
+        imagefill($flat, 0, 0, imagecolorallocate($flat, 252, 250, 245));
+        self::compositeWithAlpha($flat, $scaled, 0, 0, 252, 250, 245);
         imagedestroy($scaled);
 
-        imagejpeg($flat, $cachePath, 92);
+        imagepng($flat, $cachePath, 6);
         imagedestroy($flat);
 
         return file_exists($cachePath) ? $cachePath : null;
@@ -217,7 +319,7 @@ class PdfFooterService
             return null;
         }
 
-        $font = PdfFontService::regularFontPath() ?: PdfFontService::boldFontPath();
+        $font = PdfFontService::boldFontPath() ?: PdfFontService::regularFontPath();
         if ($font === '') {
             return null;
         }
@@ -232,8 +334,8 @@ class PdfFooterService
             mkdir($cacheDir, 0755, true);
         }
 
-        $fontSize = self::NAME_FONT_PX;
-        $cachePath = $cacheDir.'/name-'.hash('sha256', 'v6|'.$displayName.'|'.$fontSize).'.jpg';
+        $fontSize = self::NAME_FONT_PX * self::NAME_RENDER_SCALE;
+        $cachePath = $cacheDir.'/name-'.hash('sha256', 'v8|'.$displayName.'|'.$fontSize).'.png';
         if (file_exists($cachePath)) {
             return $cachePath;
         }
@@ -245,33 +347,39 @@ class PdfFooterService
 
         $textW = $box[2] - $box[0];
         $textH = $box[1] - $box[7];
-        $padX = 4;
-        $padY = 2;
+        $padX = 6;
+        $padY = 4;
         $canvasW = $textW + $padX * 2;
         $canvasH = $textH + $padY * 2;
 
         $canvas = imagecreatetruecolor($canvasW, $canvasH);
         imagesavealpha($canvas, false);
         $cream = imagecolorallocate($canvas, 252, 250, 245);
-        $black = imagecolorallocate($canvas, 26, 26, 26);
+        $black = imagecolorallocate($canvas, 10, 10, 10);
         imagefill($canvas, 0, 0, $cream);
 
         $textX = $padX - $box[0];
         $textY = $padY + $textH;
         imagettftext($canvas, $fontSize, 0, (int) $textX, (int) $textY, $black, $font, $displayName);
 
-        imagejpeg($canvas, $cachePath, 92);
+        imagepng($canvas, $cachePath, 6);
         imagedestroy($canvas);
 
         return file_exists($cachePath) ? $cachePath : null;
     }
 
-    private static function copyWithAlpha(\GdImage $dst, \GdImage $src, int $dstX, int $dstY): void
-    {
+    /** Ghép ảnh có alpha lên nền kem — blend đúng viền anti-alias, không bị mờ. */
+    private static function compositeWithAlpha(
+        \GdImage $dst,
+        \GdImage $src,
+        int $dstX,
+        int $dstY,
+        int $bgR,
+        int $bgG,
+        int $bgB
+    ): void {
         $w = imagesx($src);
         $h = imagesy($src);
-
-        imagealphablending($dst, true);
 
         for ($y = 0; $y < $h; $y++) {
             for ($x = 0; $x < $w; $x++) {
@@ -281,9 +389,10 @@ class PdfFooterService
                     continue;
                 }
 
-                $r = ($rgba >> 16) & 0xFF;
-                $g = ($rgba >> 8) & 0xFF;
-                $b = $rgba & 0xFF;
+                $alpha = (127 - $a) / 127.0;
+                $r = (int) round((($rgba >> 16) & 0xFF) * $alpha + $bgR * (1 - $alpha));
+                $g = (int) round((($rgba >> 8) & 0xFF) * $alpha + $bgG * (1 - $alpha));
+                $b = (int) round(($rgba & 0xFF) * $alpha + $bgB * (1 - $alpha));
                 $color = imagecolorallocate($dst, $r, $g, $b);
                 imagesetpixel($dst, $dstX + $x, $dstY + $y, $color);
             }
@@ -307,4 +416,11 @@ class PdfFooterService
 
                 if ($r < 28 && $g < 28 && $b < 28) {
                     $transparent = imagecolorallocatealpha($img, 0, 0, 0, 127);
-             
+                    imagesetpixel($img, $x, $y, $transparent);
+                }
+            }
+        }
+
+        return $img;
+    }
+}
