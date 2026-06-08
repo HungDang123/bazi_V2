@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Bazicontroller;
-use App\Http\Controllers\PdfExportController;
 use App\Http\Controllers\Que64Controller;
 use App\Http\Controllers\TongQuanKhiaCanhController;
 use Illuminate\Support\Facades\Route;
@@ -25,9 +24,3 @@ Route::get('/phan-4/chat-luong-nhat-chu', [Bazicontroller::class, 'phan4ChatLuon
 Route::get('/bazi/calc-phan-tram-ngu-hanh', [Bazicontroller::class, 'calcPhanTramNguHanh']);
 Route::get('/sim/diem-vkb', [Bazicontroller::class, 'diemSimVKB']);
 Route::get('/que64/{id}', [Que64Controller::class, 'show']);
-
-// Export PDF lá số quyển 1
-Route::get('/la-so/export-pdf-1', [PdfExportController::class, 'exportLaSo1']);
-
-// Export PDF lá số quyển 2
-Route::get('/la-so/export-pdf-2', [PdfExportController::class, 'exportLaSo2']);
