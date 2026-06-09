@@ -25,14 +25,7 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
-            left: 24mm;
-            width: 162mm;
-            top: 18mm;
-            height: 242mm;
-            overflow: hidden;
-        }
+        @include('pdfs.partials.content-zone-styles')
 
         /* ── Thập Thần header block ── */
         .thap-than-header {
@@ -104,7 +97,8 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-wrap">
+    <div class="content-zone" style="left:{{ $page['contentLeftMm'] ?? 24 }}mm;width:{{ $page['contentWidthMm'] ?? 162 }}mm;top:{{ $page['contentZoneTopMm'] ?? 44.5 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 208 }}mm;">
+    <div class="content-inner" style="padding-top:{{ $page['paddingTopMm'] ?? 0 }}mm;">
 
         @foreach ($page['blocks'] as $block)
             @php $type = $block['type'] ?? 'para'; @endphp
@@ -141,6 +135,7 @@
 
         @endforeach
 
+    </div>
     </div>
 
 </div>

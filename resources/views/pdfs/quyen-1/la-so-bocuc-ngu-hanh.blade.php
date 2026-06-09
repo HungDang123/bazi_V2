@@ -32,14 +32,7 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
-            left: 28mm;
-            width: 154mm;
-            top: 16mm;
-            height: 220mm;
-            overflow: hidden;
-        }
+        @include('pdfs.partials.content-zone-styles')
 
         .chapter-title {
             font-family: 'svn-poppins', sans-serif;
@@ -104,7 +97,8 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-wrap">
+    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 44.5 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 208 }}mm; left: {{ $page['contentLeftMm'] ?? 28 }}mm; width: {{ $page['contentWidthMm'] ?? 154 }}mm;">
+        <div class="content-inner" style="padding-top: {{ $page['paddingTopMm'] ?? 0 }}mm;">
 
         @if (!empty($page['chapterTitle']))
         <div class="chapter-title">{{ $page['chapterTitle'] }}</div>
@@ -129,6 +123,7 @@
             @endif
         @endforeach
 
+        </div>
     </div>
 
 </div>

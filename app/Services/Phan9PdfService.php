@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\Pdf\PdfContentPaginator;
+use App\Services\Pdf\PdfPaginationProfiles;
 use App\Models\DongChayGioiThieu;
 use App\Models\Phan9aNgoaiLuc;
 use App\Models\Phan9aNoiLuc;
@@ -14,8 +16,6 @@ use App\Models\Phan9aNoiLuc;
  */
 class Phan9PdfService
 {
-    private const CONTENT_HEIGHT_MM = 258.0;
-
     public static function coverImagePath(): string
     {
         return resource_path('views/pdfs/phan-9/bia-phan-9.png');
@@ -40,7 +40,7 @@ class Phan9PdfService
         }
 
         $bgPath = self::contentBgPath();
-        $pages = Phan8PdfPaginator::paginate($blocks, $bgPath, self::CONTENT_HEIGHT_MM);
+        $pages = PdfContentPaginator::paginate($blocks, PdfPaginationProfiles::phan9($bgPath));
 
         if ($pages === []) {
             return [];

@@ -1,10 +1,10 @@
 {
     "svn-poppins": {
         "normal": "svn_poppins_normal_f04cd139384b20765736e6f179adefb3",
-        "bold": "C:\\Users\\HUNG\\Documents\\Zalo Received Files\\vuongkimbao\\storage\\fonts\/svn_poppins_bold_6b0699b50613bf17ff96dd5c61fc8bf1"
+        "bold": "svn_poppins_bold_6b0699b50613bf17ff96dd5c61fc8bf1"
     },
     "utm-davida": {
-        "normal": "C:\\Users\\HUNG\\Documents\\Zalo Received Files\\vuongkimbao\\storage\\fonts\/utm_davida_normal_f495b1d9c380e54dc20052ba3d82b1ac",
+        "normal": "utm_davida_normal_f495b1d9c380e54dc20052ba3d82b1ac",
         "bold": "utm_davida_bold_f495b1d9c380e54dc20052ba3d82b1ac"
     }
 }

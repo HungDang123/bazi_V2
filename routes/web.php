@@ -6,7 +6,7 @@ use App\Http\Controllers\LaSoPdfController;
 use App\Http\Controllers\PdfExportController;
 use App\Http\Controllers\SimController;
 
-// Export PDF lá số — public, không cần đăng nhập
+// Export PDF công khai — không yêu cầu đăng nhập (giữ URL /api/la-so/... để tương thích)
 Route::get('/api/la-so/export-pdf-1', [PdfExportController::class, 'exportLaSo1']);
 Route::get('/api/la-so/export-pdf-2', [PdfExportController::class, 'exportLaSo2']);
 
