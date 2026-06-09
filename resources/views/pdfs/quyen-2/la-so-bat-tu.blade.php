@@ -29,7 +29,7 @@
         /* Vùng nội dung bảng */
         .content {
             position: absolute;
-            top: 12mm;
+            top: 16mm;
             left: 17mm;
             width: 176mm;
         }

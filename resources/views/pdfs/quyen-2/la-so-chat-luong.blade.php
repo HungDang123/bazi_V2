@@ -13,7 +13,7 @@
         /* Chart image centered */
         .chart-img-wrap {
             position: absolute;
-            top: 34mm;
+            top: 38mm;
             left: 0;
             width: 210mm;
             text-align: center;
@@ -31,7 +31,7 @@
         /* Legend */
         .legend {
             position: absolute;
-            top: 150mm;
+            top: 154mm;
             left: 28mm;
             font-size: 6.5pt;
             color: #444;
@@ -47,7 +47,7 @@
         /* Bảng THẬP THẦN */
         .ts-table-wrap {
             position: absolute;
-            top: 153mm;
+            top: 157mm;
             left: 14mm;
             width: 182mm;
         }
@@ -250,7 +250,7 @@
         // Chart image: width=130mm, top=34mm, centered → left=40mm
         // ═══════════════════════════════════════════════════
         $cImgLeft = 40.0;
-        $cImgTop  = 34.0;
+        $cImgTop  = 38.0;
         $cImgW    = 130.0;
         $cImgH    = $cImgW * ($GH / $GW);  // 130*(500/600) = 108.3mm
 

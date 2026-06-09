@@ -2088,6 +2088,8 @@
                         }
                     });
 
+                    const PDF_STATUS_POLL_MS = 3000;
+
                     let currentPdfExportId = null;
                     let pdfStatusPollTimer = null;
                     let pdfQueueStartedAt = null;
@@ -2317,12 +2319,13 @@
                         pdfQueueStartedAt = Date.now();
                         pdfWorkerHintShown = false;
                         pollPdfStatus();
-                        pdfStatusPollTimer = setInterval(pollPdfStatus, 3000);
+                        pdfStatusPollTimer = setInterval(pollPdfStatus, PDF_STATUS_POLL_MS);
                     }
 
                     function waitForPdfReady(quyen, timeoutMs) {
                         return new Promise(function(resolve, reject) {
                             const started = Date.now();
+                            const key = quyen === 1 ? 'quyen_1' : 'quyen_2';
 
                             function check() {
                                 if (!currentPdfExportId) {
@@ -2330,30 +2333,21 @@
                                     return;
                                 }
 
-                                $.getJSON(`/api/la-so/pdf/status/${currentPdfExportId}`)
-                                    .done(function(res) {
-                                        const key = quyen === 1 ? 'quyen_1' : 'quyen_2';
-                                        const status = res[key]?.status || 'pending';
-                                        pdfStatusSnapshot[key] = res[key] || { status };
-                                        updatePdfStatusHint();
+                                const status = pdfStatusSnapshot[key]?.status || 'pending';
 
-                                        if (status === 'ready') {
-                                            resolve(true);
-                                            return;
-                                        }
-                                        if (status === 'failed') {
-                                            reject(new Error(res[key]?.error || 'Tạo PDF thất bại'));
-                                            return;
-                                        }
-                                        if (Date.now() - started > timeoutMs) {
-                                            reject(new Error('PDF đang xử lý quá lâu. Vui lòng chạy queue worker và thử lại.'));
-                                            return;
-                                        }
-                                        setTimeout(check, 2500);
-                                    })
-                                    .fail(function(xhr) {
-                                        reject(new Error(resolveApiErrorMessage(xhr, 'error')));
-                                    });
+                                if (status === 'ready') {
+                                    resolve(true);
+                                    return;
+                                }
+                                if (status === 'failed') {
+                                    reject(new Error(pdfStatusSnapshot[key]?.error || 'Tạo PDF thất bại'));
+                                    return;
+                                }
+                                if (Date.now() - started > timeoutMs) {
+                                    reject(new Error('PDF đang xử lý quá lâu. Vui lòng chạy queue worker và thử lại.'));
+                                    return;
+                                }
+                                setTimeout(check, PDF_STATUS_POLL_MS);
                             }
 
                             check();

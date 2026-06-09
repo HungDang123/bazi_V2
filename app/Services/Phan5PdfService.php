@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\Pdf\PdfContentPaginator;
+use App\Services\Pdf\PdfPaginationProfiles;
 use App\Models\Phan5KhiaCanh;
 use App\Models\Phan5Trang;
 use App\Models\ThapThanTheoViTri;
@@ -74,10 +76,12 @@ class Phan5PdfService
         }
 
         $blocks = Phan5BlockBuilder::fromTongQuan($subSections);
-        $pages = Phan5PdfPaginator::paginate(
+        $pages  = PdfContentPaginator::paginate(
             $blocks,
-            self::tongQuanBgPath(),
-            Phan5PdfPaginator::contentHeightForLayout('tong_quan')
+            PdfPaginationProfiles::phan5TongQuan(
+                self::tongQuanBgPath(),
+                self::contentBgPath()
+            )
         );
 
         return [

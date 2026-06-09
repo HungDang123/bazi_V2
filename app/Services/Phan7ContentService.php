@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Phan7BaiHoc;
+use App\Models\Phan7TamThe;
 
 class Phan7ContentService
 {
@@ -130,6 +131,48 @@ class Phan7ContentService
         }
 
         return $blocks;
+    }
+
+    /**
+     * Build content blocks for Phần 7 Mục I (phan7_tam_the).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function buildTamTheBlocks(int $sheetIndex = 0): array
+    {
+        $blocks = [];
+
+        foreach (Phan7TamThe::getAllOrdered($sheetIndex) as $row) {
+            $noiDung = trim((string) $row->noi_dung);
+
+            if ($noiDung === '[image]' || $noiDung === '') {
+                $imagePath = self::resolveTamTheImagePath($row->image);
+                if ($imagePath !== null) {
+                    $blocks[] = ['type' => 'image', 'path' => $imagePath];
+                }
+
+                continue;
+            }
+
+            if (preg_match('/^(I{1,3}V?|IV|V|VI{0,3}|\d+)\.\s/u', $noiDung)) {
+                $blocks[] = ['type' => 'section_label', 'text' => $noiDung];
+            } else {
+                $blocks[] = ['type' => 'para', 'text' => $noiDung];
+            }
+        }
+
+        return $blocks;
+    }
+
+    private static function resolveTamTheImagePath(?string $image): ?string
+    {
+        if ($image === null || trim($image) === '') {
+            return null;
+        }
+
+        $path = public_path(ltrim($image, '/'));
+
+        return file_exists($path) ? $path : null;
     }
 
     /**

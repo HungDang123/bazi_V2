@@ -22,13 +22,13 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
+        @include('pdfs.partials.content-zone-styles')
+
+        .content-zone {
             left: 16mm;
             width: 178mm;
-            top: 18mm;
-            height: 258mm;
-            overflow: hidden;
+            top: 15mm;
+            height: 207.9mm;
         }
 
         .iv-section {
@@ -90,7 +90,7 @@
 
 <div class="page">
     <img class="bg-img" src="{{ $bgPath }}">
-    <div class="content-wrap">
+    <div class="content-zone">
 
         @php
         $depthClass = static function (array $yr): string {

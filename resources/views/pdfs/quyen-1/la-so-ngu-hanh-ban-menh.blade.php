@@ -32,13 +32,13 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
+        @include('pdfs.partials.content-zone-styles')
+
+        .content-zone {
             left: 28mm;
             width: 154mm;
-            top: 16mm;
-            height: 240mm;
-            overflow: hidden;
+            top: 15mm;
+            height: 207.9mm;
         }
 
         /* UTM Davida 24px – PNG supersampling, giữ tỉ lệ (không ép height gây vỡ nét) */
@@ -103,7 +103,7 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-wrap">
+    <div class="content-zone">
 
         @if (!empty($page['showTitle']) && !empty($page['titleImagePath']))
         <div class="hanh-title-wrap">

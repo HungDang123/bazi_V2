@@ -152,7 +152,7 @@
         $cImgW    = 168.0;
         $cImgH    = $cImgW * ($GH / $GW);   // 168*(360/580) ≈ 104.3mm
         $cImgLeft = (210.0 - $cImgW) / 2;   // 21mm
-        $cImgTop  = 35.0;
+        $cImgTop  = 39.0;
         $scale    = $cImgW / $GW;            // 0.2897 mm/px
 
         $xAxisLabels = [

@@ -3,7 +3,7 @@
 namespace App\Services\Pdf;
 
 /**
- * Cấu hình phân trang PDF — vùng nội dung 70% A4, căn giữa dọc.
+ * Cấu hình phân trang PDF — vùng nội dung 70% A4, nội dung xếp từ trên xuống.
  */
 class PdfPaginationConfig
 {
@@ -11,9 +11,9 @@ class PdfPaginationConfig
 
     public const CONTENT_RATIO = 0.7;
 
-    public const CONTENT_ZONE_HEIGHT_MM = 208.0; // 297 × 0.7
+    public const CONTENT_ZONE_HEIGHT_MM = 207.9; // 297 × 0.7
 
-    public const CONTENT_ZONE_TOP_MM = 44.5; // (297 - 208) / 2
+    public const CONTENT_ZONE_TOP_MM = 15.0; // vùng 70% bắt đầu từ trên, nội dung xếp từ trên xuống
 
     public float $contentHeightMm;
 
@@ -85,8 +85,8 @@ class PdfPaginationConfig
         $this->contentLeftMm        = (float) ($overrides['contentLeftMm'] ?? 24.0);
         $this->contentWidthMm       = (float) ($overrides['contentWidthMm'] ?? 162.0);
         $this->charsPerLine         = (int) ($overrides['charsPerLine'] ?? 72);
-        $this->lineMm               = (float) ($overrides['lineMm'] ?? 5.2);
-        $this->blockGapMm           = (float) ($overrides['blockGapMm'] ?? 2.0);
+        $this->lineMm               = (float) ($overrides['lineMm'] ?? 4.5);
+        $this->blockGapMm           = (float) ($overrides['blockGapMm'] ?? 1.5);
         $this->imageGapMm           = (float) ($overrides['imageGapMm'] ?? 5.0);
         $this->fixedBlockHeights    = (array) ($overrides['fixedBlockHeights'] ?? []);
         $this->maxImageMm           = isset($overrides['maxImageMm']) ? (float) $overrides['maxImageMm'] : null;

@@ -9,7 +9,7 @@ class PdfFooterService
 {
     public const BANNER_WIDTH_MM = 42.0;
 
-    public const BOTTOM_MARGIN_MM = 7.0;
+    public const BOTTOM_MARGIN_MM = 4.5;
 
     /** 20px/mm — badge 33mm = 660px */
     private const RENDER_BANNER_PX = 660;
@@ -90,7 +90,8 @@ class PdfFooterService
                 }
 
                 $displayPage = $firstDisplayPage + ($pageNo - $firstFooterPage);
-                self::drawFooterOnPage($pdf, $pageW, $pageH, $displayPage, $fullName, $opaqueBanner);
+                $isLastPage  = $pageNo === $pageCount;
+                self::drawFooterOnPage($pdf, $pageW, $pageH, $displayPage, $fullName, $opaqueBanner, $isLastPage);
             }
 
             $outputDir = dirname($outputPdf);
@@ -120,7 +121,8 @@ class PdfFooterService
         float $pageH,
         int $displayPage,
         string $fullName,
-        string $opaqueBanner
+        string $opaqueBanner,
+        bool $isLastPage = false
     ): void {
         $badgePath = self::renderBadgeStrip($displayPage, $opaqueBanner);
         if ($badgePath === null || ! file_exists($badgePath)) {
@@ -138,8 +140,8 @@ class PdfFooterService
 
         $displayName = trim($fullName) !== '' ? mb_strtoupper(trim($fullName), 'UTF-8') : '';
 
-        // Trang đầu tiên có footer (displayPage=1) thường nền tối → chữ trắng
-        $whiteText = ($displayPage === self::FIRST_DISPLAY_PAGE_NUMBER);
+        // Trang đầu + trang cuối thường nền tối → chữ trắng; các trang giữa → chữ đen
+        $whiteText = $isLastPage || ($displayPage === self::FIRST_DISPLAY_PAGE_NUMBER);
         $namePath  = $displayName !== '' ? self::renderNameStrip($displayName, $whiteText) : null;
         $nameWmm  = 0.0;
         $nameHmm  = 0.0;

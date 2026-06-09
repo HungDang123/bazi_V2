@@ -28,11 +28,13 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
+        @include('pdfs.partials.content-zone-styles')
+
+        .content-zone {
             left: 28mm;
             width: 154mm;
-            overflow: hidden;
+            top: 15mm;
+            height: 207.9mm;
         }
 
         .sub-title {
@@ -74,7 +76,7 @@
 
     <img class="bg-img" src="{{ $templatePath }}">
 
-    <div class="content-wrap" style="top: 16mm; height: 240mm;">
+    <div class="content-zone">
         @foreach ($subSections as $sub)
         <div class="sub-section">
             @if (!empty($sub['sub_title']))
