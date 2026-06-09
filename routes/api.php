@@ -1,9 +1,17 @@
 <?php
 
 use App\Http\Controllers\Bazicontroller;
+use App\Http\Controllers\PdfExportController;
 use App\Http\Controllers\Que64Controller;
 use App\Http\Controllers\TongQuanKhiaCanhController;
+use App\Http\Middleware\ApiTimeout;
+use App\Http\Middleware\CompressJsonResponse;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/la-so/export-pdf-1', [PdfExportController::class, 'exportLaSo1'])
+    ->withoutMiddleware([ApiTimeout::class, CompressJsonResponse::class]);
+Route::get('/la-so/export-pdf-2', [PdfExportController::class, 'exportLaSo2'])
+    ->withoutMiddleware([ApiTimeout::class, CompressJsonResponse::class]);
 
 // PHẦN 5–8 (canonical)
 Route::get('/phan-5/tong-quan', [TongQuanKhiaCanhController::class, 'index']);
