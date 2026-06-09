@@ -29,28 +29,31 @@
             font-weight: bold;
             text-transform: uppercase;
             border-bottom: 1px solid #C9A227;
-            padding-bottom: 2px;
-            margin-bottom: 6px;
-            font-size: 12px;
+            padding-bottom: 3px;
+            margin-bottom: 8px;
+            font-size: 16px;
+            line-height: 130%;
         }
 
         .red-title {
             color: #6E0101;
             font-weight: bold;
-            margin-top: 5px;
-            margin-bottom: 3px;
-            font-size: 12px;
+            margin-top: 8px;
+            margin-bottom: 4px;
+            font-size: 16px;
+            line-height: 130%;
         }
 
         .para-text {
             color: #1A1A1A;
-            line-height: 100%;
-            margin-bottom: 3px;
-            font-size: 12px;
+            line-height: 140%;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-align: justify;
         }
-        .para-text p { margin-bottom: 2px; }
+        .para-text p { margin-bottom: 5px; }
 
-        .huong-label { font-weight: bold; margin-top: 3px; margin-bottom: 2px; font-size: 12px; }
+        .huong-label { font-weight: bold; margin-top: 4px; margin-bottom: 3px; font-size: 14px; line-height: 130%; }
         .huong-label.positive { color: #2E7D32; }
         .huong-label.negative { color: #C62828; }
     </style>

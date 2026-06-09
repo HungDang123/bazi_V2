@@ -37,15 +37,15 @@
         .tru-heading {
             font-family: 'svn-poppins', sans-serif;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 16px;
             color: #8A1C1C;
             text-align: left;
-            line-height: 135%;
+            line-height: 130%;
             margin-bottom: 4mm;
         }
 
         .block-label {
-            font-size: 10px;
+            font-size: 12px;
             color: #6B5A33;
             text-align: center;
             margin-bottom: 2mm;
@@ -80,7 +80,7 @@
         }
 
         .meta-line {
-            font-size: 11px;
+            font-size: 13px;
             color: #3A3A3A;
             text-align: center;
             margin-bottom: 5mm;
@@ -102,10 +102,11 @@
             font-family: 'svn-poppins', sans-serif;
             font-weight: bold;
             text-align: center;
-            font-size: 13px;
+            font-size: 16px;
+            line-height: 130%;
             color: #1A1A1A;
             margin-top: 1mm;
-            margin-bottom: 2.5mm;
+            margin-bottom: 3mm;
         }
 
         .section-box {
@@ -118,12 +119,12 @@
 
         .section-box p {
             font-family: 'svn-poppins', sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: normal;
-            line-height: 150%;
+            line-height: 140%;
             color: #1A1A1A;
             text-align: justify;
-            margin-bottom: 2mm;
+            margin-bottom: 2.5mm;
         }
         .section-box p:last-child { margin-bottom: 0; }
     </style>

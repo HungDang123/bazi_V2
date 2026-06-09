@@ -10,13 +10,13 @@ class HanhNoiDungService
     /** Thứ tự hiển thị: Kim → Mộc → Thủy → Hỏa → Thổ */
     public const ELEMENT_ORDER = ['kim', 'moc', 'thuy', 'hoa', 'tho'];
 
-    /** ~32 dòng text sau title + ảnh trên trang đầu mỗi hành */
-    private const FIRST_PAGE_MAX_LINES = 32;
+    /** ~22 dòng text sau title + ảnh hành (88mm) trên trang đầu (font 14px / line-height 140%, content-wrap 240mm) */
+    private const FIRST_PAGE_MAX_LINES = 22;
 
-    /** ~48 dòng text trên trang overflow */
-    private const CONT_PAGE_MAX_LINES = 48;
+    /** ~38 dòng text trên trang overflow (font 14px / line-height 140%, content-wrap 240mm) */
+    private const CONT_PAGE_MAX_LINES = 38;
 
-    private const CHARS_PER_LINE = 92;
+    private const CHARS_PER_LINE = 75;
 
     public static function phanTramToSlug(int $percent): string
     {

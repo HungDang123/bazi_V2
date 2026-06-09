@@ -7,9 +7,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'svn-poppins', sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: normal;
-            line-height: 100%;
+            line-height: 140%;
             text-align: justify;
             letter-spacing: 0;
         }
@@ -57,9 +57,9 @@
 
         .hanh-title-fallback {
             font-family: 'svn-poppins', sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
-            line-height: 100%;
+            line-height: 130%;
             letter-spacing: 0;
             text-align: center;
             color: #B90000;
@@ -75,24 +75,24 @@
 
         .item-title {
             font-family: 'svn-poppins', sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
-            line-height: 100%;
+            line-height: 130%;
             letter-spacing: 0;
             color: #000000;
-            margin-top: 5px;
-            margin-bottom: 2px;
+            margin-top: 7px;
+            margin-bottom: 3px;
         }
 
         .para-text {
             font-family: 'svn-poppins', sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: normal;
-            line-height: 100%;
+            line-height: 140%;
             letter-spacing: 0;
             text-align: justify;
             color: #1A1A1A;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
     </style>
 </head>
