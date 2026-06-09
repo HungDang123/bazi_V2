@@ -18,7 +18,7 @@
             width: 210mm;
             text-align: center;
         }
-        .chart-img-wrap img { width: 130mm; height: auto; }
+        .chart-img-wrap img { width: 124mm; height: auto; }
 
         /* Icons quanh radar */
         .icon-wrap {
@@ -247,12 +247,12 @@
 
         // ═══════════════════════════════════════════════════
         // Icon positions on the PDF page (mm)
-        // Chart image: width=130mm, top=34mm, centered → left=40mm
+        // Chart image: width=124mm, top=38mm, centered
         // ═══════════════════════════════════════════════════
-        $cImgLeft = 40.0;
+        $cImgW    = 124.0;
+        $cImgLeft = (210.0 - $cImgW) / 2.0;
         $cImgTop  = 38.0;
-        $cImgW    = 130.0;
-        $cImgH    = $cImgW * ($GH / $GW);  // 130*(500/600) = 108.3mm
+        $cImgH    = $cImgW * ($GH / $GW);
 
         // Chart center in page mm
         $pCX = $cImgLeft + $cImgW * ($gcx / $GW);   // 40+65 = 105mm

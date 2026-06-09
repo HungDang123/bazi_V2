@@ -84,25 +84,30 @@ class PdfPaginationProfiles
     ): PdfPaginationConfig {
         $zoneTop = self::contentZoneTopForLayout($layoutVariant);
         [$contentLeft, $contentWidth] = self::contentBoxForLayout($layoutVariant);
+        $isItemLayout = in_array($layoutVariant, ['su_nghiep_item', 'lbtv119', 'traits_su_nghiep', 'traits_lbtv119'], true);
 
         return new PdfPaginationConfig([
             'contentZoneTopMm'    => $zoneTop,
-            'contentHeightMm'     => PdfPaginationConfig::CONTENT_BUDGET_MM,
+            'contentHeightMm'     => $isItemLayout
+                ? PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM
+                : round(PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM * 0.96, 1),
             'contentZoneHeightMm' => PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM,
             'contentLeftMm'       => $contentLeft,
             'charsPerLine'        => 68,
+            'lineMm'              => 5.5,
             'contentWidthMm'      => $contentWidth,
-            'blockGapMm'          => 1.5,
+            'blockGapMm'          => $isItemLayout ? 2.0 : 2.5,
+            'imageGapMm'          => 3.0,
             'skipOversizedTraits' => true,
             'clampImages'         => true,
-            'maxImageMm'          => 120.0,
+            'maxImageMm'          => $isItemLayout ? 88.0 : 120.0,
             'fixedBlockHeights'   => [
-                'item_title'         => 10.0,
-                'section_title'      => 10.0,
+                'item_title'         => 12.0,
+                'section_title'      => 12.0,
                 'sub_title'          => 7.0,
-                'muc_label'          => 7.0,
-                'chien_luoc_title'   => 7.0,
-                'keywords'           => 68.0,
+                'muc_label'          => 8.0,
+                'chien_luoc_title'   => 8.0,
+                'keywords'           => 66.0,
                 'table'              => 92.0,
             ],
             'blockHeightResolver' => static function (array $block): float {
@@ -115,7 +120,7 @@ class PdfPaginationProfiles
             'bgResolver'          => static fn (): string => $bgPath,
             'budgetAdjustResolver' => static function (int $pageIndex, array $remaining, float $budget) use ($continuationHeader): float {
                 if ($pageIndex > 0 && $continuationHeader !== null) {
-                    $cfg = new PdfPaginationConfig(['blockGapMm' => 1.5, 'charsPerLine' => 68, 'lineMm' => 4.5]);
+                    $cfg = new PdfPaginationConfig(['blockGapMm' => 2.5, 'charsPerLine' => 68, 'lineMm' => 5.5]);
 
                     return $budget - PdfContentPaginator::blockHeightMm($continuationHeader, $cfg);
                 }
@@ -189,11 +194,14 @@ class PdfPaginationProfiles
     {
         $base = self::phan68Base($bgPath);
 
-        if ($contentHeightMm > 0) {
-            $base->contentHeightMm     = round($contentHeightMm * 0.92, 1); // budget 92% để tránh tràn
-            $base->contentZoneHeightMm = $contentHeightMm;
-        }
+        $zoneHeight = $contentHeightMm > 0
+            ? $contentHeightMm
+            : PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM;
 
+        $base->contentHeightMm     = $zoneHeight;
+        $base->contentZoneHeightMm = $zoneHeight;
+        $base->contentZoneTopMm    = PdfPaginationConfig::CONTENT_ZONE_TOP_MM;
+        $base->blockGapMm          = 2.0;
         $base->blockHeightResolver = self::phan68BlockHeight(...);
 
         return $base;
@@ -214,7 +222,7 @@ class PdfPaginationProfiles
     {
         return match ($layout) {
             'tong_quan' => 79.0,
-            'su_nghiep' => 30.0,
+            'su_nghiep' => 34.0,
             'su_nghiep_item' => 28.0,
             'traits_su_nghiep' => 32.0,
             'lbtv119', 'traits_lbtv119' => 22.0,
@@ -271,6 +279,8 @@ class PdfPaginationProfiles
     private static function phan68Base(string $bgPath): PdfPaginationConfig
     {
         return new PdfPaginationConfig([
+            'lineMm'            => 5.5,  // 14px × 140% × 0.2646mm/px ≈ 5.19mm → dùng 5.5 cho an toàn
+            'blockGapMm'        => 2.0,
             'fixedBlockHeights' => [
                 'chapter_title' => 9.0,
                 'sub_title'     => 7.0,
@@ -290,7 +300,7 @@ class PdfPaginationProfiles
             return 0.0;
         }
 
-        $cfg = new PdfPaginationConfig(['charsPerLine' => 72, 'lineMm' => 4.5, 'blockGapMm' => 1.5]);
+        $cfg = new PdfPaginationConfig(['charsPerLine' => 72, 'lineMm' => 5.5, 'blockGapMm' => 2.0]);
 
         return PdfContentPaginator::paraHeightMm((string) ($block['text'] ?? ''), $cfg) + 3.0 + 2.0;
     }
@@ -298,24 +308,29 @@ class PdfPaginationProfiles
     /** @param array<string, mixed> $block */
     private static function traitsHeightMm(array $block): float
     {
-        $tich = (string) ($block['tichCuc'] ?? '');
-        $tieu = (string) ($block['tieuCuc'] ?? '');
-        $tichLines = max(1, self::countLines($tich));
-        $tieuLines = max(1, self::countLines($tieu));
-        $maxLines  = max($tichLines, $tieuLines);
+        $cfg = new PdfPaginationConfig([
+            'charsPerLine'       => 32,
+            'lineMm'             => 5.5,
+            'lineWidthThreshold' => 0.95,
+        ]);
+        $tichH = self::traitsColumnBodyMm((string) ($block['tichCuc'] ?? ''), $cfg);
+        $tieuH = self::traitsColumnBodyMm((string) ($block['tieuCuc'] ?? ''), $cfg);
 
-        return 12.0 + ($maxLines * 5.5) + 6 + 2.0;
+        // pill 12mm + body padding 3.5mm + row margin-bottom 6mm + block gap 2mm
+        return 12.0 + 3.5 + max($tichH, $tieuH) + 6.0 + 2.0;
     }
 
-    private static function countLines(string $text): int
+    private static function traitsColumnBodyMm(string $text, PdfPaginationConfig $cfg): float
     {
-        if (trim($text) === '') {
-            return 0;
+        $height = 0.0;
+        foreach (preg_split('/\r\n|\r|\n/', $text) ?: [] as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+            $height += PdfContentPaginator::paraHeightMm($line, $cfg);
         }
 
-        return count(array_filter(
-            array_map('trim', preg_split('/\r\n|\r|\n/', $text) ?: []),
-            static fn (string $l): bool => $l !== ''
-        ));
+        return max($height, 5.5);
     }
 }

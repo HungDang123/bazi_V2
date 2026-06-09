@@ -27,9 +27,38 @@
         .content-zone {
             left: 16mm;
             width: 178mm;
-            top: 15mm;
-            height: 207.9mm;
+            top: 18mm;
+            height: 187.1mm;
         }
+
+        .iv-intro-title {
+            color: #6E0101;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #C9A227;
+            padding-bottom: 3px;
+            margin-bottom: 6px;
+            font-size: 16px;
+            line-height: 130%;
+        }
+
+        .iv-intro-subtitle {
+            color: #6E0101;
+            font-weight: bold;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            font-size: 14px;
+            line-height: 130%;
+        }
+
+        .iv-intro-para {
+            color: #1A1A1A;
+            line-height: 140%;
+            margin-bottom: 4mm;
+            font-size: 14px;
+            text-align: justify;
+        }
+        .iv-intro-para p { margin-bottom: 3px; }
 
         .iv-section {
             margin-bottom: 6mm;
@@ -91,6 +120,21 @@
 <div class="page">
     <img class="bg-img" src="{{ $bgPath }}">
     <div class="content-zone">
+
+        @foreach ($introBlocks ?? [] as $block)
+            @php $iType = $block['type'] ?? 'para'; @endphp
+            @if ($iType === 'chapter_title')
+            <div class="iv-intro-title">{{ $block['text'] ?? '' }}</div>
+            @elseif (in_array($iType, ['sub_title', 'sub_ab'], true))
+            <div class="iv-intro-subtitle">{{ $block['text'] ?? '' }}</div>
+            @else
+            <div class="iv-intro-para">
+                @foreach (preg_split('/\r\n|\r|\n/', $block['text'] ?? '') ?: [] as $line)
+                    @if (trim($line) !== '')<p>{{ trim($line) }}</p>@endif
+                @endforeach
+            </div>
+            @endif
+        @endforeach
 
         @php
         $depthClass = static function (array $yr): string {

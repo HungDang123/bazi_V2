@@ -1,15 +1,22 @@
 @php
-    $countTraitLines = static function (?string $text): int {
+    $traitCharsPerLine = 32;
+    $wrappedTraitLines = static function (?string $text) use ($traitCharsPerLine): int {
         if ($text === null || trim($text) === '') {
             return 0;
         }
-        return count(array_filter(
-            array_map('trim', preg_split('/\r\n|\r|\n/', $text) ?: []),
-            static fn (string $line): bool => $line !== ''
-        ));
+        $total = 0;
+        foreach (preg_split('/\r\n|\r|\n/', $text) ?: [] as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+            $total += max(1, (int) ceil(mb_strlen($line) / $traitCharsPerLine));
+        }
+
+        return $total;
     };
-    $tichLineCount = $countTraitLines($tichCuc ?? '');
-    $tieuLineCount = $countTraitLines($tieuCuc ?? '');
+    $tichLineCount = $wrappedTraitLines($tichCuc ?? '');
+    $tieuLineCount = $wrappedTraitLines($tieuCuc ?? '');
     $maxTraitLines = max($tichLineCount, $tieuLineCount, 1);
     $traitBodyMinHeightMm = round($maxTraitLines * 5.5 + 2, 2);
     $traitPillRowMm = 12;

@@ -244,7 +244,7 @@ class PdfExportController extends Controller
             'content-zone-70pct',
             'lineMm-4.5-blockGap-1.5',
             'paginator-linethreshold-95-imgguard-50',
-            'content-zone-187mm-top18mm-budget172-p5budget-p3budget',
+            'content-zone-187mm-top18mm-p5dense-p8fix-pagination',
             'phan3-chapter-in-content-wrap',
             'pdf-font-v3-svn',
             'bocuc-img-v1',

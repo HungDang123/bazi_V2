@@ -589,9 +589,10 @@
             vertical-align: top;
         }
 
-        /* Rows 5+: Years */
+        /* Rows 5+: Years (phần 2) */
         #daiVanTable tbody tr:nth-child(n+5) td {
-            padding: 8px;
+            padding: 5px 7px;
+            line-height: 1.2;
         }
 
         #daiVanTable .dai-van-can {
@@ -647,8 +648,9 @@
         }
 
         #daiVanTable .year-item {
-            margin: 6px 0;
-            font-size: 13px;
+            margin: 4px 0;
+            font-size: 12px;
+            line-height: 1.2;
         }
 
         #daiVanTable .year-canchi {
@@ -943,7 +945,8 @@
             }
 
             #daiVanTable .year-item {
-                margin: 4px 0;
+                margin: 3px 0;
+                line-height: 1.2;
             }
 
             #daiVanTable .year-canchi {

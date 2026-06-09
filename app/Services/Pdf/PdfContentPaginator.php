@@ -108,6 +108,7 @@ class PdfContentPaginator
                 }
 
                 $block = self::clampImageBlock($block, $available, $config);
+                $block = self::withImageRenderHeight($block, $config);
                 $need  = self::blockHeightMm($block, $config);
 
                 if ($chunk !== [] && ($used + $need) > $maxMm) {
@@ -161,12 +162,17 @@ class PdfContentPaginator
 
             if ($chunk === [] && $need > $maxMm && $type === 'image' && $config->clampImages) {
                 $block = self::clampImageBlock($block, $maxMm - $config->imageGapMm, $config);
+                $block = self::withImageRenderHeight($block, $config);
                 $need  = self::blockHeightMm($block, $config);
                 $chunk[] = $block;
                 $used += $need;
                 $idx++;
 
                 break;
+            }
+
+            if ($type === 'image') {
+                $block = self::withImageRenderHeight($block, $config);
             }
 
             $chunk[] = $block;
@@ -250,6 +256,23 @@ class PdfContentPaginator
         if ($h > $cap) {
             $block['maxHeightMm'] = round($cap, 1);
         }
+
+        return $block;
+    }
+
+    /**
+     * Gắn chiều cao render cho blade — paginator và PDF phải khớp nhau.
+     *
+     * @param  array<string, mixed>  $block
+     * @return array<string, mixed>
+     */
+    public static function withImageRenderHeight(array $block, PdfPaginationConfig $config): array
+    {
+        if (($block['type'] ?? '') !== 'image') {
+            return $block;
+        }
+
+        $block['maxHeightMm'] = round(self::imageHeightMm($block, $config), 1);
 
         return $block;
     }

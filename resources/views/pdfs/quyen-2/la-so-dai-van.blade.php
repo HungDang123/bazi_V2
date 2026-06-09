@@ -88,13 +88,14 @@
         .t-meta { color: #555555; }
         .t-pho  { color: #6E0101; font-weight: bold; }
 
-        /* Year rows */
+        /* Year rows (phần 2 — 10 năm) */
         .yr-row td {
-            height: 7mm;
+            height: 6.2mm;
             font-size: 6pt;
+            line-height: 1.1;
             color: #333;
             vertical-align: middle;
-            padding: 0.3mm;
+            padding: 0.2mm 0.3mm;
             background-color: #F3F3F3;
         }
         .yr-row-alt td { background-color: #EBEBEB; }

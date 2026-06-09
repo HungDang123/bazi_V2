@@ -27,13 +27,6 @@
 
         @include('pdfs.partials.content-zone-styles')
 
-        .content-zone {
-            left: 24mm;
-            width: 162mm;
-            top: 15mm;
-            height: 207.9mm;
-        }
-
         .tru-heading {
             font-family: 'svn-poppins', sans-serif;
             font-weight: bold;
@@ -54,6 +47,9 @@
         .golden-title-img {
             display: block;
             margin: 0 auto 3mm auto;
+            width: 162mm;
+            height: auto;
+            object-fit: contain;
         }
 
         .golden-title {
@@ -98,6 +94,35 @@
             margin-bottom: 5mm;
         }
 
+        .preamble-title {
+            color: #6E0101;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #C9A227;
+            padding-bottom: 3px;
+            margin-bottom: 6px;
+            font-size: 16px;
+            line-height: 130%;
+        }
+
+        .preamble-subtitle {
+            color: #6E0101;
+            font-weight: bold;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            font-size: 16px;
+            line-height: 130%;
+        }
+
+        .preamble-para {
+            color: #1A1A1A;
+            line-height: 140%;
+            margin-bottom: 4px;
+            font-size: 14px;
+            text-align: justify;
+        }
+        .preamble-para p { margin-bottom: 4px; }
+
         .section-title {
             font-family: 'svn-poppins', sans-serif;
             font-weight: bold;
@@ -110,7 +135,7 @@
         }
 
         .section-box {
-            background-color: rgba(255, 255, 255, 0.55);
+            background-color: transparent;
             border: 0.3mm solid rgba(190, 190, 190, 0.6);
             border-radius: 2.5mm;
             padding: 4mm 4.5mm;
@@ -134,10 +159,39 @@
 @foreach ($pages ?? [] as $page)
 <div class="page">
     <img class="bg-img" src="{{ $page['bgPath'] }}">
-    <div class="content-zone">
+    <div class="content-zone" style="left:24mm;width:162mm;top:{{ $page['contentZoneTopMm'] ?? 18 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 187.1 }}mm;">
+        @foreach ($page['preambleBlocks'] ?? [] as $block)
+            @php $pType = $block['type'] ?? 'para'; @endphp
+            @if ($pType === 'chapter_title')
+            <div class="preamble-title">{{ $block['text'] ?? '' }}</div>
+            @elseif (in_array($pType, ['sub_title', 'sub_ab'], true))
+            <div class="preamble-subtitle">{{ $block['text'] ?? '' }}</div>
+            @else
+            <div class="preamble-para">
+                @foreach (preg_split('/\r\n|\r|\n/', $block['text'] ?? '') ?: [] as $line)
+                    @if (trim($line) !== '')<p>{{ trim($line) }}</p>@endif
+                @endforeach
+            </div>
+            @endif
+        @endforeach
+
         @if (!empty($page['showHeader']))
+            @if (!empty($page['truHeading']))
+            <div class="tru-heading">{{ $page['truHeading'] }}</div>
+            @endif
+
+            @if (!empty($page['blockLabel']))
+            <div class="block-label">{{ $page['blockLabel'] }}</div>
+            @endif
+
             @if (!empty($page['titleImagePath']))
-            <img class="golden-title-img" src="{{ $page['titleImagePath'] }}" style="width: 162mm; height: auto;">
+            @php
+                $titleStyle = 'width:162mm;height:auto;object-fit:contain;';
+                if (!empty($page['titleImageHeightMm'])) {
+                    $titleStyle .= 'max-height:'.$page['titleImageHeightMm'].'mm;';
+                }
+            @endphp
+            <img class="golden-title-img" src="{{ $page['titleImagePath'] }}" style="{{ $titleStyle }}">
             @elseif (!empty($page['title']))
             <div class="golden-title">{{ $page['title'] }}</div>
             @endif
@@ -145,8 +199,18 @@
             @if (!empty($page['subtitle']))
             <div class="golden-subtitle">{{ $page['subtitle'] }}</div>
             @endif
+
+            @if (!empty($page['meta']))
+            <div class="meta-line">{{ $page['meta'] }}</div>
+            @endif
         @elseif (!empty($page['contTitleImagePath']))
-            <img class="golden-title-img" src="{{ $page['contTitleImagePath'] }}" style="width: 162mm; height: auto;">
+            @php
+                $contStyle = 'width:162mm;height:auto;object-fit:contain;';
+                if (!empty($page['contTitleImageHeightMm'])) {
+                    $contStyle .= 'max-height:'.$page['contTitleImageHeightMm'].'mm;';
+                }
+            @endphp
+            <img class="golden-title-img" src="{{ $page['contTitleImagePath'] }}" style="{{ $contStyle }}">
         @elseif (!empty($page['continuationTitle']))
             <div class="continuation-title">{{ $page['continuationTitle'] }}</div>
         @endif

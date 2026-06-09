@@ -248,12 +248,27 @@ class Phan8ContentService
             }
         }
 
-        if ($introBlocks !== []) {
-            $specs = array_merge([['type' => 'content', 'blocks' => $introBlocks]], $specs);
-        }
-
         if ($fallbackBlocks !== []) {
             $specs[] = ['type' => 'content', 'blocks' => $fallbackBlocks];
+        }
+
+        if ($introBlocks !== [] && $specs !== []) {
+            foreach ($specs as $idx => $spec) {
+                if (($spec['type'] ?? '') === 'coding') {
+                    $specs[$idx]['data']['preambleBlocks'] = array_merge(
+                        $introBlocks,
+                        is_array($specs[$idx]['data']['preambleBlocks'] ?? null)
+                            ? $specs[$idx]['data']['preambleBlocks']
+                            : []
+                    );
+                    $introBlocks = [];
+                    break;
+                }
+            }
+        }
+
+        if ($introBlocks !== []) {
+            $specs = array_merge([['type' => 'content', 'blocks' => $introBlocks]], $specs);
         }
 
         if (! $hasCoding && $introBlocks === [] && $fallbackBlocks === []) {
@@ -311,7 +326,7 @@ class Phan8ContentService
                 .' ('.($item['thap_than_dia_chi'] ?? '—').')',
         ];
 
-        $specs[] = ['type' => 'content', 'blocks' => $introBlocks];
+        $mainIntroBlocks = $introBlocks;
 
         $truMap = [
             'nam' => ['Trụ Năm', 'Thiên Can – Niên Vận – Trụ Năm', 'Địa Chi – Niên Vận – Trụ Năm'],
@@ -341,9 +356,11 @@ class Phan8ContentService
                 foreach (self::paragraphBlocks($body) as $b) {
                     $nvBlocks[] = $b;
                 }
-                $specs[] = ['type' => 'content', 'blocks' => $nvBlocks];
             } elseif ($hasCoding) {
                 $pendingHeading = $title;
+                $nvBlocks = [];
+            } else {
+                $nvBlocks = [];
             }
 
             if ($body !== '' || $hasCoding) {
@@ -358,11 +375,37 @@ class Phan8ContentService
                 $truCodingSpecs = array_merge($truCodingSpecs, self::specsFromCodingBlock($block, $labelDc, true, $nvCodingBg));
             }
 
-            if ($pendingHeading !== null && $truCodingSpecs !== []) {
-                $truCodingSpecs[0]['data']['truHeading'] = $pendingHeading;
+            if ($truCodingSpecs !== []) {
+                if ($nvBlocks !== []) {
+                    $existing = is_array($truCodingSpecs[0]['data']['preambleBlocks'] ?? null)
+                        ? $truCodingSpecs[0]['data']['preambleBlocks']
+                        : [];
+                    $truCodingSpecs[0]['data']['preambleBlocks'] = array_merge($existing, $nvBlocks);
+                } elseif ($pendingHeading !== null) {
+                    $truCodingSpecs[0]['data']['truHeading'] = $pendingHeading;
+                }
+            } elseif ($nvBlocks !== []) {
+                $specs[] = ['type' => 'content', 'blocks' => $nvBlocks];
             }
 
             $specs = array_merge($specs, $truCodingSpecs);
+        }
+
+        if ($mainIntroBlocks !== []) {
+            $attached = false;
+            foreach ($specs as $idx => $spec) {
+                if (($spec['type'] ?? '') === 'coding') {
+                    $existing = is_array($specs[$idx]['data']['preambleBlocks'] ?? null)
+                        ? $specs[$idx]['data']['preambleBlocks']
+                        : [];
+                    $specs[$idx]['data']['preambleBlocks'] = array_merge($mainIntroBlocks, $existing);
+                    $attached = true;
+                    break;
+                }
+            }
+            if (! $attached) {
+                $specs = array_merge([['type' => 'content', 'blocks' => $mainIntroBlocks]], $specs);
+            }
         }
 
         return $specs;

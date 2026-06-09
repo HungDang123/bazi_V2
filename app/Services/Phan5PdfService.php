@@ -269,51 +269,27 @@ class Phan5PdfService
             'thapThanUpper' => mb_strtoupper($thapThan, 'UTF-8'),
         ];
 
-        $pages = [];
+        $fullData = array_merge($base, [
+            'minhHoaPath' => $minhHoa,
+            'keywords' => $keywords,
+            'giaiNghia' => $giaiNghia,
+            'tichCuc' => $tichCuc,
+            'tieuCuc' => $tieuCuc,
+            'chienLuoc' => $chienLuoc,
+            'layoutKey' => 'su_nghiep_item',
+        ]);
 
-        if ($giaiNghia !== '' || $keywords !== [] || $minhHoa !== null) {
-            $pages = array_merge(
-                $pages,
-                self::wrapPaginatedView(
-                    'pdfs.phan-5.la-so-su-nghiep-thap-than-item',
-                    array_merge($base, [
-                        'minhHoaPath' => $minhHoa,
-                        'keywords' => $keywords,
-                        'giaiNghia' => $giaiNghia,
-                        'layoutKey' => 'su_nghiep_item',
-                    ]),
-                    Phan5BlockBuilder::fromThapThanItem(array_merge($base, [
-                        'minhHoaPath' => $minhHoa,
-                        'keywords' => $keywords,
-                        'giaiNghia' => $giaiNghia,
-                    ])),
-                    'su_nghiep_item'
-                )
-            );
+        $blocks = Phan5BlockBuilder::fromThapThanItemWithTraits($fullData);
+        if ($blocks === []) {
+            return [];
         }
 
-        if ($tichCuc !== '' || $tieuCuc !== '' || $chienLuoc !== '') {
-            $pages = array_merge(
-                $pages,
-                self::wrapPaginatedView(
-                    'pdfs.phan-5.la-so-su-nghiep-thap-than-traits',
-                    array_merge($base, [
-                        'tichCuc' => $tichCuc,
-                        'tieuCuc' => $tieuCuc,
-                        'chienLuoc' => $chienLuoc,
-                        'layoutKey' => 'traits_su_nghiep',
-                    ]),
-                    Phan5BlockBuilder::fromTraits([
-                        'tichCuc' => $tichCuc,
-                        'tieuCuc' => $tieuCuc,
-                        'chienLuoc' => $chienLuoc,
-                    ]),
-                    'traits_su_nghiep'
-                )
-            );
-        }
-
-        return $pages;
+        return self::wrapPaginatedView(
+            'pdfs.phan-5.la-so-su-nghiep-thap-than-item',
+            $fullData,
+            $blocks,
+            'su_nghiep_item'
+        );
     }
 
     /**
@@ -405,50 +381,28 @@ class Phan5PdfService
             'thapThanUpper' => mb_strtoupper($thapThan, 'UTF-8'),
         ];
 
-        $pages = [];
-        $hasIntro = $minhHoa !== null
-            || $parsed['keywords'] !== []
-            || $parsed['giaiNghia'] !== ''
-            || $parsed['bodySections'] !== [];
+        $itemData = array_merge($base, [
+            'minhHoaPath' => $minhHoa,
+            'keywords' => $parsed['keywords'],
+            'giaiNghia' => $parsed['giaiNghia'],
+            'bodySections' => $parsed['bodySections'],
+            'tichCuc' => $parsed['tichCuc'],
+            'tieuCuc' => $parsed['tieuCuc'],
+            'chienLuoc' => $parsed['chienLuoc'],
+            'layoutKey' => 'lbtv119',
+        ]);
 
-        if ($hasIntro) {
-            $itemData = array_merge($base, [
-                'minhHoaPath' => $minhHoa,
-                'keywords' => $parsed['keywords'],
-                'giaiNghia' => $parsed['giaiNghia'],
-                'bodySections' => $parsed['bodySections'],
-                'layoutKey' => 'lbtv119',
-            ]);
-            $pages = array_merge(
-                $pages,
-                self::wrapPaginatedView(
-                    'pdfs.phan-5.la-so-su-nghiep-thap-than-item',
-                    $itemData,
-                    Phan5BlockBuilder::fromThapThanItem($itemData),
-                    'lbtv119'
-                )
-            );
+        $blocks = Phan5BlockBuilder::fromThapThanItemWithTraits($itemData);
+        if ($blocks === []) {
+            return [];
         }
 
-        if ($parsed['tichCuc'] !== '' || $parsed['tieuCuc'] !== '' || $parsed['chienLuoc'] !== '') {
-            $traitsData = array_merge($base, [
-                'tichCuc' => $parsed['tichCuc'],
-                'tieuCuc' => $parsed['tieuCuc'],
-                'chienLuoc' => $parsed['chienLuoc'],
-                'layoutKey' => 'traits_lbtv119',
-            ]);
-            $pages = array_merge(
-                $pages,
-                self::wrapPaginatedView(
-                    'pdfs.phan-5.la-so-su-nghiep-thap-than-traits',
-                    $traitsData,
-                    Phan5BlockBuilder::fromTraits($traitsData),
-                    'traits_lbtv119'
-                )
-            );
-        }
-
-        return $pages;
+        return self::wrapPaginatedView(
+            'pdfs.phan-5.la-so-su-nghiep-thap-than-item',
+            $itemData,
+            $blocks,
+            'lbtv119'
+        );
     }
 
     /**

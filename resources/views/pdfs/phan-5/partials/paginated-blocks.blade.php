@@ -21,7 +21,14 @@
         'highlightPillars' => $block['highlightPillars'] ?? [],
     ])
     @elseif ($type === 'image')
+    @php
+        $imgStyle = 'display:block;width:100%;height:auto;margin:0 auto 4mm;object-fit:contain;';
+        if (! empty($block['maxHeightMm'])) {
+            $imgStyle .= 'max-height:'.$block['maxHeightMm'].'mm;';
+        }
+    @endphp
     <img class="content-img{{ ($imageClass ?? '') !== '' ? ' '.$imageClass : '' }}"
+         style="{{ $imgStyle }}"
          src="{{ $block['path'] }}"
          alt="">
     @elseif ($type === 'traits')

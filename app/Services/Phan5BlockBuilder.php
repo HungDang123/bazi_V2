@@ -167,6 +167,18 @@ class Phan5BlockBuilder
      * @param  array<string, mixed>  $data
      * @return array<int, array<string, mixed>>
      */
+    public static function fromThapThanItemWithTraits(array $data): array
+    {
+        return array_merge(
+            self::fromThapThanItem($data),
+            self::fromTraits($data)
+        );
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<int, array<string, mixed>>
+     */
     public static function fromTraits(array $data): array
     {
         $blocks = [];

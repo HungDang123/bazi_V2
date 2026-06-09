@@ -31,7 +31,7 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            margin-bottom: 8mm;
+            margin-bottom: 6mm;
         }
 
         .traits-row > tbody > tr > td {

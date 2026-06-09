@@ -2,18 +2,16 @@
 
 namespace App\Services;
 
+use App\Services\Pdf\PdfPaginationConfig;
+
 /**
  * Phân trang trang coding Đại Vận (LBTV-195).
  */
 class Phan8CodingPaginator
 {
-    private const CONTENT_HEIGHT_MM = 222.0;
-
     private const CHARS_PER_LINE = 72;
 
-    private const LINE_MM = 4.7;
-
-    private const BLOCK_LABEL_MM = 6.0;
+    private const LINE_MM = 5.5;
 
     private const TITLE_CHARS_PER_LINE = 26;
 
@@ -21,17 +19,13 @@ class Phan8CodingPaginator
 
     private const SUBTITLE_LINE_MM = 4.6;
 
-    private const META_MM = 9.0;
+    private const SECTION_TITLE_MM = 7.0;
 
-    private const SECTION_TITLE_MM = 6.5;
+    private const SECTION_GAP_MM = 2.0;
 
-    private const SECTION_GAP_MM = 2.5;
-
-    private const BOX_PAD_MM = 6.0;
+    private const BOX_PAD_MM = 8.0;
 
     private const CONT_TITLE_MM = 13.0;
-
-    private const TRU_HEADING_MM = 8.0;
 
     /**
      * @param  array<string, mixed>  $data
@@ -47,25 +41,27 @@ class Phan8CodingPaginator
         $pages = [];
         $remaining = $sections;
         $pageIndex = 0;
+        $zoneHeight = PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM;
 
         while ($remaining !== []) {
-            $budget = self::CONTENT_HEIGHT_MM;
+            $budget = $zoneHeight;
             $showHeader = $pageIndex === 0;
 
             if ($showHeader) {
                 $budget -= self::headerHeightMm($data);
+                $budget -= self::preambleHeightMm($data['preambleBlocks'] ?? []);
             } else {
                 $contH = (float) ($data['contTitleImageHeightMm'] ?? 0.0);
-                $budget -= $contH > 0 ? $contH + 4.0 : self::CONT_TITLE_MM;
+                $budget -= $contH > 0 ? $contH + 3.0 : self::CONT_TITLE_MM;
             }
 
-            [$chunk, $remaining] = self::takeSections($remaining, $budget);
+            [$chunk, $remaining] = self::takeSections($remaining, max(20.0, $budget));
 
             if ($chunk === []) {
                 break;
             }
 
-            $page = [
+            $pages[] = [
                 'bgPath' => $data['bgPath'] ?? Phan8AssetService::codingBgPath(),
                 'showHeader' => $showHeader,
                 'truHeading' => $showHeader ? ($data['truHeading'] ?? '') : '',
@@ -75,13 +71,15 @@ class Phan8CodingPaginator
                 'titleImageHeightMm' => $showHeader ? ($data['titleImageHeightMm'] ?? 0.0) : 0.0,
                 'subtitle' => $showHeader ? ($data['subtitle'] ?? '') : '',
                 'meta' => $showHeader ? ($data['meta'] ?? '') : '',
+                'preambleBlocks' => $showHeader ? ($data['preambleBlocks'] ?? []) : [],
                 'continuationTitle' => $showHeader ? '' : trim((string) ($data['title'] ?? '')).' (tiếp)',
                 'contTitleImagePath' => $showHeader ? '' : ($data['contTitleImagePath'] ?? ''),
                 'contTitleImageHeightMm' => $showHeader ? 0.0 : ($data['contTitleImageHeightMm'] ?? 0.0),
                 'sections' => $chunk,
+                'contentZoneTopMm' => PdfPaginationConfig::CONTENT_ZONE_TOP_MM,
+                'contentZoneHeightMm' => $zoneHeight,
             ];
 
-            $pages[] = $page;
             $pageIndex++;
         }
 
@@ -95,19 +93,59 @@ class Phan8CodingPaginator
     {
         $h = 0.0;
 
+        $truHeading = trim((string) ($data['truHeading'] ?? ''));
+        if ($truHeading !== '') {
+            $h += 8.0;
+        }
+
+        $blockLabel = trim((string) ($data['blockLabel'] ?? ''));
+        if ($blockLabel !== '') {
+            $h += 5.0;
+        }
+
         $titleImgH = (float) ($data['titleImageHeightMm'] ?? 0.0);
         if ($titleImgH > 0) {
-            $h += $titleImgH + 3;
+            $h += $titleImgH + 3.0;
         } else {
             $title = trim((string) ($data['title'] ?? ''));
             if ($title !== '') {
-                $h += max(1, (int) ceil(mb_strlen($title) / self::TITLE_CHARS_PER_LINE)) * self::TITLE_LINE_MM + 3;
+                $h += max(1, (int) ceil(mb_strlen($title) / self::TITLE_CHARS_PER_LINE)) * self::TITLE_LINE_MM + 3.0;
             }
         }
 
         $subtitle = trim((string) ($data['subtitle'] ?? ''));
         if ($subtitle !== '') {
-            $h += max(1, (int) ceil(mb_strlen($subtitle) / 40)) * self::SUBTITLE_LINE_MM + 5;
+            $h += max(1, (int) ceil(mb_strlen($subtitle) / 40)) * self::SUBTITLE_LINE_MM + 4.0;
+        }
+
+        $meta = trim((string) ($data['meta'] ?? ''));
+        if ($meta !== '') {
+            $h += 8.0;
+        }
+
+        return $h;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $blocks
+     */
+    private static function preambleHeightMm(array $blocks): float
+    {
+        $h = 0.0;
+        foreach ($blocks as $block) {
+            if (! is_array($block)) {
+                continue;
+            }
+            $type = (string) ($block['type'] ?? 'para');
+            if ($type === 'chapter_title') {
+                $h += 12.0;
+            } elseif (in_array($type, ['sub_title', 'sub_ab'], true)) {
+                $h += 8.0;
+            } else {
+                $text = trim((string) ($block['text'] ?? ''));
+                $lines = max(1, (int) ceil(mb_strlen($text) / self::CHARS_PER_LINE));
+                $h += $lines * self::LINE_MM + 2.0;
+            }
         }
 
         return $h;

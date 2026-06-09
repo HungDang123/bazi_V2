@@ -58,6 +58,7 @@ class Phan8PdfService
         $bufType = null;
         $bufBlocks = [];
         $ivTableBuf = [];
+        $ivIntroBlocks = [];
 
         foreach ($pageSpecs as $spec) {
             $type = $spec['type'] ?? 'content';
@@ -102,9 +103,11 @@ class Phan8PdfService
             }
 
             if ($type === 'iv_table') {
-                self::appendTextPages($pdfPages, $bufType, $bufBlocks);
-                $bufType = null;
-                $bufBlocks = [];
+                if ($bufBlocks !== []) {
+                    $ivIntroBlocks = array_merge($ivIntroBlocks, $bufBlocks);
+                    $bufBlocks = [];
+                    $bufType = null;
+                }
 
                 $tableData = $spec['data'] ?? null;
                 if (is_array($tableData) && ($tableData['years'] ?? []) !== []) {
@@ -131,7 +134,7 @@ class Phan8PdfService
         }
 
         self::appendTextPages($pdfPages, $bufType, $bufBlocks);
-        self::flushIvTables($pdfPages, $ivTableBuf);
+        self::flushIvTables($pdfPages, $ivTableBuf, $ivIntroBlocks);
 
         return $pdfPages;
     }
@@ -145,20 +148,27 @@ class Phan8PdfService
      * @param  array<int, array{view: string, data: array<string, mixed>}>  $pdfPages
      * @param  array<int, array<string, mixed>>  $ivTableBuf
      */
-    private static function flushIvTables(array &$pdfPages, array $ivTableBuf): void
+    private static function flushIvTables(array &$pdfPages, array $ivTableBuf, array $introBlocks = []): void
     {
         if ($ivTableBuf === []) {
+            if ($introBlocks !== []) {
+                self::appendTextPages($pdfPages, 'content', $introBlocks);
+            }
+
             return;
         }
 
+        $first = true;
         foreach (array_chunk($ivTableBuf, self::IV_TABLES_PER_PAGE) as $group) {
             $pdfPages[] = [
                 'view' => 'pdfs.phan-8.la-so-phan-8-iv-table',
                 'data' => [
                     'bgPath' => Phan8AssetService::contentBgPath(),
                     'tables' => $group,
+                    'introBlocks' => $first ? $introBlocks : [],
                 ],
             ];
+            $first = false;
         }
     }
 
@@ -180,11 +190,14 @@ class Phan8PdfService
             ? 'pdfs.phan-8.la-so-phan-8-nien-van'
             : 'pdfs.phan-8.la-so-phan-8-content';
 
-        foreach (Phan8PdfPaginator::paginate($blocks, $bgPath) as $page) {
-            $pdfPages[] = [
-                'view' => $view,
-                'data' => ['pages' => [$page]],
-            ];
+        $pages = Phan8PdfPaginator::paginate($blocks, $bgPath);
+        if ($pages === []) {
+            return;
         }
+
+        $pdfPages[] = [
+            'view' => $view,
+            'data' => ['pages' => $pages],
+        ];
     }
 }
