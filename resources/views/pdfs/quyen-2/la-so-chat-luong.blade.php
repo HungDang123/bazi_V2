@@ -72,7 +72,9 @@
             font-weight: bold;
             height: 8mm;
             text-align: center;
+            vertical-align: middle;
             font-size: 8pt;
+            line-height: 1.2;
         }
         .ts-lbl-col {
             width: 25%;
@@ -80,9 +82,12 @@
             color: #E5CA8E;
             font-weight: bold;
             text-align: center;
-            font-size: 7.5pt;
+            vertical-align: middle;
+            font-size: 8pt;
+            line-height: 1.2;
+            padding: 1mm 2mm;
         }
-        .bar-cell { width: 37.5%; padding: 1mm 2mm; }
+        .bar-cell { width: 37.5%; padding: 1mm 2mm; vertical-align: middle; }
         .ts-odd  td:not(.ts-lbl-col) { background: #F2EFE8; }
         .ts-even td:not(.ts-lbl-col) { background: #E9E5DE; }
         .bar-track {
@@ -91,33 +96,39 @@
             border-radius: 9px;
             height: 18px;
             overflow: hidden;
+            line-height: 0;
         }
         .bar-fill-bm {
             background: #0479FD;
             border-radius: 9px;
             height: 18px;
-            font-size: 7.5px;
+            min-width: 28px;
+            font-size: 8px;
             color: #fff;
             text-align: center;
-            padding-top: 3px;
+            line-height: 18px;
             font-weight: bold;
+            padding: 0;
         }
         .bar-fill-nv {
             background: #6E0101;
             border-radius: 9px;
             height: 18px;
-            font-size: 7.5px;
+            min-width: 28px;
+            font-size: 8px;
             color: #fff;
             text-align: center;
-            padding-top: 3px;
+            line-height: 18px;
             font-weight: bold;
+            padding: 0;
         }
         .bar-zero {
             height: 18px;
-            font-size: 7.5px;
+            font-size: 8px;
             color: #888;
-            padding-top: 3px;
-            padding-left: 6px;
+            line-height: 18px;
+            text-align: left;
+            padding: 0 0 0 6px;
         }
     </style>
 </head>

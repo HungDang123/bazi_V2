@@ -51,7 +51,7 @@
         .dv-hdr th {
             background-color: #6E0101;
             color: #ffffff;
-            font-size: 8pt;
+            font-size: 8.5pt;
             font-weight: bold;
             height: 9mm;
             border: 0.5pt solid #6E0101;
@@ -61,7 +61,7 @@
         th.lbl {
             background-color: #6E0101 !important;
             color: #ffffff !important;
-            font-size: 7.5pt;
+            font-size: 8pt;
             font-weight: bold;
             width: 9%;
         }
@@ -69,26 +69,26 @@
         td.lbl {
             background-color: #F3F3F3 !important;
             color: #333333 !important;
-            font-size: 7.5pt;
+            font-size: 8pt;
             font-weight: bold;
             width: 9%;
         }
 
         /* Thiên Can row */
-        .tc-row td  { height: 25mm; background-color: #F3F3F3; }
-        .dv-name    { font-size: 9pt;   font-weight: bold; color: #6E0101; }
-        .dv-meta    { font-size: 6.5pt; color: #555555; }
-        .dv-tt      { font-size: 6.5pt; font-weight: bold; color: #6E0101; }
+        .tc-row td  { height: 26mm; background-color: #F3F3F3; }
+        .dv-name    { font-size: 10pt;  font-weight: bold; color: #6E0101; line-height: 1.15; }
+        .dv-meta    { font-size: 7pt;   color: #555555; line-height: 1.15; }
+        .dv-tt      { font-size: 7pt;   font-weight: bold; color: #6E0101; line-height: 1.15; }
 
         /* Địa Chi row */
-        .dc-row td  { height: 14mm; background-color: #F3F3F3; }
+        .dc-row td  { height: 15mm; background-color: #F3F3F3; }
 
         /* Tàng Cang row */
-        .tang-row td { height: 12mm; background-color: #F3F3F3; }
+        .tang-row td { height: 13mm; background-color: #F3F3F3; }
 
         /* Sub-table Tàng Can (dùng chung) */
         .tc-sub { width: 100%; border-collapse: collapse; }
-        .tc-sub td { border: none !important; padding: 0.1mm; text-align: center; font-size: 5.5pt; line-height: 1.1; }
+        .tc-sub td { border: none !important; padding: 0.2mm; text-align: center; font-size: 6pt; line-height: 1.15; vertical-align: middle; }
         .t-can  { color: #6E0101; font-weight: bold; }
         .t-meta { color: #555555; }
         .t-pho  { color: #6E0101; font-weight: bold; }
@@ -96,8 +96,8 @@
         /* Year rows (phần 2 — 10 năm) */
         .yr-row td {
             height: 6.2mm;
-            font-size: 6pt;
-            line-height: 1.1;
+            font-size: 6.5pt;
+            line-height: 1.15;
             color: #333;
             vertical-align: middle;
             padding: 0.2mm 0.3mm;

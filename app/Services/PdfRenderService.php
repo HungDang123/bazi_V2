@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\Pdf\PdfTextSanitizer;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PdfRenderService
@@ -45,12 +47,32 @@ class PdfRenderService
      */
     private static function normalizeViewData(array $data): array
     {
+        $data = PdfTextSanitizer::sanitizeDeep($data);
+
         foreach ($data as $key => $value) {
             if (is_string($value)) {
                 $value = self::normalizeUnicode($value);
                 $data[$key] = self::optimizeImagePathIfNeeded($value);
             } elseif (is_array($value)) {
-                $data[$key] = self::normalizeViewData($value);
+                $data[$key] = self::normalizeViewDataRecursive($value);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private static function normalizeViewDataRecursive(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                $value = self::normalizeUnicode($value);
+                $data[$key] = self::optimizeImagePathIfNeeded($value);
+            } elseif (is_array($value)) {
+                $data[$key] = self::normalizeViewDataRecursive($value);
             }
         }
 

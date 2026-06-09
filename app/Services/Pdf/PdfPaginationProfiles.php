@@ -89,8 +89,8 @@ class PdfPaginationProfiles
         return new PdfPaginationConfig([
             'contentZoneTopMm'    => $zoneTop,
             'contentHeightMm'     => $isItemLayout
-                ? PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM
-                : round(PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM * 0.96, 1),
+                ? round(PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM * 0.88, 1)
+                : round(PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM * 0.92, 1),
             'contentZoneHeightMm' => PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM,
             'contentLeftMm'       => $contentLeft,
             'charsPerLine'        => 68,
@@ -107,7 +107,7 @@ class PdfPaginationProfiles
                 'sub_title'          => 7.0,
                 'muc_label'          => 8.0,
                 'chien_luoc_title'   => 8.0,
-                'keywords'           => 66.0,
+                'keywords'           => 70.0,
                 'table'              => 92.0,
             ],
             'blockHeightResolver' => static function (array $block): float {
@@ -119,6 +119,15 @@ class PdfPaginationProfiles
 
                 if ($type === 'keywords') {
                     return self::keywordsHeightMm($block);
+                }
+
+                if ($type === 'para' || $type === '') {
+                    return PdfTextWrapHelper::renderedHeightMm(
+                        (string) ($block['text'] ?? ''),
+                        68,
+                        5.5,
+                        2.0
+                    ) + 2.0;
                 }
 
                 return 0.0;
@@ -204,11 +213,26 @@ class PdfPaginationProfiles
             ? $contentHeightMm
             : PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM;
 
-        $base->contentHeightMm     = $zoneHeight;
+        $base->contentHeightMm     = round(PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM * 0.88, 1);
         $base->contentZoneHeightMm = $zoneHeight;
         $base->contentZoneTopMm    = PdfPaginationConfig::CONTENT_ZONE_TOP_MM;
         $base->blockGapMm          = 2.0;
-        $base->blockHeightResolver = self::phan68BlockHeight(...);
+        $base->charsPerLine        = 72;
+        $base->lineMm              = 5.5;
+        $base->blockHeightResolver = static function (array $block): float {
+            $type = (string) ($block['type'] ?? '');
+
+            if ($type === 'para' || $type === '') {
+                return PdfTextWrapHelper::renderedHeightMm(
+                    (string) ($block['text'] ?? ''),
+                    72,
+                    5.5,
+                    2.0
+                ) + 2.0;
+            }
+
+            return self::phan68BlockHeight($block);
+        };
 
         return $base;
     }
@@ -314,14 +338,14 @@ class PdfPaginationProfiles
     /** @param array<string, mixed> $block */
     private static function keywordsHeightMm(array $block): float
     {
-        // khung 59.71mm + label ~8mm + margin-bottom 5mm + block gap 2mm
+        // khung 59.71mm + label 8mm + margin 5mm + buffer 2mm
         $h = 59.71 + 5.0 + 2.0;
         $label = trim((string) ($block['label'] ?? ''));
         if ($label !== '') {
             $h += 8.0;
         }
 
-        return $h;
+        return $h + 2.0;
     }
 
     /** @param array<string, mixed> $block */

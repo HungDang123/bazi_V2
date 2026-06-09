@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\Pdf\PdfTextSanitizer;
+
 class Phan5BlockBuilder
 {
     /**
@@ -27,7 +29,7 @@ class Phan5BlockBuilder
                         'widthMm' => 154.0,
                     ];
                 } else {
-                    $text = trim((string) ($block['text'] ?? ''));
+                    $text = PdfTextSanitizer::trimMultiline((string) ($block['text'] ?? ''));
                     if ($text !== '') {
                         $blocks[] = ['type' => 'para', 'text' => $text];
                     }
@@ -114,15 +116,18 @@ class Phan5BlockBuilder
 
         $keywords = $data['keywords'] ?? [];
         if (is_array($keywords) && $keywords !== []) {
-            $blocks[] = [
-                'type' => 'keywords',
-                'label' => 'Ba từ khóa cốt lõi',
-                'keywords' => $keywords,
-                'keywordFramePath' => $data['keywordFramePath'] ?? '',
-            ];
+            $keywords = PdfTextSanitizer::trimKeywordList($keywords);
+            if ($keywords !== []) {
+                $blocks[] = [
+                    'type' => 'keywords',
+                    'label' => 'Ba từ khóa cốt lõi',
+                    'keywords' => $keywords,
+                    'keywordFramePath' => $data['keywordFramePath'] ?? '',
+                ];
+            }
         }
 
-        $giaiNghia = trim((string) ($data['giaiNghia'] ?? ''));
+        $giaiNghia = PdfTextSanitizer::trimMultiline((string) ($data['giaiNghia'] ?? ''));
         if ($giaiNghia !== '') {
             $blocks[] = ['type' => 'muc_label', 'text' => 'Giải nghĩa năng lượng'];
             foreach (self::linesAsParas($giaiNghia) as $p) {
@@ -134,8 +139,8 @@ class Phan5BlockBuilder
             if (! is_array($sec)) {
                 continue;
             }
-            $label = trim((string) ($sec['label'] ?? ''));
-            $content = trim((string) ($sec['content'] ?? ''));
+            $label = PdfTextSanitizer::trimString((string) ($sec['label'] ?? ''));
+            $content = PdfTextSanitizer::trimMultiline((string) ($sec['content'] ?? ''));
             if ($content === '') {
                 continue;
             }
@@ -182,13 +187,13 @@ class Phan5BlockBuilder
     public static function fromTraits(array $data): array
     {
         $blocks = [];
-        $tich = trim((string) ($data['tichCuc'] ?? ''));
-        $tieu = trim((string) ($data['tieuCuc'] ?? ''));
+        $tich = PdfTextSanitizer::trimMultiline((string) ($data['tichCuc'] ?? ''));
+        $tieu = PdfTextSanitizer::trimMultiline((string) ($data['tieuCuc'] ?? ''));
         if ($tich !== '' || $tieu !== '') {
             $blocks[] = ['type' => 'traits', 'tichCuc' => $tich, 'tieuCuc' => $tieu];
         }
 
-        $chienLuoc = trim((string) ($data['chienLuoc'] ?? ''));
+        $chienLuoc = PdfTextSanitizer::trimMultiline((string) ($data['chienLuoc'] ?? ''));
         if ($chienLuoc !== '') {
             $blocks[] = ['type' => 'chien_luoc_title', 'text' => 'Chiến lược phát triển'];
             foreach (self::linesAsParas($chienLuoc) as $p) {
@@ -204,9 +209,14 @@ class Phan5BlockBuilder
      */
     protected static function linesAsParas(string $text): array
     {
+        $text = PdfTextSanitizer::trimMultiline($text);
+        if ($text === '') {
+            return [];
+        }
+
         $blocks = [];
         foreach (preg_split('/\r\n|\r|\n/', $text) ?: [] as $line) {
-            $line = trim($line);
+            $line = PdfTextSanitizer::trimString($line);
             if ($line !== '') {
                 $blocks[] = ['type' => 'para', 'text' => $line];
             }

@@ -37,6 +37,12 @@
         'tieuCuc' => $block['tieuCuc'] ?? '',
     ])
     @else
-    <div class="para-text"><p>{{ $block['text'] ?? '' }}</p></div>
+    <div class="para-text">
+        @include('pdfs.partials.pdf-text-chunks', [
+            'text' => $block['text'] ?? '',
+            'maxChars' => 68,
+            'bulletPrefix' => false,
+        ])
+    </div>
     @endif
 @endforeach

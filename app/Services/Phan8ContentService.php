@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\Pdf\PdfTextSanitizer;
+
 class Phan8ContentService
 {
     /**
@@ -473,12 +475,12 @@ class Phan8ContentService
             if (! is_array($sec)) {
                 continue;
             }
-            $content = trim((string) ($sec['content'] ?? ''));
+            $content = PdfTextSanitizer::trimMultiline((string) ($sec['content'] ?? ''));
             if ($content === '') {
                 continue;
             }
             $sections[] = [
-                'label' => self::displaySectionLabel((string) ($sec['label'] ?? '')),
+                'label' => self::displaySectionLabel(PdfTextSanitizer::trimString((string) ($sec['label'] ?? ''))),
                 'content' => $content,
             ];
         }
@@ -491,14 +493,16 @@ class Phan8ContentService
 
         $meta = [];
         if ($isDiaChi) {
-            $meta[] = 'Địa Chi: '.($block['dia_chi_1'] ?? '').' – '.($block['dia_chi_2'] ?? '');
+            $meta[] = 'Địa Chi: '.PdfTextSanitizer::trimString((string) ($block['dia_chi_1'] ?? ''))
+                .' – '.PdfTextSanitizer::trimString((string) ($block['dia_chi_2'] ?? ''));
         } else {
-            $meta[] = 'Thiên Can: '.($block['thien_can_1'] ?? '').' – '.($block['thien_can_2'] ?? '');
+            $meta[] = 'Thiên Can: '.PdfTextSanitizer::trimString((string) ($block['thien_can_1'] ?? ''))
+                .' – '.PdfTextSanitizer::trimString((string) ($block['thien_can_2'] ?? ''));
         }
-        $meta[] = 'Thập Thần: '.($block['thap_than'] ?? '');
-        $meta[] = 'Mối quan hệ: '.($p8['moi_quan_he'] ?? $block['moi_quan_he'] ?? '');
+        $meta[] = 'Thập Thần: '.PdfTextSanitizer::trimString((string) ($block['thap_than'] ?? ''));
+        $meta[] = 'Mối quan hệ: '.PdfTextSanitizer::trimString((string) ($p8['moi_quan_he'] ?? $block['moi_quan_he'] ?? ''));
 
-        $titleText = $title !== '' ? $title : mb_strtoupper((string) ($block['thap_than'] ?? ''), 'UTF-8');
+        $titleText = $title !== '' ? $title : mb_strtoupper(PdfTextSanitizer::trimString((string) ($block['thap_than'] ?? '')), 'UTF-8');
 
         // Render tiêu đề bằng font UTM-Davida thành PNG (giống tiêu đề HÀNH ở Phần 3),
         // vì DomPDF không nạp được Davida nên chữ live bị fallback sang serif.
@@ -534,12 +538,14 @@ class Phan8ContentService
 
         $meta = [];
         if ($isDiaChi) {
-            $meta[] = 'Địa Chi: '.($block['dia_chi_1'] ?? '').' – '.($block['dia_chi_2'] ?? '');
+            $meta[] = 'Địa Chi: '.PdfTextSanitizer::trimString((string) ($block['dia_chi_1'] ?? ''))
+                .' – '.PdfTextSanitizer::trimString((string) ($block['dia_chi_2'] ?? ''));
         } else {
-            $meta[] = 'Thiên Can: '.($block['thien_can_1'] ?? '').' – '.($block['thien_can_2'] ?? '');
+            $meta[] = 'Thiên Can: '.PdfTextSanitizer::trimString((string) ($block['thien_can_1'] ?? ''))
+                .' – '.PdfTextSanitizer::trimString((string) ($block['thien_can_2'] ?? ''));
         }
-        $meta[] = 'Thập Thần: '.($block['thap_than'] ?? '');
-        $meta[] = 'Mối quan hệ: '.($block['moi_quan_he'] ?? '');
+        $meta[] = 'Thập Thần: '.PdfTextSanitizer::trimString((string) ($block['thap_than'] ?? ''));
+        $meta[] = 'Mối quan hệ: '.PdfTextSanitizer::trimString((string) ($block['moi_quan_he'] ?? ''));
         $blocks[] = ['type' => 'para', 'text' => implode(' – ', $meta)];
 
         $noiDung = is_array($block['noi_dung'] ?? null) ? $block['noi_dung'] : [];
@@ -547,15 +553,16 @@ class Phan8ContentService
             if (! is_array($item)) {
                 continue;
             }
-            $nd = trim((string) ($item['noi_dung'] ?? ''));
+            $nd = PdfTextSanitizer::trimMultiline((string) ($item['noi_dung'] ?? ''));
             if ($nd === '') {
                 continue;
             }
-            $filtered = Phan6ContentService::filterNoiDungByMoiQuanHe($nd, (string) ($block['moi_quan_he'] ?? ''));
+            $filtered = Phan6ContentService::filterNoiDungByMoiQuanHe($nd, PdfTextSanitizer::trimString((string) ($block['moi_quan_he'] ?? '')));
             if ($filtered === '') {
                 continue;
             }
-            $huong = trim((string) ($item['huong'] ?? ''));
+            $filtered = PdfTextSanitizer::trimMultiline($filtered);
+            $huong = PdfTextSanitizer::trimString((string) ($item['huong'] ?? ''));
             if ($huong !== '') {
                 $tone = mb_stripos($huong, 'tích') !== false ? 'positive' : 'negative';
                 $blocks[] = ['type' => 'huong_label', 'text' => $huong, 'tone' => $tone];
@@ -584,6 +591,7 @@ class Phan8ContentService
 
     public static function displaySectionLabel(string $raw): string
     {
+        $raw   = PdfTextSanitizer::trimString($raw);
         $lower = mb_strtolower($raw, 'UTF-8');
         if (str_contains($lower, 'cơ hội') || str_starts_with($lower, 'a.')) {
             return 'Cơ hội và sự kiện';
@@ -603,16 +611,21 @@ class Phan8ContentService
      */
     protected static function paragraphBlocks(string $text): array
     {
+        $text = PdfTextSanitizer::trimMultiline($text);
+        if ($text === '') {
+            return [];
+        }
+
         $blocks = [];
-        foreach (preg_split('/\n\s*\n/u', trim($text)) ?: [] as $para) {
-            $para = trim($para);
+        foreach (preg_split('/\n\s*\n/u', $text) ?: [] as $para) {
+            $para = PdfTextSanitizer::trimMultiline($para);
             if ($para !== '') {
                 $blocks[] = ['type' => 'para', 'text' => $para];
             }
         }
 
-        if ($blocks === [] && trim($text) !== '') {
-            $blocks[] = ['type' => 'para', 'text' => trim($text)];
+        if ($blocks === []) {
+            $blocks[] = ['type' => 'para', 'text' => $text];
         }
 
         return $blocks;

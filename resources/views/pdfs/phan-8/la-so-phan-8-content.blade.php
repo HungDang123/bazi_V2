@@ -46,12 +46,21 @@
 
         .para-text {
             color: #1A1A1A;
-            line-height: 140%;
-            margin-bottom: 5px;
+            margin-bottom: 2mm;
             font-size: 14px;
             text-align: justify;
+            background: transparent;
         }
-        .para-text p { margin-bottom: 5px; }
+        .para-text p {
+            font-size: 14px;
+            line-height: 15pt;
+            display: block;
+            margin: 0;
+            padding-bottom: 2mm;
+            color: #1A1A1A;
+            background: transparent;
+        }
+        .para-text p:last-child { padding-bottom: 0; }
 
         .huong-label { font-weight: bold; margin-top: 4px; margin-bottom: 3px; font-size: 14px; line-height: 130%; }
         .huong-label.positive { color: #2E7D32; }
@@ -78,9 +87,11 @@
             <div class="huong-label {{ $block['tone'] ?? '' }}">{{ $block['text'] ?? '' }}</div>
             @else
             <div class="para-text">
-                @foreach (preg_split('/\r\n|\r|\n/', $block['text'] ?? '') ?: [] as $line)
-                    @if (trim($line) !== '')<p>{{ trim($line) }}</p>@endif
-                @endforeach
+                @include('pdfs.partials.pdf-text-chunks', [
+                    'text' => $block['text'] ?? '',
+                    'maxChars' => 72,
+                    'bulletPrefix' => false,
+                ])
             </div>
             @endif
         @endforeach

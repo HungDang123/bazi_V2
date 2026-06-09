@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Services\Pdf\PdfContentPaginator;
 use App\Services\Pdf\PdfPaginationProfiles;
+use App\Services\Pdf\PdfTextSanitizer;
 use App\Models\Phan5KhiaCanh;
 use App\Models\Phan5Trang;
 use App\Models\ThapThanTheoViTri;
@@ -560,7 +561,7 @@ class Phan5PdfService
      */
     public static function parseKeywords(string $text): array
     {
-        $text = trim($text);
+        $text = PdfTextSanitizer::trimMultiline($text);
         if ($text === '') {
             return [];
         }
@@ -568,7 +569,7 @@ class Phan5PdfService
         $parts = preg_split('/[,，、;]+|\r\n|\r|\n/u', $text) ?: [];
         $keywords = [];
         foreach ($parts as $part) {
-            $part = trim($part);
+            $part = PdfTextSanitizer::trimString($part);
             if ($part === '') {
                 continue;
             }
@@ -578,7 +579,7 @@ class Phan5PdfService
             }
         }
 
-        return $keywords;
+        return PdfTextSanitizer::trimKeywordList($keywords);
     }
 
     public static function resolveAssetPath(string $relative): string

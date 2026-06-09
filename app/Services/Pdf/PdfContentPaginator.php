@@ -17,6 +17,8 @@ class PdfContentPaginator
             return [];
         }
 
+        $blocks = PdfTextSanitizer::trimBlocks($blocks);
+
         $pages     = [];
         $remaining = $blocks;
         $pageIndex = 0;
@@ -211,6 +213,21 @@ class PdfContentPaginator
     public static function paraHeightMm(string $text, PdfPaginationConfig $config): float
     {
         $effectiveChars = max(1, (int) floor($config->charsPerLine * $config->lineWidthThreshold));
+        $parts = array_values(array_filter(
+            array_map('trim', preg_split('/\r\n|\r|\n/', $text) ?: []),
+            static fn (string $l): bool => $l !== ''
+        ));
+
+        if (count($parts) > 1) {
+            $height = 0.0;
+            foreach ($parts as $part) {
+                $lines = max(1, (int) ceil(mb_strlen($part) / $effectiveChars));
+                $height += ($lines * $config->lineMm) + 2.0;
+            }
+
+            return $height;
+        }
+
         $lines = max(1, (int) ceil(mb_strlen($text) / $effectiveChars));
 
         return $lines * $config->lineMm;
@@ -294,7 +311,7 @@ class PdfContentPaginator
             return [$block, null];
         }
 
-        $headText = mb_substr($text, 0, $maxChars);
+        $headText = trim(mb_substr($text, 0, $maxChars));
         $tailText = trim(mb_substr($text, $maxChars));
 
         return [

@@ -123,6 +123,12 @@
         }
         .preamble-para p { margin-bottom: 4px; }
 
+        .section-block {
+            margin-bottom: 2mm;
+            background: transparent;
+            overflow: hidden;
+        }
+
         .section-title {
             font-family: 'svn-poppins', sans-serif;
             font-weight: bold;
@@ -132,6 +138,7 @@
             color: #1A1A1A;
             margin-top: 1mm;
             margin-bottom: 3mm;
+            background: transparent;
         }
 
         .section-box {
@@ -139,19 +146,23 @@
             border: 0.3mm solid rgba(190, 190, 190, 0.6);
             border-radius: 2.5mm;
             padding: 4mm 4.5mm;
-            margin-bottom: 4mm;
+            margin-bottom: 2mm;
+            overflow: hidden;
         }
 
         .section-box p {
             font-family: 'svn-poppins', sans-serif;
-            font-size: 14px;
+            font-size: 10.5pt;
             font-weight: normal;
-            line-height: 140%;
+            line-height: 15pt;
             color: #1A1A1A;
             text-align: justify;
-            margin-bottom: 2.5mm;
+            display: block;
+            margin: 0;
+            padding-bottom: 2mm;
+            background: transparent;
         }
-        .section-box p:last-child { margin-bottom: 0; }
+        .section-box p:last-child { padding-bottom: 0; }
     </style>
 </head>
 <body>
@@ -216,14 +227,15 @@
         @endif
 
         @foreach ($page['sections'] ?? [] as $sec)
-        <div class="section-title">{{ $sec['label'] ?? '' }}</div>
-        <div class="section-box">
-            @foreach (preg_split('/\r\n|\r|\n/', $sec['content'] ?? '') ?: [] as $line)
-                @php $line = trim($line); @endphp
-                @if ($line !== '')
-                <p>{{ preg_match('/^-\s*/u', $line) ? $line : '– '.$line }}</p>
-                @endif
-            @endforeach
+        <div class="section-block">
+            <div class="section-title">{{ $sec['label'] ?? '' }}</div>
+            <div class="section-box">
+                @include('pdfs.partials.pdf-text-chunks', [
+                    'text' => $sec['content'] ?? '',
+                    'maxChars' => 72,
+                    'bulletPrefix' => true,
+                ])
+            </div>
         </div>
         @endforeach
     </div>

@@ -55,26 +55,40 @@
 
         .para-text {
             color: #1A1A1A;
-            font-size: 14px;
-            line-height: 140%;
             margin-bottom: 2mm;
+            background: transparent;
         }
+        .para-text p {
+            font-size: 14px;
+            line-height: 15pt;
+            display: block;
+            margin: 0;
+            padding-bottom: 2mm;
+            color: #1A1A1A;
+            background: transparent;
+        }
+        .para-text p:last-child { padding-bottom: 0; }
 
         .kw-section {
             width: 100%;
-            margin-bottom: 5mm;
+            margin-bottom: 6mm;
+            padding-bottom: 2mm;
+            overflow: hidden;
             background: transparent;
+            page-break-inside: avoid;
         }
 
         .kw-grid {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             table-layout: fixed;
         }
 
         .kw-cell {
             width: 33.33%;
             height: 59.71mm;
+            min-height: 59.71mm;
             vertical-align: top;
             text-align: center;
             padding: 0;
