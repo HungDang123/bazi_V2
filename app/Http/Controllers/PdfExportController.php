@@ -243,6 +243,8 @@ class PdfExportController extends Controller
             'phan3-layout-v5-page19-top66',
             'content-zone-70pct',
             'lineMm-4.5-blockGap-1.5',
+            'paginator-linethreshold-95-imgguard-50',
+            'phan3-chapter-in-content-wrap',
             'pdf-font-v3-svn',
             'bocuc-img-v1',
             'bocuc-paginate-v1',

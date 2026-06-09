@@ -147,15 +147,17 @@ class PdfPaginationProfiles
 
     public static function phan7(string $bgPath): PdfPaginationConfig
     {
+        // line-height: 140% → ~5.9mm/dòng ở 72dpi → dùng 6.0mm để ước tính chính xác
         return new PdfPaginationConfig([
             'charsPerLine'        => 70,
-            'blockGapMm'          => 1.5,
+            'lineMm'              => 6.0,
+            'blockGapMm'          => 2.0,
             'imageGapMm'          => 3.0,
             'maxImageMm'          => 95.0,
             'forceNewPageBefore'  => ['thap_than_title'],
             'fixedBlockHeights'   => [
                 'thap_than_title' => 22.0,
-                'section_label'   => 7.0,
+                'section_label'   => 8.0,
             ],
             'clampImages'         => true,
             'bgResolver'          => static fn (): string => $bgPath,
@@ -164,14 +166,15 @@ class PdfPaginationProfiles
 
     public static function phan7Muc1(string $bgPath): PdfPaginationConfig
     {
+        // Cùng blade la-so-phan-7-muc2-content → line-height: 140% → lineMm=6.0
         return new PdfPaginationConfig([
             'charsPerLine'      => 70,
-            'lineMm'            => 4.5,
-            'blockGapMm'        => 1.5,
+            'lineMm'            => 6.0,
+            'blockGapMm'        => 2.0,
             'imageGapMm'        => 3.0,
             'maxImageMm'        => 120.0,
             'fixedBlockHeights' => [
-                'section_label' => 7.0,
+                'section_label' => 8.0,
             ],
             'clampImages'       => true,
             'bgResolver'        => static fn (): string => $bgPath,

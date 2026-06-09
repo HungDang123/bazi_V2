@@ -47,6 +47,12 @@ class PdfPaginationConfig
     /** @var array<int, string> */
     public array $forceNewPageBefore;
 
+    /** Tỉ lệ fill thực tế của text trên 1 dòng (mặc định 0.95 = 95% chiều rộng). */
+    public float $lineWidthThreshold;
+
+    /** Min không gian còn lại (mm) để đặt ảnh trên trang hiện tại; dưới ngưỡng → sang trang mới. */
+    public float $minImagePageMm;
+
     /** @var null|\Closure(int $pageIndex): string */
     public $bgResolver;
 
@@ -94,6 +100,8 @@ class PdfPaginationConfig
         $this->clampImages          = (bool) ($overrides['clampImages'] ?? true);
         $this->skipOversizedTraits  = (bool) ($overrides['skipOversizedTraits'] ?? false);
         $this->forceNewPageBefore   = (array) ($overrides['forceNewPageBefore'] ?? []);
+        $this->lineWidthThreshold   = (float) ($overrides['lineWidthThreshold'] ?? 0.95);
+        $this->minImagePageMm       = (float) ($overrides['minImagePageMm'] ?? 50.0);
         $this->bgResolver           = $overrides['bgResolver'] ?? null;
         $this->blockHeightResolver  = $overrides['blockHeightResolver'] ?? null;
         $this->budgetAdjustResolver = $overrides['budgetAdjustResolver'] ?? null;

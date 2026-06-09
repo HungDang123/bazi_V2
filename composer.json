@@ -13,7 +13,8 @@
         "laravel/tinker": "^2.10.1",
         "overtrue/chinese-calendar": "^1.0",
         "phpoffice/phpspreadsheet": "^5.3",
-        "setasign/fpdi": "^2.6"
+        "setasign/fpdi": "^2.6",
+        "tinify/tinify": "^1.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
