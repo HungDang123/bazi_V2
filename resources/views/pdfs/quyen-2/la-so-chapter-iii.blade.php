@@ -3,10 +3,17 @@
 <head>
     <meta charset="utf-8">
     <style>
-        @include('pdfs.partials.pdf-base-typography')
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { width: 210mm; height: 297mm; }
+        body {
+            width: 210mm; height: 297mm;
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 100%;
+            text-align: justify;
+            letter-spacing: 0;
+        }
 
         .page {
             position: relative;
@@ -29,6 +36,11 @@
         }
 
         .chapter-title {
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 100%;
+            letter-spacing: 0;
             color: #6E0101;
             text-transform: uppercase;
             border-bottom: 1px solid #C9A227;
@@ -37,13 +49,28 @@
         }
 
         .sub-title {
-            color: #333;
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 100%;
+            letter-spacing: 0;
+            color: #6E0101;
             margin-top: 6px;
             margin-bottom: 2px;
         }
 
         .para-text {
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 100%;
+            letter-spacing: 0;
+            text-align: justify;
             color: #1A1A1A;
+        }
+
+        .para-text p {
+            margin-bottom: 4px;
         }
 
         .sub-section { margin-bottom: 6px; }

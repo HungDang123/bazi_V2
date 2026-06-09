@@ -3,20 +3,54 @@
 <head>
     <meta charset="utf-8">
     <style>
-        @include('pdfs.partials.pdf-base-typography')
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { width: 210mm; height: 297mm; }
+        body {
+            width: 210mm; height: 297mm;
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 100%;
+            text-align: justify;
+            letter-spacing: 0;
+        }
         .page { position: relative; width: 210mm; height: 297mm; overflow: hidden; }
         .bg-img { position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; }
         .content-wrap { position: absolute; left: 28mm; width: 154mm; overflow: hidden; }
         .chapter-title {
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 100%;
+            letter-spacing: 0;
             color: #6E0101;
             text-transform: uppercase;
             border-bottom: 1px solid #C9A227; padding-bottom: 2px; margin-bottom: 6px;
         }
-        .sub-title { color: #333; margin-top: 6px; margin-bottom: 2px; }
-        .para-text { color: #1A1A1A; }
+        .sub-title {
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 100%;
+            letter-spacing: 0;
+            color: #6E0101;
+            margin-top: 6px;
+            margin-bottom: 2px;
+        }
+        .para-text {
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 100%;
+            letter-spacing: 0;
+            text-align: justify;
+            color: #1A1A1A;
+        }
+
+        .para-text p {
+            margin-bottom: 4px;
+        }
+
         .sub-section { margin-bottom: 6px; }
     </style>
 </head>
