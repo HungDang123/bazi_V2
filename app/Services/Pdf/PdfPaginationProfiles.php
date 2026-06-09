@@ -88,7 +88,7 @@ class PdfPaginationProfiles
             'contentLeftMm'       => $contentLeft,
             'charsPerLine'        => 68,
             'contentWidthMm'      => $contentWidth,
-            'blockGapMm'          => 2.0,
+            'blockGapMm'          => 1.5,
             'skipOversizedTraits' => true,
             'clampImages'         => true,
             'maxImageMm'          => 120.0,
@@ -111,7 +111,7 @@ class PdfPaginationProfiles
             'bgResolver'          => static fn (): string => $bgPath,
             'budgetAdjustResolver' => static function (int $pageIndex, array $remaining, float $budget) use ($continuationHeader): float {
                 if ($pageIndex > 0 && $continuationHeader !== null) {
-                    $cfg = new PdfPaginationConfig(['blockGapMm' => 2.0, 'charsPerLine' => 68, 'lineMm' => 5.2]);
+                    $cfg = new PdfPaginationConfig(['blockGapMm' => 1.5, 'charsPerLine' => 68, 'lineMm' => 4.5]);
 
                     return $budget - PdfContentPaginator::blockHeightMm($continuationHeader, $cfg);
                 }
@@ -149,8 +149,8 @@ class PdfPaginationProfiles
     {
         return new PdfPaginationConfig([
             'charsPerLine'        => 70,
-            'blockGapMm'          => 2.5,
-            'imageGapMm'          => 4.0,
+            'blockGapMm'          => 1.5,
+            'imageGapMm'          => 3.0,
             'maxImageMm'          => 95.0,
             'forceNewPageBefore'  => ['thap_than_title'],
             'fixedBlockHeights'   => [
@@ -166,9 +166,9 @@ class PdfPaginationProfiles
     {
         return new PdfPaginationConfig([
             'charsPerLine'      => 70,
-            'lineMm'            => 5.0,
-            'blockGapMm'        => 2.5,
-            'imageGapMm'        => 4.0,
+            'lineMm'            => 4.5,
+            'blockGapMm'        => 1.5,
+            'imageGapMm'        => 3.0,
             'maxImageMm'        => 120.0,
             'fixedBlockHeights' => [
                 'section_label' => 7.0,
@@ -283,7 +283,7 @@ class PdfPaginationProfiles
             return 0.0;
         }
 
-        $cfg = new PdfPaginationConfig(['charsPerLine' => 72, 'lineMm' => 5.2, 'blockGapMm' => 2.0]);
+        $cfg = new PdfPaginationConfig(['charsPerLine' => 72, 'lineMm' => 4.5, 'blockGapMm' => 1.5]);
 
         return PdfContentPaginator::paraHeightMm((string) ($block['text'] ?? ''), $cfg) + 3.0 + 2.0;
     }
