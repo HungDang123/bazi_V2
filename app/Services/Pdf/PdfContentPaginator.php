@@ -101,8 +101,14 @@ class PdfContentPaginator
 
             if ($config->clampImages && $type === 'image') {
                 $available = $maxMm - $used - $config->imageGapMm;
-                $block     = self::clampImageBlock($block, $available, $config);
-                $need      = self::blockHeightMm($block, $config);
+
+                // Không đủ chỗ tối thiểu cho ảnh → đẩy sang trang mới
+                if ($chunk !== [] && $available < $config->minImagePageMm) {
+                    return [$chunk, array_slice($blocks, $idx), $used];
+                }
+
+                $block = self::clampImageBlock($block, $available, $config);
+                $need  = self::blockHeightMm($block, $config);
 
                 if ($chunk !== [] && ($used + $need) > $maxMm) {
                     break;
@@ -198,7 +204,8 @@ class PdfContentPaginator
 
     public static function paraHeightMm(string $text, PdfPaginationConfig $config): float
     {
-        $lines = max(1, (int) ceil(mb_strlen($text) / max(1, $config->charsPerLine)));
+        $effectiveChars = max(1, (int) floor($config->charsPerLine * $config->lineWidthThreshold));
+        $lines = max(1, (int) ceil(mb_strlen($text) / $effectiveChars));
 
         return $lines * $config->lineMm;
     }
@@ -258,7 +265,8 @@ class PdfContentPaginator
             return [null, $block];
         }
 
-        $maxChars = max(40, (int) floor(($maxMm / $config->lineMm) * $config->charsPerLine));
+        $effectiveChars = max(1, (int) floor($config->charsPerLine * $config->lineWidthThreshold));
+        $maxChars = max(40, (int) floor(($maxMm / $config->lineMm) * $effectiveChars));
         if (mb_strlen($text) <= $maxChars) {
             return [$block, null];
         }

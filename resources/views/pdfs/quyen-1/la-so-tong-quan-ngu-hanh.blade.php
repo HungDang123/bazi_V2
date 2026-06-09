@@ -28,13 +28,6 @@
             width: 210mm; height: 297mm;
         }
 
-        .chapter-header {
-            position: absolute;
-            left: 28mm;
-            width: 154mm;
-            top: 15mm;
-        }
-
         .content-wrap {
             position: absolute;
             left: 28mm;
@@ -42,6 +35,7 @@
             top: 66mm;
             height: 206mm;
             overflow: hidden;
+            background: transparent;
         }
 
         .chapter-title {
@@ -103,13 +97,11 @@
 
     <img class="bg-img" src="{{ $templatePath }}">
 
-    @if (!empty($chapterTitle))
-    <div class="chapter-header">
-        <div class="chapter-title">{{ $chapterTitle }}</div>
-    </div>
-    @endif
-
     <div class="content-wrap">
+
+        @if (!empty($chapterTitle))
+        <div class="chapter-title">{{ $chapterTitle }}</div>
+        @endif
 
         @if (!empty($intro))
         <div class="para-text">

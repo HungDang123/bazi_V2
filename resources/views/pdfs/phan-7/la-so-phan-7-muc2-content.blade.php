@@ -101,7 +101,7 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-zone" style="left:{{ $page['contentLeftMm'] ?? 24 }}mm;width:{{ $page['contentWidthMm'] ?? 162 }}mm;top:{{ $page['contentZoneTopMm'] ?? 15 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 207.9 }}mm;">
+    <div class="content-zone" style="left:{{ $page['contentLeftMm'] ?? 24 }}mm;width:{{ $page['contentWidthMm'] ?? 162 }}mm;top:{{ $page['contentZoneTopMm'] ?? 18 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 187.1 }}mm;">
 @foreach ($page['blocks'] as $block)
             @php $type = $block['type'] ?? 'para'; @endphp
 
