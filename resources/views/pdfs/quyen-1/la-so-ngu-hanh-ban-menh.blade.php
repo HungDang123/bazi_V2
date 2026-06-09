@@ -3,9 +3,16 @@
 <head>
     <meta charset="utf-8">
     <style>
-        @include('pdfs.partials.pdf-base-typography')
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 100%;
+            text-align: justify;
+            letter-spacing: 0;
+        }
 
         .page {
             position: relative;
@@ -67,12 +74,23 @@
         }
 
         .item-title {
-            color: #333;
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 100%;
+            letter-spacing: 0;
+            color: #000000;
             margin-top: 5px;
             margin-bottom: 2px;
         }
 
         .para-text {
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 100%;
+            letter-spacing: 0;
+            text-align: justify;
             color: #1A1A1A;
             margin-bottom: 2px;
         }
