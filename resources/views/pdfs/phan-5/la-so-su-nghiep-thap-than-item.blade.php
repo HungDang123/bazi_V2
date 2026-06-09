@@ -60,20 +60,67 @@
             margin-bottom: 2mm;
         }
 
-        .kw-grid { width: 100%; margin-bottom: 5mm; }
-        .kw-grid table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .kw-grid td { width: 33.33%; text-align: center; vertical-align: middle; padding: 0; }
-        .kw-box { position: relative; width: 36.78mm; height: 59.71mm; margin: 0 auto; }
-        .kw-frame { position: absolute; top: 0; left: 0; width: 36.78mm; height: 59.71mm; display: block; }
-        .kw-text { position: absolute; top: 11mm; left: 5mm; width: 26.78mm; height: 36mm; }
-        .kw-text table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; }
-        .kw-text-cell {
-            width: 26.78mm; height: 36mm; vertical-align: middle; text-align: center; padding: 0;
+        .kw-section {
+            width: 100%;
+            margin-bottom: 5mm;
+            background: transparent;
         }
-        .kw-text-cell span {
-            display: inline-block; max-width: 100%; color: #D4AF37; font-weight: bold;
-            font-size: 12px; line-height: 120%; text-align: center;
-            word-wrap: break-word; word-break: break-word; white-space: normal;
+
+        .kw-grid {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .kw-cell {
+            width: 33.33%;
+            height: 59.71mm;
+            vertical-align: top;
+            text-align: center;
+            padding: 0;
+            background: transparent;
+        }
+
+        .kw-box {
+            position: relative;
+            width: 36.78mm;
+            height: 59.71mm;
+            margin: 0 auto;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        .kw-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 36.78mm;
+            height: 59.71mm;
+            display: block;
+            z-index: 0;
+        }
+
+        .kw-text {
+            position: relative;
+            z-index: 1;
+            width: 26.78mm;
+            margin: 11mm auto 0;
+            min-height: 36mm;
+            display: table;
+            background: transparent;
+        }
+
+        .kw-text span {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+            color: #D4AF37;
+            font-weight: bold;
+            font-size: 12px;
+            line-height: 120%;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
         }
 
         .traits-row {

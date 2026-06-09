@@ -111,11 +111,17 @@ class PdfPaginationProfiles
                 'table'              => 92.0,
             ],
             'blockHeightResolver' => static function (array $block): float {
-                if (($block['type'] ?? '') !== 'traits') {
-                    return 0.0;
+                $type = (string) ($block['type'] ?? '');
+
+                if ($type === 'traits') {
+                    return self::traitsHeightMm($block);
                 }
 
-                return self::traitsHeightMm($block);
+                if ($type === 'keywords') {
+                    return self::keywordsHeightMm($block);
+                }
+
+                return 0.0;
             },
             'bgResolver'          => static fn (): string => $bgPath,
             'budgetAdjustResolver' => static function (int $pageIndex, array $remaining, float $budget) use ($continuationHeader): float {
@@ -303,6 +309,19 @@ class PdfPaginationProfiles
         $cfg = new PdfPaginationConfig(['charsPerLine' => 72, 'lineMm' => 5.5, 'blockGapMm' => 2.0]);
 
         return PdfContentPaginator::paraHeightMm((string) ($block['text'] ?? ''), $cfg) + 3.0 + 2.0;
+    }
+
+    /** @param array<string, mixed> $block */
+    private static function keywordsHeightMm(array $block): float
+    {
+        // khung 59.71mm + label ~8mm + margin-bottom 5mm + block gap 2mm
+        $h = 59.71 + 5.0 + 2.0;
+        $label = trim((string) ($block['label'] ?? ''));
+        if ($label !== '') {
+            $h += 8.0;
+        }
+
+        return $h;
     }
 
     /** @param array<string, mixed> $block */
