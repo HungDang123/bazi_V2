@@ -69,8 +69,8 @@
 
         .trait-body-cell {
             color: #1A1A1A;
-            font-size: 12px;
-            line-height: 100%;
+            font-size: 14px;
+            line-height: 140%;
             padding: 0 3.5mm 3.5mm;
             vertical-align: top;
         }
@@ -82,14 +82,15 @@
             color: #6E0101;
             font-weight: bold;
             font-style: italic;
-            font-size: 12px;
+            font-size: 14px;
+            line-height: 130%;
             margin-bottom: 3mm;
         }
 
         .para-text {
             color: #1A1A1A;
-            font-size: 12px;
-            line-height: 100%;
+            font-size: 14px;
+            line-height: 140%;
         }
 
         .para-text p { margin-bottom: 2.5mm; }

@@ -31,7 +31,8 @@
             text-align: center;
             color: #6E0101;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 16px;
+            line-height: 130%;
             margin-bottom: 4mm;
             text-transform: uppercase;
         }
@@ -40,7 +41,8 @@
             color: #6E0101;
             font-weight: bold;
             font-style: italic;
-            font-size: 12px;
+            font-size: 14px;
+            line-height: 130%;
             margin-bottom: 3mm;
         }
 
@@ -53,8 +55,8 @@
 
         .para-text {
             color: #1A1A1A;
-            font-size: 12px;
-            line-height: 100%;
+            font-size: 14px;
+            line-height: 140%;
             margin-bottom: 2mm;
         }
 

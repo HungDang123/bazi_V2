@@ -28,26 +28,28 @@
             color: #6E0101;
             font-weight: bold;
             text-transform: uppercase;
-            margin-bottom: 4mm;
-            font-size: 13px;
+            margin-bottom: 5mm;
+            font-size: 16px;
+            line-height: 130%;
         }
 
         .red-title {
             color: #6E0101;
             font-weight: bold;
-            margin-top: 4px;
-            margin-bottom: 3px;
-            font-size: 12px;
+            margin-top: 6px;
+            margin-bottom: 4px;
+            font-size: 16px;
+            line-height: 130%;
         }
 
         .para-text {
             color: #1A1A1A;
-            line-height: 100%;
-            margin-bottom: 3px;
-            font-size: 12px;
+            line-height: 140%;
+            margin-bottom: 5px;
+            font-size: 14px;
             text-align: justify;
         }
-        .para-text p { margin-bottom: 2.5mm; }
+        .para-text p { margin-bottom: 3mm; }
     </style>
 </head>
 <body>

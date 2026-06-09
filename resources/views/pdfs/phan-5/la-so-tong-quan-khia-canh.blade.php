@@ -30,7 +30,8 @@
         .section-title {
             color: #6E0101;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 16px;
+            line-height: 130%;
             margin-bottom: 4mm;
             text-transform: uppercase;
         }
@@ -38,7 +39,8 @@
         .sub-title {
             color: #6E0101;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 16px;
+            line-height: 130%;
             margin-top: 5mm;
             margin-bottom: 2mm;
         }
@@ -49,8 +51,9 @@
 
         .para-text {
             color: #1A1A1A;
-            font-size: 12px;
-            line-height: 100%;
+            font-size: 14px;
+            line-height: 140%;
+            text-align: justify;
         }
 
         .para-text p {
