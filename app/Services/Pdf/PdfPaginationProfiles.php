@@ -10,12 +10,16 @@ class PdfPaginationProfiles
     public static function phan3(string $firstBgPath, string $contBgPath): PdfPaginationConfig
     {
         return new PdfPaginationConfig([
-            'charsPerLine'       => 92,
-            'lineMm'             => 4.5,
-            'contentLeftMm'      => 28.0,
-            'contentWidthMm'     => 154.0,
-            'fixedBlockHeights'  => [
-                'sub_title' => 7.0,
+            'charsPerLine'        => 75,
+            'lineMm'              => 5.5,
+            'blockGapMm'          => 2.5,
+            'contentZoneTopMm'    => 22.0,
+            'contentHeightMm'     => 240.0,
+            'contentZoneHeightMm' => 240.0,
+            'contentLeftMm'       => 28.0,
+            'contentWidthMm'      => 154.0,
+            'fixedBlockHeights'   => [
+                'sub_title' => 9.0,
             ],
             'bgResolver'         => static fn (int $i): string => $i === 0 ? $firstBgPath : $contBgPath,
             'budgetAdjustResolver' => static function (int $pageIndex, array $remaining, float $budget): float {

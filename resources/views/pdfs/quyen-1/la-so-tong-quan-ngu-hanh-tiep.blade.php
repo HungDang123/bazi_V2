@@ -74,7 +74,7 @@
 
     <img class="bg-img" src="{{ $templatePath }}">
 
-    <div class="content-wrap" style="top: 16mm; height: 220mm;">
+    <div class="content-wrap" style="top: 16mm; height: 240mm;">
         @foreach ($subSections as $sub)
         <div class="sub-section">
             @if (!empty($sub['sub_title']))

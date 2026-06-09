@@ -37,7 +37,7 @@
             left: 28mm;
             width: 154mm;
             top: 16mm;
-            height: 220mm;
+            height: 240mm;
             overflow: hidden;
         }
 

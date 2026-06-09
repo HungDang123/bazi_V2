@@ -1,7 +1,7 @@
 /* SVN-Poppins – đăng ký qua PdfFontService::registerWithDompdf()
- * Typography (Figma):
- *   Body : 12px, weight 400, line-height 100%, justify
- *   Bold : 12px, weight 700, line-height 100%, justify
+ * Typography:
+ *   Body : 14px, weight 400, line-height 140%, justify
+ *   Bold : 14px, weight 700, line-height 140%, justify
  */
 
 body,
@@ -14,8 +14,8 @@ body,
 
 body {
     font-weight: normal;
-    font-size: 12px;
-    line-height: 100%;
+    font-size: 14px;
+    line-height: 140%;
     text-align: justify;
 }
 
@@ -30,8 +30,8 @@ body {
     font-family: 'svn-poppins', sans-serif;
     font-weight: normal;
     font-style: normal;
-    font-size: 12px;
-    line-height: 100%;
+    font-size: 14px;
+    line-height: 140%;
     letter-spacing: 0;
     text-align: justify;
 }
@@ -42,11 +42,11 @@ b,
     font-family: 'svn-poppins', sans-serif;
     font-weight: bold;
     font-style: normal;
-    font-size: 12px;
-    line-height: 100%;
+    font-size: 14px;
+    line-height: 140%;
     letter-spacing: 0;
 }
 
 .para-text p {
-    margin-bottom: 4px;
+    margin-bottom: 5px;
 }
