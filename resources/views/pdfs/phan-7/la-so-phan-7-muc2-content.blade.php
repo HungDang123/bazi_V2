@@ -36,7 +36,8 @@
         .thap-than-title {
             color: #6E0101;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 16px;
+            line-height: 130%;
             text-transform: uppercase;
             letter-spacing: 0.3mm;
             margin-bottom: 2px;
@@ -44,7 +45,8 @@
 
         .thap-than-subtitle {
             color: #6E0101;
-            font-size: 11px;
+            font-size: 14px;
+            line-height: 130%;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.2mm;
@@ -63,7 +65,8 @@
             color: #6E0101;
             font-style: italic;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 14px;
+            line-height: 130%;
             margin-top: 3mm;
             margin-bottom: 1.5mm;
         }
@@ -71,13 +74,14 @@
         /* ── Paragraph text ── */
         .para-text {
             color: #1A1A1A;
-            font-size: 12px;
+            font-size: 14px;
             line-height: 140%;
             margin-bottom: 2mm;
+            text-align: justify;
         }
 
         .para-text p {
-            margin-bottom: 1.5px;
+            margin-bottom: 5px;
         }
 
         /* ── Thập Thần illustration image ── */
