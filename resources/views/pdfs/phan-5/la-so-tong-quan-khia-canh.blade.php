@@ -75,7 +75,7 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 15 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 207.9 }}mm; left: {{ $page['contentLeftMm'] ?? 28 }}mm; width: {{ $page['contentWidthMm'] ?? 154 }}mm;">
+    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 18 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 187.1 }}mm; left: {{ $page['contentLeftMm'] ?? 28 }}mm; width: {{ $page['contentWidthMm'] ?? 154 }}mm;">
         @include('pdfs.phan-5.partials.paginated-blocks', [
             'blocks' => $page['blocks'] ?? [],
             'imageClass' => '',

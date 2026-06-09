@@ -14,7 +14,7 @@ class PdfPaginationProfiles
             'lineMm'              => 5.5,
             'blockGapMm'          => 2.5,
             'contentZoneTopMm'    => 22.0,
-            'contentHeightMm'     => 240.0,
+            'contentHeightMm'     => 220.0,
             'contentZoneHeightMm' => 240.0,
             'contentLeftMm'       => 28.0,
             'contentWidthMm'      => 154.0,
@@ -87,7 +87,7 @@ class PdfPaginationProfiles
 
         return new PdfPaginationConfig([
             'contentZoneTopMm'    => $zoneTop,
-            'contentHeightMm'     => PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM,
+            'contentHeightMm'     => PdfPaginationConfig::CONTENT_BUDGET_MM,
             'contentZoneHeightMm' => PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM,
             'contentLeftMm'       => $contentLeft,
             'charsPerLine'        => 68,
@@ -190,7 +190,7 @@ class PdfPaginationProfiles
         $base = self::phan68Base($bgPath);
 
         if ($contentHeightMm > 0) {
-            $base->contentHeightMm     = $contentHeightMm;
+            $base->contentHeightMm     = round($contentHeightMm * 0.92, 1); // budget 92% để tránh tràn
             $base->contentZoneHeightMm = $contentHeightMm;
         }
 
@@ -214,10 +214,10 @@ class PdfPaginationProfiles
     {
         return match ($layout) {
             'tong_quan' => 79.0,
-            'su_nghiep' => 26.0,
-            'su_nghiep_item' => 24.0,
-            'traits_su_nghiep' => 28.0,
-            'lbtv119', 'traits_lbtv119' => 18.0,
+            'su_nghiep' => 30.0,
+            'su_nghiep_item' => 28.0,
+            'traits_su_nghiep' => 32.0,
+            'lbtv119', 'traits_lbtv119' => 22.0,
             'page_content' => PdfPaginationConfig::CONTENT_ZONE_TOP_MM,
             default => PdfPaginationConfig::CONTENT_ZONE_TOP_MM,
         };

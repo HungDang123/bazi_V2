@@ -33,8 +33,8 @@
         .content-zone {
             left: 28mm;
             width: 154mm;
-            top: 15mm;
-            height: 207.9mm;
+            top: 18mm;
+            height: 187.1mm;
         }
 
         .sub-title {

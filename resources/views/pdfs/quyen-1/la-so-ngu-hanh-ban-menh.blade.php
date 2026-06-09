@@ -37,8 +37,8 @@
         .content-zone {
             left: 28mm;
             width: 154mm;
-            top: 15mm;
-            height: 207.9mm;
+            top: 18mm;
+            height: 187.1mm;
         }
 
         /* UTM Davida 24px – PNG supersampling, giữ tỉ lệ (không ép height gây vỡ nét) */
