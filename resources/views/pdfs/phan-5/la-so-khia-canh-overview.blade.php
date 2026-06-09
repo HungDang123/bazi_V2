@@ -68,15 +68,12 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 44.5 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 208 }}mm; left: {{ $page['contentLeftMm'] ?? 24 }}mm; width: {{ $page['contentWidthMm'] ?? 162 }}mm;">
-        <div class="content-inner" style="padding-top: {{ $page['paddingTopMm'] ?? 0 }}mm;">
-        @include('pdfs.phan-5.partials.paginated-blocks', [
+    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 15 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 207.9 }}mm; left: {{ $page['contentLeftMm'] ?? 24 }}mm; width: {{ $page['contentWidthMm'] ?? 162 }}mm;">
+@include('pdfs.phan-5.partials.paginated-blocks', [
             'blocks' => $page['blocks'] ?? [],
             'imageClass' => 'vi-tri-img',
         ])
         </div>
-    </div>
-
 </div>
 @endforeach
 

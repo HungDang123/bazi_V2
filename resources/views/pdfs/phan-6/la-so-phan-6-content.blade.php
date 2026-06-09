@@ -134,10 +134,8 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-zone" style="left:{{ $page['contentLeftMm'] ?? 24 }}mm;width:{{ $page['contentWidthMm'] ?? 162 }}mm;top:{{ $page['contentZoneTopMm'] ?? 44.5 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 208 }}mm;">
-    <div class="content-inner" style="padding-top:{{ $page['paddingTopMm'] ?? 0 }}mm;">
-
-        @if (!empty($page['chapterTitle']))
+    <div class="content-zone" style="left:{{ $page['contentLeftMm'] ?? 24 }}mm;width:{{ $page['contentWidthMm'] ?? 162 }}mm;top:{{ $page['contentZoneTopMm'] ?? 15 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 207.9 }}mm;">
+@if (!empty($page['chapterTitle']))
         <div class="chapter-title">{{ $page['chapterTitle'] }}</div>
         @endif
 
@@ -179,8 +177,6 @@
         @endforeach
 
     </div>
-    </div>
-
 </div>
 @endforeach
 

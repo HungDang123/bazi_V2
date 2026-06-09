@@ -3,7 +3,7 @@
             position: absolute;
             left: 0;
             width: 210mm;
-            bottom: 8mm;
+            bottom: 5mm;
             text-align: center;
         }
 

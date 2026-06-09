@@ -11,6 +11,7 @@ use App\Services\Phan3PdfPaginator;
 use App\Services\Phan5PdfService;
 use App\Services\Phan6PdfService;
 use App\Services\Phan7MucIIPdfService;
+use App\Services\Phan7MucIPdfService;
 use App\Services\Phan7PdfService;
 use App\Services\Phan8PdfService;
 use App\Services\Phan9PdfService;
@@ -239,7 +240,8 @@ class PdfExportController extends Controller
             (string) optional($phan3Records->get('phan3_dinh_vi_goc_nhin'))->updated_at,
             (string) optional($phan3Records->get('phan3_bocuc_ngu_hanh_ii'))->updated_at,
             'phan3-section-i-v2',
-            'phan3-layout-v3',
+            'phan3-layout-v5-page19-top66',
+            'content-zone-70pct',
             'pdf-font-v3-svn',
             'bocuc-img-v1',
             'bocuc-paginate-v1',
@@ -745,7 +747,7 @@ class PdfExportController extends Controller
         $pdfsToMerge[] = $page21Path;
         $tempFiles[]     = $page21Path;
 
-        // ── PHẦN 7: bìa + Mục I (tĩnh) ─────────────────────────────────────────
+        // ── PHẦN 7: bìa + trang mở đầu Mục I (tĩnh) ─────────────────────────────
         $phan7Pages = Phan7PdfService::staticPagePaths();
         $phan7Bundle = PdfStaticPageCache::resolveBundle(Phan7PdfService::bundleCacheKey(), $phan7Pages);
         if ($phan7Bundle !== null) {
@@ -756,13 +758,31 @@ class PdfExportController extends Controller
             }
         }
 
-        // ── PHẦN 7 MỤC II: nội dung động (blade) ────────────────────────────────
+        // ── PHẦN 7 MỤC I: nội dung từ phan7_tam_the (sheet 0) ───────────────────
+        $phan7Muc1Spec = Phan7MucIPdfService::buildContentPageSpec(0);
+        if ($phan7Muc1Spec !== null) {
+            $pagePhan7Muc1Path = $tempDir . '/q2p-phan7-muc1-' . $uid . '.pdf';
+            PdfRenderService::saveView($phan7Muc1Spec['view'], $phan7Muc1Spec['data'], $pagePhan7Muc1Path);
+            $pdfsToMerge[] = $pagePhan7Muc1Path;
+            $tempFiles[]   = $pagePhan7Muc1Path;
+        }
+
+        // ── PHẦN 7 MỤC II: nội dung động theo % Thập Thần ───────────────────────
         $phan7Muc2Spec = Phan7MucIIPdfService::buildContentPageSpec($req);
         if ($phan7Muc2Spec !== null) {
             $pagePhan7Muc2Path = $tempDir . '/q2p-phan7-muc2-' . $uid . '.pdf';
             PdfRenderService::saveView($phan7Muc2Spec['view'], $phan7Muc2Spec['data'], $pagePhan7Muc2Path);
             $pdfsToMerge[] = $pagePhan7Muc2Path;
             $tempFiles[]   = $pagePhan7Muc2Path;
+        }
+
+        // ── PHẦN 7: đoạn nối cuối (phan7_tam_the sheet 1) ───────────────────────
+        $phan7Muc1CuoiSpec = Phan7MucIPdfService::buildContentPageSpec(1);
+        if ($phan7Muc1CuoiSpec !== null) {
+            $pagePhan7Muc1CuoiPath = $tempDir . '/q2p-phan7-muc1-cuoi-' . $uid . '.pdf';
+            PdfRenderService::saveView($phan7Muc1CuoiSpec['view'], $phan7Muc1CuoiSpec['data'], $pagePhan7Muc1CuoiPath);
+            $pdfsToMerge[] = $pagePhan7Muc1CuoiPath;
+            $tempFiles[]   = $pagePhan7Muc1CuoiPath;
         }
 
         // ── PHẦN 8 (8B): Niên Vận tiếp theo + III. Dự báo khía cạnh ─────────

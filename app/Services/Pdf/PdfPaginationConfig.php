@@ -3,7 +3,7 @@
 namespace App\Services\Pdf;
 
 /**
- * Cấu hình phân trang PDF — vùng nội dung 70% A4, căn giữa dọc.
+ * Cấu hình phân trang PDF — vùng nội dung 70% A4, nội dung xếp từ trên xuống.
  */
 class PdfPaginationConfig
 {
@@ -11,9 +11,9 @@ class PdfPaginationConfig
 
     public const CONTENT_RATIO = 0.7;
 
-    public const CONTENT_ZONE_HEIGHT_MM = 208.0; // 297 × 0.7
+    public const CONTENT_ZONE_HEIGHT_MM = 207.9; // 297 × 0.7
 
-    public const CONTENT_ZONE_TOP_MM = 44.5; // (297 - 208) / 2
+    public const CONTENT_ZONE_TOP_MM = 15.0; // vùng 70% bắt đầu từ trên, nội dung xếp từ trên xuống
 
     public float $contentHeightMm;
 

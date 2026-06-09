@@ -25,13 +25,13 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
+        @include('pdfs.partials.content-zone-styles')
+
+        .content-zone {
             left: 24mm;
             width: 162mm;
-            top: 40mm;
-            height: 222mm;
-            overflow: hidden;
+            top: 15mm;
+            height: 207.9mm;
         }
 
         .tru-heading {
@@ -133,7 +133,7 @@
 @foreach ($pages ?? [] as $page)
 <div class="page">
     <img class="bg-img" src="{{ $page['bgPath'] }}">
-    <div class="content-wrap">
+    <div class="content-zone">
         @if (!empty($page['showHeader']))
             @if (!empty($page['titleImagePath']))
             <img class="golden-title-img" src="{{ $page['titleImagePath'] }}" style="width: 162mm; height: auto;">

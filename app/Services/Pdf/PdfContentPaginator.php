@@ -43,14 +43,12 @@ class PdfContentPaginator
                 $chunk = ($config->chunkAdjustResolver)($pageIndex, $chunk, $remaining);
             }
 
-            $paddingTop = max(0.0, ($config->contentZoneHeightMm - $usedMm) / 2);
-
             $page = [
                 'bgPath'              => self::resolveBg($config, $pageIndex),
                 'blocks'              => $chunk,
                 'chapterTitle'        => $chapterTitle,
                 'contentUsedMm'       => round($usedMm, 2),
-                'paddingTopMm'        => round($paddingTop, 2),
+                'paddingTopMm'        => 0.0,
                 'contentZoneTopMm'    => $config->contentZoneTopMm,
                 'contentZoneHeightMm' => $config->contentZoneHeightMm,
                 'contentLeftMm'       => $config->contentLeftMm,

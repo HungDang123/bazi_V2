@@ -47,6 +47,32 @@ class PdfPaginationProfiles
         return $config;
     }
 
+    /** I. Tổng quan: trang 1 = tong-quan-bg, trang tiếp = page-content-bg. */
+    public static function phan5TongQuan(string $firstBgPath, string $contBgPath): PdfPaginationConfig
+    {
+        $continuationHeader = ['type' => 'section_title', 'text' => 'I. TỔNG QUAN'];
+        $config             = self::phan5($firstBgPath, 'tong_quan', $continuationHeader);
+
+        $config->bgResolver = static fn (int $pageIndex): string => $pageIndex === 0
+            ? $firstBgPath
+            : $contBgPath;
+
+        $config->pageMetaResolver = static function (int $pageIndex, array $page): array {
+            if ($pageIndex === 0) {
+                return ['layoutVariant' => 'tong_quan'];
+            }
+
+            return [
+                'layoutVariant'    => 'page_content',
+                'contentZoneTopMm' => PdfPaginationConfig::CONTENT_ZONE_TOP_MM,
+                'contentLeftMm'    => 28.0,
+                'contentWidthMm'   => 154.0,
+            ];
+        };
+
+        return $config;
+    }
+
     public static function phan5(
         string $bgPath,
         string $layoutVariant = '',
@@ -136,6 +162,22 @@ class PdfPaginationProfiles
         ]);
     }
 
+    public static function phan7Muc1(string $bgPath): PdfPaginationConfig
+    {
+        return new PdfPaginationConfig([
+            'charsPerLine'      => 70,
+            'lineMm'            => 5.0,
+            'blockGapMm'        => 2.5,
+            'imageGapMm'        => 4.0,
+            'maxImageMm'        => 120.0,
+            'fixedBlockHeights' => [
+                'section_label' => 7.0,
+            ],
+            'clampImages'       => true,
+            'bgResolver'        => static fn (): string => $bgPath,
+        ]);
+    }
+
     public static function phan8(string $bgPath, float $contentHeightMm = 0.0): PdfPaginationConfig
     {
         $base = self::phan68Base($bgPath);
@@ -169,6 +211,7 @@ class PdfPaginationProfiles
             'su_nghiep_item' => 24.0,
             'traits_su_nghiep' => 28.0,
             'lbtv119', 'traits_lbtv119' => 18.0,
+            'page_content' => PdfPaginationConfig::CONTENT_ZONE_TOP_MM,
             default => PdfPaginationConfig::CONTENT_ZONE_TOP_MM,
         };
     }
@@ -177,7 +220,7 @@ class PdfPaginationProfiles
     private static function contentBoxForLayout(string $layout): array
     {
         return match ($layout) {
-            'tong_quan' => [28.0, 154.0],
+            'tong_quan', 'page_content' => [28.0, 154.0],
             'su_nghiep', 'su_nghiep_item', 'traits_su_nghiep', 'traits_lbtv119' => [22.0, 166.0],
             'lbtv119' => [24.0, 162.0],
             default => [24.0, 162.0],
