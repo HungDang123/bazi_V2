@@ -3,10 +3,17 @@
 <head>
     <meta charset="utf-8">
     <style>
-        @include('pdfs.partials.pdf-base-typography')
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { width: 210mm; height: 297mm; }
+        body {
+            width: 210mm; height: 297mm;
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 140%;
+            text-align: justify;
+            letter-spacing: 0;
+        }
         .page { position: relative; width: 210mm; height: 297mm; overflow: hidden; }
         .bg-img { position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; }
 
