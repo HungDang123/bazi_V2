@@ -25,21 +25,7 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
-            left: 22mm;
-            width: 166mm;
-            top: 28mm;
-            height: 255mm;
-            overflow: hidden;
-        }
-
-        .content-wrap.content-wrap-lbtv119 {
-            left: 24mm;
-            width: 162mm;
-            top: 18mm;
-            height: 255mm;
-        }
+        @include('pdfs.partials.content-zone-styles')
 
         .traits-row {
             width: 100%;
@@ -112,15 +98,16 @@
 <body>
 
 @foreach ($pages ?? [] as $page)
-@php $isLbtv119 = ($page['layoutVariant'] ?? '') === 'lbtv119'; @endphp
 <div class="page">
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-wrap{{ $isLbtv119 ? ' content-wrap-lbtv119' : '' }}">
+    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 44.5 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 208 }}mm; left: {{ $page['contentLeftMm'] ?? 22 }}mm; width: {{ $page['contentWidthMm'] ?? 166 }}mm;">
+        <div class="content-inner" style="padding-top: {{ $page['paddingTopMm'] ?? 0 }}mm;">
         @include('pdfs.phan-5.partials.paginated-blocks', [
             'blocks' => $page['blocks'] ?? [],
         ])
+        </div>
     </div>
 
 </div>

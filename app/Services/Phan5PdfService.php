@@ -462,12 +462,11 @@ class Phan5PdfService
         }
 
         $bgPath = (string) ($baseData['templatePath'] ?? self::contentBgPath());
-        $variant = (string) ($baseData['layoutVariant'] ?? '');
         $pages = Phan5PdfPaginator::paginate(
             $blocks,
             $bgPath,
             Phan5PdfPaginator::contentHeightForLayout($layoutKey),
-            $variant,
+            $layoutKey,
             self::continuationHeaderFromBlocks($blocks)
         );
 

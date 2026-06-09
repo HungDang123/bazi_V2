@@ -25,15 +25,7 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
-            left: 28mm;
-            width: 154mm;
-            top: 79mm;
-            height: 192mm;
-            padding-top: 5mm;
-            overflow: hidden;
-        }
+        @include('pdfs.partials.content-zone-styles')
 
         .sub-title {
             color: #6E0101;
@@ -72,11 +64,13 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-wrap">
+    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 44.5 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 208 }}mm; left: {{ $page['contentLeftMm'] ?? 28 }}mm; width: {{ $page['contentWidthMm'] ?? 154 }}mm;">
+        <div class="content-inner" style="padding-top: {{ $page['paddingTopMm'] ?? 0 }}mm;">
         @include('pdfs.phan-5.partials.paginated-blocks', [
             'blocks' => $page['blocks'] ?? [],
             'imageClass' => '',
         ])
+        </div>
     </div>
 
 </div>

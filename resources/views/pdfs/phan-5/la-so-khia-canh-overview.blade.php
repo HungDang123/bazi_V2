@@ -25,14 +25,7 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
-            left: 24mm;
-            width: 162mm;
-            top: 18mm;
-            height: 258mm;
-            overflow: hidden;
-        }
+        @include('pdfs.partials.content-zone-styles')
 
         .section-title {
             text-align: center;
@@ -75,11 +68,13 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-wrap">
+    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 44.5 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 208 }}mm; left: {{ $page['contentLeftMm'] ?? 24 }}mm; width: {{ $page['contentWidthMm'] ?? 162 }}mm;">
+        <div class="content-inner" style="padding-top: {{ $page['paddingTopMm'] ?? 0 }}mm;">
         @include('pdfs.phan-5.partials.paginated-blocks', [
             'blocks' => $page['blocks'] ?? [],
             'imageClass' => 'vi-tri-img',
         ])
+        </div>
     </div>
 
 </div>

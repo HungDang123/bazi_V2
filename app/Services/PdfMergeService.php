@@ -14,6 +14,16 @@ use setasign\Fpdi\Fpdi;
  */
 class PdfMergeService
 {
+    /** ~300 DPI cho cạnh dài A4 (297mm) — tránh ảnh mờ khi fill full page. */
+    private const MAX_RASTER_PX = 3508;
+
+    private const JPEG_QUALITY = 92;
+
+    /** PNG/JPEG đủ nét thì giữ file gốc, không re-encode JPEG. */
+    private const SKIP_REENCODE_PNG_MAX_BYTES = 2_000_000;
+
+    private const SKIP_REENCODE_JPEG_MAX_BYTES = 800_000;
+
     /**
      * Merge nhiều PDF lại thành 1 file.
      */
@@ -202,9 +212,18 @@ class PdfMergeService
 
         $fileSize = filesize($imagePath) ?: 0;
         $mime     = (string) ($info['mime'] ?? '');
+        $w        = (int) ($info[0] ?? 0);
+        $h        = (int) ($info[1] ?? 0);
+        $fitsInMax = $w > 0 && $h > 0 && $w <= self::MAX_RASTER_PX && $h <= self::MAX_RASTER_PX;
 
-        if ($fileSize < 350_000 && $mime === 'image/jpeg') {
-            return $imagePath;
+        // Ảnh đủ nét + nhỏ → nhúng trực tiếp (PNG/JPEG gốc), không nén mất chất lượng
+        if ($fitsInMax) {
+            if ($mime === 'image/png' && $fileSize <= self::SKIP_REENCODE_PNG_MAX_BYTES) {
+                return $imagePath;
+            }
+            if ($mime === 'image/jpeg' && $fileSize <= self::SKIP_REENCODE_JPEG_MAX_BYTES) {
+                return $imagePath;
+            }
         }
 
         $cacheDir = storage_path('app/pdf-cache/raster');
@@ -213,7 +232,7 @@ class PdfMergeService
         }
 
         $mtime = filemtime($imagePath) ?: 0;
-        $key   = hash('xxh128', $imagePath.'|'.$mtime.'|'.$fileSize.'|jpeg-q75-max2000-white-v4');
+        $key   = hash('xxh128', $imagePath.'|'.$mtime.'|'.$fileSize.'|jpeg-q'.self::JPEG_QUALITY.'-max'.self::MAX_RASTER_PX.'-white-v5');
         $cached = $cacheDir.DIRECTORY_SEPARATOR.$key.'.jpg';
 
         if (file_exists($cached)) {
@@ -232,10 +251,9 @@ class PdfMergeService
 
         $w = imagesx($src);
         $h = imagesy($src);
-        $maxPx = 2000;
 
-        if ($w > $maxPx || $h > $maxPx) {
-            $scale = min($maxPx / $w, $maxPx / $h);
+        if ($w > self::MAX_RASTER_PX || $h > self::MAX_RASTER_PX) {
+            $scale = min(self::MAX_RASTER_PX / $w, self::MAX_RASTER_PX / $h);
             $nw    = max(1, (int) round($w * $scale));
             $nh    = max(1, (int) round($h * $scale));
             $dst   = imagecreatetruecolor($nw, $nh);
@@ -248,7 +266,7 @@ class PdfMergeService
             $src = self::flattenPngOnWhite($src);
         }
 
-        imagejpeg($src, $cached, 75);
+        imagejpeg($src, $cached, self::JPEG_QUALITY);
         imagedestroy($src);
 
         return file_exists($cached) ? $cached : $imagePath;

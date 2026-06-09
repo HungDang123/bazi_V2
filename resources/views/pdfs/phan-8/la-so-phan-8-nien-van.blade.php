@@ -22,14 +22,7 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
-            left: 24mm;
-            width: 162mm;
-            top: 12mm;
-            height: 252mm;
-            overflow: hidden;
-        }
+        @include('pdfs.partials.content-zone-styles')
 
         .chapter-title {
             color: #6E0101;
@@ -62,7 +55,8 @@
 @foreach ($pages as $page)
 <div class="page">
     <img class="bg-img" src="{{ $page['bgPath'] }}">
-    <div class="content-wrap">
+    <div class="content-zone" style="left:{{ $page['contentLeftMm'] ?? 24 }}mm;width:{{ $page['contentWidthMm'] ?? 162 }}mm;top:{{ $page['contentZoneTopMm'] ?? 44.5 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 208 }}mm;">
+    <div class="content-inner" style="padding-top:{{ $page['paddingTopMm'] ?? 0 }}mm;">
         @if (!empty($page['chapterTitle']))
         <div class="chapter-title">{{ $page['chapterTitle'] }}</div>
         @endif
@@ -81,6 +75,7 @@
             </div>
             @endif
         @endforeach
+    </div>
     </div>
 </div>
 @endforeach

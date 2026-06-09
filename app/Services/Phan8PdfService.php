@@ -180,9 +180,7 @@ class Phan8PdfService
             ? 'pdfs.phan-8.la-so-phan-8-nien-van'
             : 'pdfs.phan-8.la-so-phan-8-content';
 
-        $heightMm = $type === 'nien_van' ? 252.0 : 258.0;
-
-        foreach (Phan8PdfPaginator::paginate($blocks, $bgPath, $heightMm) as $page) {
+        foreach (Phan8PdfPaginator::paginate($blocks, $bgPath) as $page) {
             $pdfPages[] = [
                 'view' => $view,
                 'data' => ['pages' => [$page]],

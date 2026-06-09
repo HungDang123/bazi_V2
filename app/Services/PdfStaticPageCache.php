@@ -29,7 +29,7 @@ class PdfStaticPageCache
 
         $mtime = filemtime($sourcePath) ?: 0;
         $size  = filesize($sourcePath) ?: 0;
-        $key   = hash('xxh128', $sourcePath . '|' . $mtime . '|' . $size . '|' . ($fullPage ? 'full' : 'fit') . '|raster-v4');
+        $key   = hash('xxh128', $sourcePath . '|' . $mtime . '|' . $size . '|' . ($fullPage ? 'full' : 'fit') . '|raster-v5');
         $cached = $cacheDir . DIRECTORY_SEPARATOR . $key . '.pdf';
 
         if (file_exists($cached)) {
@@ -86,7 +86,7 @@ class PdfStaticPageCache
             $parts[] = $path . '|' . (file_exists($path) ? (filemtime($path) ?: 0) : 0) . '|' . (file_exists($path) ? (filesize($path) ?: 0) : 0);
         }
 
-        $key    = hash('xxh128', $bundleKey . '|' . implode(';', $parts) . '|' . ($fullPage ? 'full' : 'fit') . '|raster-v4');
+        $key    = hash('xxh128', $bundleKey . '|' . implode(';', $parts) . '|' . ($fullPage ? 'full' : 'fit') . '|raster-v5');
         $cached = $cacheDir . DIRECTORY_SEPARATOR . $key . '.pdf';
 
         if (file_exists($cached)) {

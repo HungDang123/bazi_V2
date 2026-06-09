@@ -25,21 +25,7 @@
             width: 210mm; height: 297mm;
         }
 
-        .content-wrap {
-            position: absolute;
-            left: 22mm;
-            width: 166mm;
-            top: 24mm;
-            height: 248mm;
-            overflow: hidden;
-        }
-
-        .content-wrap.content-wrap-lbtv119 {
-            left: 24mm;
-            width: 162mm;
-            top: 18mm;
-            height: 258mm;
-        }
+        @include('pdfs.partials.content-zone-styles')
 
         .item-title {
             text-align: center;
@@ -60,13 +46,9 @@
 
         .content-img {
             display: block;
-            width: 166mm;
+            width: 100%;
             height: auto;
             margin: 0 auto 4mm;
-        }
-
-        .content-wrap-lbtv119 .content-img {
-            width: 162mm;
         }
 
         .para-text {
@@ -96,17 +78,18 @@
 <body>
 
 @foreach ($pages ?? [] as $page)
-@php $isLbtv119 = ($page['layoutVariant'] ?? '') === 'lbtv119'; @endphp
 <div class="page">
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-wrap{{ $isLbtv119 ? ' content-wrap-lbtv119' : '' }}">
+    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 44.5 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 208 }}mm; left: {{ $page['contentLeftMm'] ?? 22 }}mm; width: {{ $page['contentWidthMm'] ?? 166 }}mm;">
+        <div class="content-inner" style="padding-top: {{ $page['paddingTopMm'] ?? 0 }}mm;">
         @include('pdfs.phan-5.partials.paginated-blocks', [
             'blocks' => $page['blocks'] ?? [],
             'keywordFramePath' => $keywordFramePath ?? '',
             'imageClass' => 'minh-hoa',
         ])
+        </div>
     </div>
 
 </div>

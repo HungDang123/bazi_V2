@@ -423,7 +423,6 @@ class PdfExportController extends Controller
             $phan9Dir . '/page-568.png',
             $phan9Dir . '/page-569.png',
             $q1AppendixDir . '/page-572.png',
-            $phan9Dir . '/page-572.png',
             $phan9Dir . '/page-581.png',
         ]);
         if ($ketBaiBundle !== null) {
@@ -438,7 +437,6 @@ class PdfExportController extends Controller
                 [$phan9Dir, 'page-568.png'],
                 [$phan9Dir, 'page-569.png'],
                 [$q1AppendixDir, 'page-572.png'],
-                [$phan9Dir, 'page-572.png'],
                 [$phan9Dir, 'page-581.png'],
             ] as [$dir, $fname]) {
                 self::appendStaticPage($pdfsToMerge, $dir . '/' . $fname, "q1-ket-bai-{$dir}-$fname");
