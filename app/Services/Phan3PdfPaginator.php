@@ -8,19 +8,19 @@ namespace App\Services;
  */
 class Phan3PdfPaginator
 {
-    private const CONTENT_HEIGHT_MM = 268.0;
+    private const CONTENT_HEIGHT_MM = 220.0;
 
     private const CONTENT_WIDTH_MM = 154.0;
 
-    private const CHARS_PER_LINE = 92;
+    private const CHARS_PER_LINE = 78;
 
-    private const LINE_MM = 4.5;
+    private const LINE_MM = 5.5;
 
-    private const CHAPTER_TITLE_MM = 9.0;
+    private const CHAPTER_TITLE_MM = 10.5;
 
-    private const SUB_TITLE_MM = 7.0;
+    private const SUB_TITLE_MM = 8.5;
 
-    private const BLOCK_GAP_MM = 2.0;
+    private const BLOCK_GAP_MM = 2.5;
 
     private const IMAGE_GAP_MM = 5.0;
 

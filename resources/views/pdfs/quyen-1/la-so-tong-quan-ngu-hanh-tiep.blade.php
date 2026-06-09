@@ -8,9 +8,9 @@
         body {
             width: 210mm; height: 297mm;
             font-family: 'svn-poppins', sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: normal;
-            line-height: 100%;
+            line-height: 140%;
             text-align: justify;
             letter-spacing: 0;
         }
@@ -37,13 +37,13 @@
 
         .sub-title {
             font-family: 'svn-poppins', sans-serif;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
-            line-height: 100%;
+            line-height: 130%;
             letter-spacing: 0;
             color: #6E0101;
-            margin-top: 6px;
-            margin-bottom: 3px;
+            margin-top: 8px;
+            margin-bottom: 4px;
         }
 
         .sub-section:first-child .sub-title {
@@ -52,20 +52,20 @@
 
         .para-text {
             font-family: 'svn-poppins', sans-serif;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: normal;
-            line-height: 100%;
+            line-height: 140%;
             letter-spacing: 0;
             text-align: justify;
             color: #1A1A1A;
         }
 
         .para-text p {
-            margin-bottom: 3px;
+            margin-bottom: 5px;
         }
 
         .sub-section {
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
     </style>
 </head>
@@ -74,7 +74,7 @@
 
     <img class="bg-img" src="{{ $templatePath }}">
 
-    <div class="content-wrap" style="top: 16mm; height: 268mm;">
+    <div class="content-wrap" style="top: 16mm; height: 220mm;">
         @foreach ($subSections as $sub)
         <div class="sub-section">
             @if (!empty($sub['sub_title']))
