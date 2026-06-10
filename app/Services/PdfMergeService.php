@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Process;
 use setasign\Fpdi\Fpdi;
 
 /**
@@ -14,6 +15,10 @@ use setasign\Fpdi\Fpdi;
  */
 class PdfMergeService
 {
+    private const QPDF_BATCH_SIZE = 25;
+
+    private static ?string $lastMergeDriver = null;
+
     /** ~300 DPI cho cạnh dài A4 (297mm) — tránh ảnh mờ khi fill full page. */
     private const MAX_RASTER_PX = 3508;
 
@@ -24,21 +29,227 @@ class PdfMergeService
 
     private const SKIP_REENCODE_JPEG_MAX_BYTES = 800_000;
 
+    public static function lastMergeDriver(): ?string
+    {
+        return self::$lastMergeDriver;
+    }
+
     /**
      * Merge nhiều PDF lại thành 1 file.
+     * Driver: config pdf.merge_driver = auto|qpdf|pdftk|fpdi (fallback FPDI khi binary thất bại).
      */
     public static function mergeMultiple(array $pdfPaths, string $outputPath): bool
+    {
+        self::$lastMergeDriver = null;
+        $driver                = strtolower((string) config('pdf.merge_driver', 'auto'));
+
+        $tryOrder = match ($driver) {
+            'qpdf'  => ['qpdf', 'fpdi'],
+            'pdftk' => ['pdftk', 'fpdi'],
+            'fpdi'  => ['fpdi'],
+            default => ['qpdf', 'pdftk', 'fpdi'],
+        };
+
+        foreach ($tryOrder as $name) {
+            $ok = match ($name) {
+                'qpdf'  => self::mergeWithQpdf($pdfPaths, $outputPath),
+                'pdftk' => self::mergeWithPdftk($pdfPaths, $outputPath),
+                'fpdi'  => self::mergeWithFpdi($pdfPaths, $outputPath),
+                default => false,
+            };
+
+            if ($ok) {
+                self::$lastMergeDriver = $name;
+                Log::debug('PdfMergeService: merge driver', ['driver' => $name, 'files' => count($pdfPaths)]);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static function resolveBinary(string $name, ?string $configuredPath = null): ?string
+    {
+        if ($configuredPath !== null && $configuredPath !== '') {
+            return is_file($configuredPath) ? $configuredPath : null;
+        }
+
+        if (PHP_OS_FAMILY === 'Windows') {
+            $result = Process::run(['where', $name]);
+        } else {
+            $result = Process::run(['which', $name]);
+        }
+
+        if (! $result->successful()) {
+            return null;
+        }
+
+        $line = trim(explode("\n", $result->output())[0] ?? '');
+
+        return $line !== '' && is_file($line) ? $line : null;
+    }
+
+    public static function binaryVersion(string $binary): ?string
+    {
+        $base = basename($binary);
+        $flag = str_contains($base, 'pdftk') ? null : '--version';
+        $args = $flag !== null ? [$binary, $flag] : [$binary];
+        $result = Process::run($args);
+
+        if (! $result->successful() && $result->output() === '' && $result->errorOutput() === '') {
+            return null;
+        }
+
+        $text = trim($result->output() !== '' ? $result->output() : $result->errorOutput());
+
+        return $text !== '' ? strtok($text, "\r\n") : null;
+    }
+
+    /** Driver merge sẽ dùng trên server hiện tại (auto-detect). */
+    public static function preferredMergeDriver(): string
+    {
+        $driver = strtolower((string) config('pdf.merge_driver', 'auto'));
+
+        if ($driver === 'fpdi') {
+            return 'fpdi';
+        }
+
+        if ($driver === 'qpdf' || ($driver === 'auto' && self::resolveBinary('qpdf', config('pdf.qpdf_binary')) !== null)) {
+            return 'qpdf';
+        }
+
+        if ($driver === 'pdftk' || ($driver === 'auto' && self::resolveBinary('pdftk', config('pdf.pdftk_binary')) !== null)) {
+            return 'pdftk';
+        }
+
+        return 'fpdi';
+    }
+
+    private static function existingPdfPaths(array $pdfPaths): array
+    {
+        return array_values(array_filter($pdfPaths, static function ($path) {
+            if (! is_string($path) || $path === '') {
+                return false;
+            }
+            if (! file_exists($path)) {
+                Log::warning('PdfMergeService: file không tồn tại, bỏ qua', ['path' => $path]);
+
+                return false;
+            }
+
+            return true;
+        }));
+    }
+
+    private static function ensureOutputDir(string $outputPath): void
+    {
+        $outputDir = dirname($outputPath);
+        if (! file_exists($outputDir)) {
+            mkdir($outputDir, 0755, true);
+        }
+    }
+
+    private static function mergeWithQpdf(array $pdfPaths, string $outputPath): bool
+    {
+        $qpdf = self::resolveBinary('qpdf', config('pdf.qpdf_binary'));
+        if ($qpdf === null) {
+            return false;
+        }
+
+        $existing = self::existingPdfPaths($pdfPaths);
+        if ($existing === []) {
+            return false;
+        }
+
+        self::ensureOutputDir($outputPath);
+
+        if (count($existing) <= self::QPDF_BATCH_SIZE) {
+            return self::runQpdfMerge($qpdf, $existing, $outputPath);
+        }
+
+        $tempDir = storage_path('app/temp/qpdf-merge');
+        if (! is_dir($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
+
+        $partials = [];
+        foreach (array_chunk($existing, self::QPDF_BATCH_SIZE) as $chunk) {
+            $partPath = $tempDir.'/batch-'.uniqid('', true).'.pdf';
+            if (! self::runQpdfMerge($qpdf, $chunk, $partPath)) {
+                foreach ($partials as $partial) {
+                    @unlink($partial);
+                }
+
+                return false;
+            }
+            $partials[] = $partPath;
+        }
+
+        $ok = self::runQpdfMerge($qpdf, $partials, $outputPath);
+        foreach ($partials as $partial) {
+            @unlink($partial);
+        }
+
+        return $ok;
+    }
+
+    /**
+     * @param  list<string>  $files
+     */
+    private static function runQpdfMerge(string $qpdf, array $files, string $outputPath): bool
+    {
+        $args   = array_merge([$qpdf, '--empty', '--pages'], $files, ['--', $outputPath]);
+        $result = Process::run($args);
+
+        if (! $result->successful() || ! file_exists($outputPath)) {
+            Log::warning('PdfMergeService: qpdf merge thất bại', [
+                'stderr' => trim($result->errorOutput()),
+                'files'  => count($files),
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private static function mergeWithPdftk(array $pdfPaths, string $outputPath): bool
+    {
+        $pdftk = self::resolveBinary('pdftk', config('pdf.pdftk_binary'));
+        if ($pdftk === null) {
+            return false;
+        }
+
+        $existing = self::existingPdfPaths($pdfPaths);
+        if ($existing === []) {
+            return false;
+        }
+
+        self::ensureOutputDir($outputPath);
+
+        $args   = array_merge([$pdftk], $existing, ['cat', 'output', $outputPath]);
+        $result = Process::run($args);
+
+        if (! $result->successful() || ! file_exists($outputPath)) {
+            Log::warning('PdfMergeService: pdftk merge thất bại', [
+                'stderr' => trim($result->errorOutput()),
+                'files'  => count($existing),
+            ]);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private static function mergeWithFpdi(array $pdfPaths, string $outputPath): bool
     {
         try {
             /** @var \setasign\Fpdi\Fpdi $pdf */
             $pdf = new Fpdi();
 
-            foreach ($pdfPaths as $pdfPath) {
-                if (!file_exists($pdfPath)) {
-                    Log::warning('PdfMergeService: file không tồn tại, bỏ qua', ['path' => $pdfPath]);
-                    continue;
-                }
-
+            foreach (self::existingPdfPaths($pdfPaths) as $pdfPath) {
                 $pageCount = $pdf->setSourceFile($pdfPath);
                 for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
                     $tplId = $pdf->importPage($pageNo);
@@ -50,18 +261,16 @@ class PdfMergeService
                 }
             }
 
-            $outputDir = dirname($outputPath);
-            if (!file_exists($outputDir)) {
-                mkdir($outputDir, 0755, true);
-            }
-
+            self::ensureOutputDir($outputPath);
             $pdf->Output('F', $outputPath);  // @phpstan-ignore-line
-            return true;
+
+            return file_exists($outputPath);
         } catch (\Exception $e) {
-            Log::error('PdfMergeService::mergeMultiple thất bại', [
-                'error' => $e->getMessage(),
+            Log::error('PdfMergeService::mergeWithFpdi thất bại', [
+                'error'     => $e->getMessage(),
                 'pdf_paths' => $pdfPaths,
             ]);
+
             return false;
         }
     }

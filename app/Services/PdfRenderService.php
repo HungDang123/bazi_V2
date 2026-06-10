@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\Pdf\PdfExportMetrics;
 use App\Services\Pdf\PdfTextSanitizer;
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -13,32 +14,34 @@ class PdfRenderService
      */
     public static function saveView(string $view, array $data, string $outputPath): void
     {
-        PdfFontService::ensureRegistered();
+        PdfExportMetrics::recordRender(function () use ($view, $data, $outputPath): void {
+            PdfFontService::ensureRegistered();
 
-        $dir = dirname($outputPath);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
+            $dir = dirname($outputPath);
+            if (! is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
 
-        $fontDir = PdfFontService::fontDir();
+            $fontDir = PdfFontService::fontDir();
 
-        $pdf = Pdf::loadView($view, self::normalizeViewData($data));
-        PdfFontService::registerWithDompdf($pdf->getDomPDF()->getFontMetrics());
+            $pdf = Pdf::loadView($view, self::normalizeViewData($data));
+            PdfFontService::registerWithDompdf($pdf->getDomPDF()->getFontMetrics());
 
-        $pdf->setPaper('a4', 'portrait')
-            ->setOption('isRemoteEnabled', true)
-            ->setOption('fontDir', $fontDir)
-            ->setOption('fontCache', $fontDir)
-            ->setOption('defaultFont', 'svn-poppins')
-            ->setOption('convertEntities', false)
-            ->setOption('isHtml5ParserEnabled', true)
-            ->setOption('isPhpEnabled', false)
-            ->setOption('isJavascriptEnabled', false)
-            ->setOption('enable_font_subsetting', true)
-            ->setOption('debugKeepTemp', false)
-            ->setOption('debugCss', false)
-            ->setOption('debugLayout', false)
-            ->save($outputPath);
+            $pdf->setPaper('a4', 'portrait')
+                ->setOption('isRemoteEnabled', true)
+                ->setOption('fontDir', $fontDir)
+                ->setOption('fontCache', $fontDir)
+                ->setOption('defaultFont', 'svn-poppins')
+                ->setOption('convertEntities', false)
+                ->setOption('isHtml5ParserEnabled', true)
+                ->setOption('isPhpEnabled', false)
+                ->setOption('isJavascriptEnabled', false)
+                ->setOption('enable_font_subsetting', true)
+                ->setOption('debugKeepTemp', false)
+                ->setOption('debugCss', false)
+                ->setOption('debugLayout', false)
+                ->save($outputPath);
+        });
     }
 
     /**

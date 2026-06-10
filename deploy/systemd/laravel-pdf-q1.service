@@ -1,0 +1,23 @@
+# systemd units — chạy song song Quyển 1 + Quyển 2
+# Copy vào /etc/systemd/system/ rồi:
+#   systemctl daemon-reload
+#   systemctl enable --now laravel-pdf-q1 laravel-pdf-q2
+#
+# Điều chỉnh WorkingDirectory, User, đường dẫn php.
+
+[Unit]
+Description=Laravel PDF queue worker (Quyển 1)
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=3
+WorkingDirectory=/var/www/vuongkimbao
+ExecStart=/usr/bin/php artisan queue:work --queue=pdf-q1 --timeout=600 --memory=512 --tries=2 --sleep=1
+StandardOutput=append:/var/www/vuongkimbao/storage/logs/pdf-worker-q1.log
+StandardError=append:/var/www/vuongkimbao/storage/logs/pdf-worker-q1.log
+
+[Install]
+WantedBy=multi-user.target

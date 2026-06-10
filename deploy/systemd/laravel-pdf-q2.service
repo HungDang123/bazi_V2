@@ -1,0 +1,16 @@
+[Unit]
+Description=Laravel PDF queue worker (Quyển 2)
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=3
+WorkingDirectory=/var/www/vuongkimbao
+ExecStart=/usr/bin/php artisan queue:work --queue=pdf-q2 --timeout=600 --memory=512 --tries=2 --sleep=1
+StandardOutput=append:/var/www/vuongkimbao/storage/logs/pdf-worker-q2.log
+StandardError=append:/var/www/vuongkimbao/storage/logs/pdf-worker-q2.log
+
+[Install]
+WantedBy=multi-user.target

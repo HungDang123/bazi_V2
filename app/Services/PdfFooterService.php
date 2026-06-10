@@ -226,12 +226,12 @@ class PdfFooterService
     /**
      * Tên HOA → PNG dùng Imagick.
      * $whiteText=true  → chữ trắng, nền trong suốt (trang nền tối).
-     * $whiteText=false → chữ đen, nền cream opaque (trang nền sáng).
+     * $whiteText=false → chữ đen, nền trong suốt (trang nền sáng).
      */
     private static function renderNameStrip(string $displayName, bool $whiteText = false): ?string
     {
         if (! class_exists(\Imagick::class) || ! class_exists(\ImagickDraw::class)) {
-            return self::renderNameStripGd($displayName);
+            return self::renderNameStripGd($displayName, $whiteText);
         }
 
         $font = PdfFontService::boldFontPath() ?: PdfFontService::regularFontPath();
@@ -282,12 +282,14 @@ class PdfFooterService
         } catch (\Throwable $e) {
             Log::warning('PdfFooterService renderNameStrip Imagick thất bại', ['error' => $e->getMessage()]);
 
-            return self::renderNameStripGd($displayName);
+            return self::renderNameStripGd($displayName, $whiteText);
         }
     }
 
-    /** Fallback: render tên bằng GD (opaque cream bg). */
-    private static function renderNameStripGd(string $displayName): ?string
+    /**
+     * Tên HOA → PNG (GD) — nền trong suốt, giống Imagick khi server không có extension.
+     */
+    private static function renderNameStripGd(string $displayName, bool $whiteText = false): ?string
     {
         if (! function_exists('imagettftext')) {
             return null;
@@ -303,7 +305,8 @@ class PdfFooterService
             mkdir($cacheDir, 0755, true);
         }
 
-        $cacheKey = hash('sha256', 'name-gd-v2|'.$displayName.'|'.self::NAME_FONT_PX);
+        $variant  = $whiteText ? 'white' : 'dark';
+        $cacheKey = hash('sha256', 'name-gd-v3|'.$variant.'|'.$displayName.'|'.self::NAME_FONT_PX);
         $cachePath = $cacheDir.'/'.$cacheKey.'.png';
         if (file_exists($cachePath)) {
             return $cachePath;
@@ -316,18 +319,24 @@ class PdfFooterService
 
         $textW = $box[2] - $box[0];
         $textH = $box[1] - $box[7];
-        $padX = 8;
-        $padY = 6;
+        $padX  = 16;
+        $padY  = 10;
         $canvasW = $textW + $padX * 2;
         $canvasH = $textH + $padY * 2;
 
         $canvas = imagecreatetruecolor($canvasW, $canvasH);
-        imagesavealpha($canvas, false);
-        imagefill($canvas, 0, 0, imagecolorallocate($canvas, 252, 250, 245));
-        $black = imagecolorallocate($canvas, 10, 10, 10);
+        imagesavealpha($canvas, true);
+        imagealphablending($canvas, false);
+        $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+        imagefill($canvas, 0, 0, $transparent);
+        imagealphablending($canvas, true);
+
+        $textColor = $whiteText
+            ? imagecolorallocate($canvas, 255, 255, 255)
+            : imagecolorallocate($canvas, 10, 10, 10);
         $textX = (int) ($padX - $box[0]);
         $textY = (int) ($padY + $textH);
-        imagettftext($canvas, self::NAME_FONT_PX, 0, $textX, $textY, $black, $font, $displayName);
+        imagettftext($canvas, self::NAME_FONT_PX, 0, $textX, $textY, $textColor, $font, $displayName);
 
         imagepng($canvas, $cachePath, 6);
         imagedestroy($canvas);
@@ -480,11 +489,13 @@ class PdfFooterService
             }
         }
 
-        return self::legacyUpscaledBannerPath();
+        return self::gdTransparentBannerPath();
     }
 
-    /** Fallback: upscale 08.png bằng GD nếu SVG/Imagick không dùng được. */
-    private static function legacyUpscaledBannerPath(): ?string
+    /**
+     * Upscale footer-banner.png bằng GD — giữ alpha (PNG-32), không cần Imagick.
+     */
+    private static function gdTransparentBannerPath(): ?string
     {
         $source = self::bannerPath();
         if (! file_exists($source) || ! function_exists('imagecreatefromstring')) {
@@ -496,7 +507,7 @@ class PdfFooterService
             mkdir($cacheDir, 0755, true);
         }
 
-        $cachePath = $cacheDir.'/banner-legacy-'.self::RENDER_BANNER_PX.'-'.filemtime($source).'.png';
+        $cachePath = $cacheDir.'/banner-gd-alpha-v1-'.self::RENDER_BANNER_PX.'-'.filemtime($source).'.png';
         if (file_exists($cachePath)) {
             return $cachePath;
         }
@@ -527,47 +538,10 @@ class PdfFooterService
         imagecopyresampled($scaled, $img, 0, 0, 0, 0, $targetW, $targetH, $srcW, $srcH);
         imagedestroy($img);
 
-        $flat = imagecreatetruecolor($targetW, $targetH);
-        imagesavealpha($flat, false);
-        imagefill($flat, 0, 0, imagecolorallocate($flat, 252, 250, 245));
-        self::compositeWithAlpha($flat, $scaled, 0, 0, 252, 250, 245);
+        imagepng($scaled, $cachePath, 6);
         imagedestroy($scaled);
 
-        imagepng($flat, $cachePath, 6);
-        imagedestroy($flat);
-
         return file_exists($cachePath) ? $cachePath : null;
-    }
-
-    /** Ghép ảnh có alpha lên nền kem — blend đúng viền anti-alias, không bị mờ. */
-    private static function compositeWithAlpha(
-        \GdImage $dst,
-        \GdImage $src,
-        int $dstX,
-        int $dstY,
-        int $bgR,
-        int $bgG,
-        int $bgB
-    ): void {
-        $w = imagesx($src);
-        $h = imagesy($src);
-
-        for ($y = 0; $y < $h; $y++) {
-            for ($x = 0; $x < $w; $x++) {
-                $rgba = imagecolorat($src, $x, $y);
-                $a = ($rgba & 0x7F000000) >> 24;
-                if ($a >= 127) {
-                    continue;
-                }
-
-                $alpha = (127 - $a) / 127.0;
-                $r = (int) round((($rgba >> 16) & 0xFF) * $alpha + $bgR * (1 - $alpha));
-                $g = (int) round((($rgba >> 8) & 0xFF) * $alpha + $bgG * (1 - $alpha));
-                $b = (int) round(($rgba & 0xFF) * $alpha + $bgB * (1 - $alpha));
-                $color = imagecolorallocate($dst, $r, $g, $b);
-                imagesetpixel($dst, $dstX + $x, $dstY + $y, $color);
-            }
-        }
     }
 
     private static function makeNearBlackTransparent(\GdImage $img): \GdImage

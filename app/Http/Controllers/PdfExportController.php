@@ -22,6 +22,7 @@ use App\Services\PdfMergeService;
 use App\Services\PdfRenderService;
 use App\Services\PdfStaticPageCache;
 use App\Services\PdfViewCache;
+use App\Services\Pdf\PdfExportMetrics;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -83,6 +84,8 @@ class PdfExportController extends Controller
         ini_set('memory_limit', '512M');
         ini_set('max_execution_time', '0');
 
+        PdfExportMetrics::begin(1);
+
         $tempDir = storage_path('app/temp');
         if (!file_exists($tempDir)) {
             mkdir($tempDir, 0755, true);
@@ -109,6 +112,7 @@ class PdfExportController extends Controller
         $birthD = $req->input('d');
 
         if ($birthY && $birthM && $birthD) {
+            $baziT0 = microtime(true);
             try {
                 $baziData = BaZiServiceV2::calc(
                     $req->input('full_name', ''),
@@ -130,6 +134,7 @@ class PdfExportController extends Controller
             } catch (\Throwable $e) {
                 Log::error('PdfExport Q1: BaZiServiceV2::calc lỗi – ' . $e->getMessage());
             }
+            PdfExportMetrics::addBaziMs((microtime(true) - $baziT0) * 1000);
         }
 
         $pdfsToMerge = [];
@@ -451,7 +456,9 @@ class PdfExportController extends Controller
 
         // ── Merge + footer (banner 08.png, số trang, tên người nhập) ─────────
         $mergedTemp = $tempDir.'/merged-q1-'.$uid.'.pdf';
-        $merged = PdfMergeService::mergeMultiple($pdfsToMerge, $mergedTemp);
+        $tMerge     = microtime(true);
+        $merged     = PdfMergeService::mergeMultiple($pdfsToMerge, $mergedTemp);
+        $mergeMs    = (microtime(true) - $tMerge) * 1000;
 
         foreach ($tempFiles as $tmp) {
             @unlink($tmp);
@@ -462,6 +469,7 @@ class PdfExportController extends Controller
         }
 
         $fullName = trim((string) $req->input('full_name', ''));
+        $tFooter  = microtime(true);
         if (! PdfFooterService::applyToMergedPdf($mergedTemp, $finalPath, $fullName)) {
             Log::warning('Gắn footer PDF Quyển 1 thất bại — xuất PDF không footer', [
                 'uid' => $uid,
@@ -469,11 +477,20 @@ class PdfExportController extends Controller
             ]);
             @copy($mergedTemp, $finalPath);
         }
+        $footerMs = (microtime(true) - $tFooter) * 1000;
         @unlink($mergedTemp);
 
         if (! file_exists($finalPath)) {
             throw new \RuntimeException('Gắn footer PDF Quyển 1 thất bại');
         }
+
+        PdfExportMetrics::logFinish([
+            'uid'           => $uid,
+            'merge_ms'      => round($mergeMs, 1),
+            'footer_ms'     => round($footerMs, 1),
+            'merge_driver'  => PdfMergeService::lastMergeDriver(),
+            'segments'      => count($pdfsToMerge),
+        ]);
     }
 
     /**
@@ -534,6 +551,8 @@ class PdfExportController extends Controller
     {
         ini_set('memory_limit', '512M');
         ini_set('max_execution_time', '0');
+
+        PdfExportMetrics::begin(2);
 
         $tempDir = storage_path('app/temp');
         if (!file_exists($tempDir)) {
@@ -607,6 +626,7 @@ class PdfExportController extends Controller
         $birthD = $req->input('d');
 
         if ($birthY && $birthM && $birthD) {
+            $baziT0 = microtime(true);
             try {
                 $baziData = BaZiServiceV2::calc(
                     $req->input('full_name', ''),
@@ -649,6 +669,7 @@ class PdfExportController extends Controller
             } catch (\Throwable $e) {
                 Log::error('PdfExport: BaZiServiceV2::calc lỗi – ' . $e->getMessage());
             }
+            PdfExportMetrics::addBaziMs((microtime(true) - $baziT0) * 1000);
         }
 
         // ── Trang 12: blade la-so-bat-tu ─────────────────────────────────────
@@ -832,7 +853,9 @@ class PdfExportController extends Controller
 
         // ── Merge + footer (banner 08.png, số trang, tên người nhập) ─────────
         $mergedTemp = $tempDir.'/merged-q2-'.$uid.'.pdf';
-        $merged = PdfMergeService::mergeMultiple($pdfsToMerge, $mergedTemp);
+        $tMerge     = microtime(true);
+        $merged     = PdfMergeService::mergeMultiple($pdfsToMerge, $mergedTemp);
+        $mergeMs    = (microtime(true) - $tMerge) * 1000;
 
         foreach ($tempFiles as $tmp) {
             @unlink($tmp);
@@ -843,6 +866,7 @@ class PdfExportController extends Controller
         }
 
         $fullName = trim((string) $req->input('full_name', ''));
+        $tFooter  = microtime(true);
         if (! PdfFooterService::applyToMergedPdf($mergedTemp, $finalPath, $fullName)) {
             Log::warning('Gắn footer PDF Quyển 2 thất bại — xuất PDF không footer', [
                 'uid' => $uid,
@@ -850,11 +874,20 @@ class PdfExportController extends Controller
             ]);
             @copy($mergedTemp, $finalPath);
         }
+        $footerMs = (microtime(true) - $tFooter) * 1000;
         @unlink($mergedTemp);
 
         if (! file_exists($finalPath)) {
             throw new \RuntimeException('Gắn footer PDF Quyển 2 thất bại');
         }
+
+        PdfExportMetrics::logFinish([
+            'uid'           => $uid,
+            'merge_ms'      => round($mergeMs, 1),
+            'footer_ms'     => round($footerMs, 1),
+            'merge_driver'  => PdfMergeService::lastMergeDriver(),
+            'segments'      => count($pdfsToMerge),
+        ]);
     }
 
     /**

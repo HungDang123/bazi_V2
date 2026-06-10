@@ -6,6 +6,7 @@ use App\Models\LaSoPdfExport;
 use App\Services\LaSoPdfGeneratorService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class GenerateLaSoPdfJob implements ShouldQueue
@@ -23,7 +24,13 @@ class GenerateLaSoPdfJob implements ShouldQueue
         public string $exportId,
         public int $quyen,
         public array $params
-    ) {}
+    ) {
+        $queue = $quyen === 1
+            ? config('pdf.queue_q1', 'pdf-q1')
+            : config('pdf.queue_q2', 'pdf-q2');
+
+        $this->onQueue($queue);
+    }
 
     public function handle(LaSoPdfGeneratorService $generator): void
     {
@@ -60,6 +67,14 @@ class GenerateLaSoPdfJob implements ShouldQueue
                 $readyCol  => now(),
                 $errorCol  => null,
             ]);
+
+            if ($export->queued_at !== null) {
+                Log::info('PdfExport wall-clock', [
+                    'export_id'          => $this->exportId,
+                    'quyen'              => $this->quyen,
+                    'queued_to_ready_ms' => (int) $export->queued_at->diffInMilliseconds(now()),
+                ]);
+            }
         } catch (Throwable $e) {
             if (is_file($outputPath)) {
                 @unlink($outputPath);
