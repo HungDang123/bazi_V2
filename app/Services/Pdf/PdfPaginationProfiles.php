@@ -205,10 +205,7 @@ class PdfPaginationProfiles
         $firstBg    = $firstPageBgPath ?? $bgPath;
         $hasIntroBg = $firstPageBgPath !== null && $firstPageBgPath !== $bgPath;
         $introTop   = Phan7PdfService::MUC1_FIRST_PAGE_TOP_MM;
-        $introOffset = $hasIntroBg ? ($introTop - $zoneTop) : 0.0;
-        $baseBudget  = round($zoneHeight * 0.96, 1);
-        $introBudget = round($baseBudget - $introOffset, 1);
-        $introZoneHeight = $zoneHeight - $introOffset;
+        $baseBudget = round($zoneHeight * 0.96, 1);
 
         return new PdfPaginationConfig([
             'contentHeightMm'     => $baseBudget,
@@ -228,24 +225,16 @@ class PdfPaginationProfiles
             ],
             'blockHeightResolver' => static fn (array $block): float => 0.0,
             'bgResolver'          => static fn (int $pageIndex): string => $pageIndex === 0 ? $firstBg : $bgPath,
-            'budgetAdjustResolver' => static function (int $pageIndex, array $remaining, float $budget) use ($hasIntroBg, $introBudget): float {
-                if ($hasIntroBg && $pageIndex === 0) {
-                    return $introBudget;
-                }
-
-                return $budget;
-            },
             'pageMetaResolver' => static function (int $pageIndex, array $page) use (
                 $hasIntroBg,
                 $introTop,
-                $introZoneHeight,
                 $zoneTop,
                 $zoneHeight
             ): array {
                 if ($hasIntroBg && $pageIndex === 0) {
                     return [
                         'contentZoneTopMm'    => $introTop,
-                        'contentZoneHeightMm' => $introZoneHeight,
+                        'contentZoneHeightMm' => $zoneHeight,
                     ];
                 }
 
