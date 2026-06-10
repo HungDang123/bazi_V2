@@ -17,6 +17,9 @@ class Phan7PdfService
         return self::pageDir().'/LBTV - 583.png';
     }
 
+    /** Vùng nội dung trang Mục I đầu — dưới banner cuộn trên LBTV-583. */
+    public const MUC1_FIRST_PAGE_TOP_MM = 74.0;
+
     public static function pageDir(): string
     {
         return resource_path('views/pdfs/phan-7');

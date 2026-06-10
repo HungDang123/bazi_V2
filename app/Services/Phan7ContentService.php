@@ -148,7 +148,7 @@ class Phan7ContentService
             if ($noiDung === '[image]' || $noiDung === '') {
                 $imagePath = self::resolveTamTheImagePath($row->image);
                 if ($imagePath !== null) {
-                    $blocks[] = ['type' => 'image', 'path' => $imagePath, 'widthMm' => 154.0];
+                    $blocks[] = ['type' => 'image', 'path' => $imagePath, 'widthMm' => 162.0];
                 }
 
                 continue;

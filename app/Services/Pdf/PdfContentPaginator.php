@@ -123,6 +123,14 @@ class PdfContentPaginator
 
                 $block = self::clampImageBlock($block, $available, $config);
                 $block = self::withImageRenderHeight($block, $config);
+                $maxWidthMm = (float) ($block['widthMm'] ?? $config->contentWidthMm);
+                $renderWidth = (float) ($block['renderWidthMm'] ?? $maxWidthMm);
+
+                // Không thu nhỏ ảnh — nếu không đủ chỗ full width thì sang trang mới
+                if ($chunk !== [] && $renderWidth < $maxWidthMm * 0.92) {
+                    return [$chunk, array_slice($blocks, $idx), $used];
+                }
+
                 $need  = self::blockHeightMm($block, $config);
 
                 if ($chunk !== [] && ($used + $need) > $maxMm) {

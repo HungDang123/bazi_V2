@@ -2,6 +2,8 @@
 
 namespace App\Services\Pdf;
 
+use App\Services\Phan7PdfService;
+
 /**
  * Preset cấu hình phân trang theo từng Phần PDF.
  */
@@ -201,9 +203,15 @@ class PdfPaginationProfiles
         $zoneHeight = PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM;
         $zoneTop    = PdfPaginationConfig::CONTENT_ZONE_TOP_MM;
         $firstBg    = $firstPageBgPath ?? $bgPath;
+        $hasIntroBg = $firstPageBgPath !== null && $firstPageBgPath !== $bgPath;
+        $introTop   = Phan7PdfService::MUC1_FIRST_PAGE_TOP_MM;
+        $introOffset = $hasIntroBg ? ($introTop - $zoneTop) : 0.0;
+        $baseBudget  = round($zoneHeight * 0.96, 1);
+        $introBudget = round($baseBudget - $introOffset, 1);
+        $introZoneHeight = $zoneHeight - $introOffset;
 
         return new PdfPaginationConfig([
-            'contentHeightMm'     => round($zoneHeight * 0.96, 1),
+            'contentHeightMm'     => $baseBudget,
             'contentZoneHeightMm' => $zoneHeight,
             'contentZoneTopMm'    => $zoneTop,
             'contentLeftMm'       => 24.0,
@@ -220,6 +228,32 @@ class PdfPaginationProfiles
             ],
             'blockHeightResolver' => static fn (array $block): float => 0.0,
             'bgResolver'          => static fn (int $pageIndex): string => $pageIndex === 0 ? $firstBg : $bgPath,
+            'budgetAdjustResolver' => static function (int $pageIndex, array $remaining, float $budget) use ($hasIntroBg, $introBudget): float {
+                if ($hasIntroBg && $pageIndex === 0) {
+                    return $introBudget;
+                }
+
+                return $budget;
+            },
+            'pageMetaResolver' => static function (int $pageIndex, array $page) use (
+                $hasIntroBg,
+                $introTop,
+                $introZoneHeight,
+                $zoneTop,
+                $zoneHeight
+            ): array {
+                if ($hasIntroBg && $pageIndex === 0) {
+                    return [
+                        'contentZoneTopMm'    => $introTop,
+                        'contentZoneHeightMm' => $introZoneHeight,
+                    ];
+                }
+
+                return [
+                    'contentZoneTopMm'    => $zoneTop,
+                    'contentZoneHeightMm' => $zoneHeight,
+                ];
+            },
         ]);
     }
 

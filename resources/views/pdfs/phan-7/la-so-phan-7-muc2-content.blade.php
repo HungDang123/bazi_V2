@@ -87,10 +87,10 @@
         /* ── Thập Thần illustration image ── */
         .content-img {
             display: block;
-            width: 154mm;
-            max-width: 154mm;
+            width: 162mm;
+            max-width: 162mm;
             height: auto;
-            margin: 2mm 0 3mm;
+            margin: 2mm auto 3mm;
         }
     </style>
 </head>
@@ -126,7 +126,7 @@
                         $block['renderHeightMm']
                     );
                 } else {
-                    $imgStyle = 'display:block;width:154mm;max-width:154mm;height:auto;margin:2mm 0 3mm;';
+                    $imgStyle = 'display:block;width:162mm;max-width:162mm;height:auto;margin:2mm auto 3mm;';
                     if (! empty($block['maxHeightMm'])) {
                         $imgStyle .= 'max-height:'.$block['maxHeightMm'].'mm;';
                     }
