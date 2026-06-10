@@ -27,56 +27,7 @@
 
         @include('pdfs.partials.content-zone-styles')
 
-        .traits-row {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            margin-bottom: 6mm;
-        }
-
-        .traits-row > tbody > tr > td {
-            width: 50%;
-            vertical-align: top;
-            padding: 0 2mm;
-        }
-
-        .traits-row > tbody > tr > td:first-child { padding-left: 0; }
-        .traits-row > tbody > tr > td:last-child { padding-right: 0; }
-
-        .trait-box {
-            width: 100%;
-            border-collapse: collapse;
-            border: 0.45mm solid;
-        }
-
-        .trait-box.tich-cuc { border-color: #4CAF50; }
-        .trait-box.tieu-cuc { border-color: #C62828; }
-
-        .trait-pill-cell { text-align: center; padding: 2.5mm 2mm 3mm; }
-
-        .trait-pill {
-            display: inline-block;
-            padding: 1.2mm 7mm;
-            border-radius: 99mm;
-            color: #FFFFFF;
-            font-weight: bold;
-            font-size: 12px;
-            line-height: 120%;
-        }
-
-        .trait-box.tich-cuc .trait-pill { background: #4CAF50; }
-        .trait-box.tieu-cuc .trait-pill { background: #8B1A1A; }
-
-        .trait-body-cell {
-            color: #1A1A1A;
-            font-size: 14px;
-            line-height: 140%;
-            padding: 0 3.5mm 3.5mm;
-            vertical-align: top;
-        }
-
-        .trait-body-cell p { margin-bottom: 2.5mm; }
-        .trait-body-cell p:last-child { margin-bottom: 0; }
+        @include('pdfs.phan-5.partials.traits-row-styles')
 
         .muc-label {
             color: #6E0101;

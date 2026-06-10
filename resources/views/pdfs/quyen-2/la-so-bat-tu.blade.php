@@ -5,6 +5,7 @@
     <style>
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        @include('pdfs.partials.pdf-justify-styles')
 
         body {
             width: 210mm;

@@ -20,7 +20,7 @@ class Phan7MucIPdfService
             return null;
         }
 
-        $rawPages = Phan7PdfPaginator::paginateMuc1($blocks, self::contentBgPath());
+        $rawPages = Phan7PdfPaginator::paginateMuc1($blocks, self::contentBgPath(), $sheetIndex === 0);
 
         if ($rawPages === []) {
             return null;

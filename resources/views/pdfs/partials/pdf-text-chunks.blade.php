@@ -1,15 +1,15 @@
 {{--
-  Render text thành nhiều <p> ngắn — chỉ tách khi dòng vượt maxChars.
+  Render đoạn văn — một <p> mỗi dòng logic (xuống dòng \n).
+  Không tách wrapAtChars khi render: mỗi <p> một dòng ngắn thì justify không có tác dụng.
+  wrapAtChars chỉ dùng trong paginator (PdfTextWrapHelper) để ước lượng chiều cao.
   @param string $text
-  @param int $maxChars
+  @param int $maxChars  (giữ để tương thích caller; không dùng khi render)
   @param bool $bulletPrefix  Thêm '– ' cho mỗi bullet (coding Phần 8)
 --}}
 @php
     use App\Services\Pdf\PdfTextSanitizer;
-    use App\Services\Pdf\PdfTextWrapHelper;
 
     $raw = PdfTextSanitizer::trimMultiline((string) ($text ?? ''));
-    $maxChars = (int) ($maxChars ?? 72);
     $bulletPrefix = (bool) ($bulletPrefix ?? false);
 @endphp
 @if ($raw !== '')
@@ -24,10 +24,7 @@
                     ? '– '.PdfTextSanitizer::trimString(preg_replace('/^-\s*/u', '', $line))
                     : '– '.$line;
             }
-            $chunks = PdfTextWrapHelper::wrapAtChars($line, $maxChars);
         @endphp
-        @foreach ($chunks as $chunk)
-        <p>{{ $chunk }}</p>
-        @endforeach
+        <p class="pdf-justify" style="text-align: justify; text-align-last: justify;">{{ $line }}</p>
     @endforeach
 @endif

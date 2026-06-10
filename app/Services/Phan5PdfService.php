@@ -126,7 +126,8 @@ class Phan5PdfService
         $data['pages'] = Phan5PdfPaginator::paginate(
             $blocks,
             $data['templatePath'],
-            Phan5PdfPaginator::contentHeightForLayout('su_nghiep')
+            Phan5PdfPaginator::contentHeightForLayout('su_nghiep'),
+            'su_nghiep',
         );
 
         return $data;
@@ -448,18 +449,6 @@ class Phan5PdfService
      */
     protected static function continuationHeaderFromBlocks(array $blocks): ?array
     {
-        foreach ($blocks as $block) {
-            $type = (string) ($block['type'] ?? '');
-            if ($type === 'item_title' || $type === 'section_title') {
-                $text = trim((string) ($block['text'] ?? ''));
-                if ($text === '') {
-                    continue;
-                }
-
-                return ['type' => $type, 'text' => $text.' (tiếp)'];
-            }
-        }
-
         return null;
     }
 
@@ -497,18 +486,19 @@ class Phan5PdfService
 
                 continue;
             }
+            // Nhiều section trùng label có thể chứa nội dung y hệt — không nối trùng
             if (str_contains($lower, 'tích cực')) {
-                $tichCuc = $tichCuc === '' ? $content : $tichCuc."\n\n".$content;
+                $tichCuc = self::mergeUnique($tichCuc, $content);
 
                 continue;
             }
             if (str_contains($lower, 'tiêu cực')) {
-                $tieuCuc = $tieuCuc === '' ? $content : $tieuCuc."\n\n".$content;
+                $tieuCuc = self::mergeUnique($tieuCuc, $content);
 
                 continue;
             }
             if (str_contains($lower, 'chiến lược')) {
-                $chienLuoc = $chienLuoc === '' ? $content : $chienLuoc."\n\n".$content;
+                $chienLuoc = self::mergeUnique($chienLuoc, $content);
 
                 continue;
             }
@@ -517,6 +507,19 @@ class Phan5PdfService
         }
 
         return compact('keywords', 'giaiNghia', 'tichCuc', 'tieuCuc', 'chienLuoc', 'bodySections');
+    }
+
+    /** Nối content mới vào, bỏ qua nếu đã có y hệt (data nguồn hay lặp). */
+    protected static function mergeUnique(string $existing, string $content): string
+    {
+        if ($existing === '') {
+            return $content;
+        }
+        if (str_contains($existing, $content)) {
+            return $existing;
+        }
+
+        return $existing."\n\n".$content;
     }
 
     /**

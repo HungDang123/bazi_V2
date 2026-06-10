@@ -9,7 +9,7 @@ class PdfFooterService
 {
     public const BANNER_WIDTH_MM = 42.0;
 
-    public const BOTTOM_MARGIN_MM = 4.5;
+    public const BOTTOM_MARGIN_MM = 1.0;
 
     /** 20px/mm — badge 33mm = 660px */
     private const RENDER_BANNER_PX = 660;

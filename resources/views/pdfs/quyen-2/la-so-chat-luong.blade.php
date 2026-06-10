@@ -5,6 +5,7 @@
     <style>
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        @include('pdfs.partials.pdf-justify-styles')
         body {
             width: 210mm; height: 297mm;
             font-family: 'svn-poppins', sans-serif;
@@ -58,13 +59,20 @@
             left: 14mm;
             width: 182mm;
         }
-        .ts-tbl { width: 100%; border-collapse: collapse; }
-        .ts-tbl th, .ts-tbl td {
-            border: 0.4pt solid #fff;
-            padding: 1mm 1.5mm;
-            font-size: 7.5pt;
+        .ts-tbl {
+            width: 182mm;
+            table-layout: fixed;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        .ts-tbl col.col-lbl { width: 46mm; }
+        .ts-tbl col.col-bar { width: 68mm; }
+        .ts-tbl th,
+        .ts-tbl td {
+            border: none;
+            padding: 0;
+            margin: 0;
             vertical-align: middle;
-            height: 7.5mm;
         }
         .ts-hdr th {
             background: #6E0101;
@@ -72,63 +80,72 @@
             font-weight: bold;
             height: 8mm;
             text-align: center;
-            vertical-align: middle;
             font-size: 8pt;
-            line-height: 1.2;
+            line-height: 8mm;
+            padding: 0 1mm;
+        }
+        .ts-tbl tbody tr {
+            height: 8mm;
         }
         .ts-lbl-col {
-            width: 25%;
             background: #6E0101;
             color: #E5CA8E;
             font-weight: bold;
             text-align: center;
-            vertical-align: middle;
-            font-size: 8pt;
-            line-height: 1.2;
-            padding: 1mm 2mm;
+            font-size: 7.5pt;
+            line-height: 8mm;
+            height: 8mm;
+            padding: 0 1.5mm;
+            white-space: nowrap;
         }
-        .bar-cell { width: 37.5%; padding: 1mm 2mm; vertical-align: middle; }
-        .ts-odd  td:not(.ts-lbl-col) { background: #F2EFE8; }
-        .ts-even td:not(.ts-lbl-col) { background: #E9E5DE; }
+        .bar-cell {
+            height: 8mm;
+            padding: 0 2mm 0.6mm;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .ts-odd  .bar-cell { background: #F2EFE8; }
+        .ts-even .bar-cell { background: #E9E5DE; }
         .bar-track {
             width: 100%;
             background: #CECECE;
-            border-radius: 9px;
-            height: 18px;
+            border-radius: 2.4mm;
+            height: 4.8mm;
             overflow: hidden;
             line-height: 0;
+            margin: 0 0 0.5mm;
         }
         .bar-fill-bm {
             background: #0479FD;
-            border-radius: 9px;
-            height: 18px;
-            min-width: 28px;
-            font-size: 8px;
-            color: #fff;
+            border-radius: 2.4mm;
+            height: 4.8mm;
+            min-width: 8mm;
+            font-size: 7pt;
+            color: #ffffff;
             text-align: center;
-            line-height: 18px;
+            line-height: 4.8mm;
             font-weight: bold;
             padding: 0;
         }
         .bar-fill-nv {
             background: #6E0101;
-            border-radius: 9px;
-            height: 18px;
-            min-width: 28px;
-            font-size: 8px;
-            color: #fff;
+            border-radius: 2.4mm;
+            height: 4.8mm;
+            min-width: 8mm;
+            font-size: 7pt;
+            color: #ffffff;
             text-align: center;
-            line-height: 18px;
+            line-height: 4.8mm;
             font-weight: bold;
             padding: 0;
         }
         .bar-zero {
-            height: 18px;
-            font-size: 8px;
-            color: #888;
-            line-height: 18px;
+            height: 4.8mm;
+            font-size: 7pt;
+            color: #666666;
+            line-height: 4.8mm;
             text-align: left;
-            padding: 0 0 0 6px;
+            padding: 0 0 0 1.5mm;
         }
     </style>
 </head>
@@ -334,11 +351,16 @@
     {{-- ── CHẤT LƯỢNG THẬP THẦN ── --}}
     <div class="ts-table-wrap">
         <table class="ts-tbl">
+            <colgroup>
+                <col class="col-lbl">
+                <col class="col-bar">
+                <col class="col-bar">
+            </colgroup>
             <thead>
                 <tr class="ts-hdr">
-                    <th style="width:25%;"></th>
-                    <th style="width:37.5%;">BẢN MỆNH</th>
-                    <th style="width:37.5%;">NIÊN MỆNH {{ $nienMenhYear }}</th>
+                    <th align="center"></th>
+                    <th align="center">BẢN MỆNH</th>
+                    <th align="center">NIÊN MỆNH {{ $nienMenhYear }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -350,8 +372,8 @@
                     $rowIdx++;
                 @endphp
                 <tr class="{{ $cls }}">
-                    <td class="ts-lbl-col">{{ $item['name'] ?? '' }}</td>
-                    <td class="bar-cell">
+                    <td class="ts-lbl-col" align="center" valign="middle">{{ $item['name'] ?? '' }}</td>
+                    <td class="bar-cell" align="center" valign="middle">
                         <div class="bar-track">
                             @if($bmPct > 0)
                             <div class="bar-fill-bm" style="width:{{ $bmPct }}%;">{{ $bmPct }}%</div>
@@ -360,7 +382,7 @@
                             @endif
                         </div>
                     </td>
-                    <td class="bar-cell">
+                    <td class="bar-cell" align="center" valign="middle">
                         <div class="bar-track">
                             @if($nvPct > 0)
                             <div class="bar-fill-nv" style="width:{{ $nvPct }}%;">{{ $nvPct }}%</div>

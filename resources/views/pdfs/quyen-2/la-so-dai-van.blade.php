@@ -5,6 +5,7 @@
     <style>
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        @include('pdfs.partials.pdf-justify-styles')
         body {
             width: 210mm;
             height: 297mm;
@@ -136,7 +137,7 @@
                     @foreach($bangDaiVan as $dv)
                     <td>
                         <div class="dv-name">{{ $dv['can']['thien_can'] }}</div>
-                        <div class="dv-meta">{{ $dv['can']['am_duong'] }} {{ $dv['can']['menh'] }}</div>
+                        <div class="dv-meta">{{ $dv['can']['menh'] }}</div>
                         <div class="dv-tt">{{ $dv['can']['chu_tinh'] }}</div>
                     </td>
                     @endforeach
@@ -148,7 +149,7 @@
                     @foreach($bangDaiVan as $dv)
                     <td>
                         <div class="dv-name">{{ $dv['chi']['dia_chi'] }}</div>
-                        <div class="dv-meta">{{ $dv['chi']['am_duong'] }} {{ $dv['chi']['menh'] }}</div>
+                        <div class="dv-meta">{{ $dv['chi']['menh'] }}</div>
                         @if(!empty($dv['chi']['khong_vong']))<div class="kv-note">(KV)</div>@endif
                     </td>
                     @endforeach
@@ -167,7 +168,7 @@
                             </tr>
                             <tr>
                                 @foreach($dv['cantang'] as $tc)
-                                <td><span class="t-meta">{{ $tc['menh'] }}</span></td>
+                                <td><span class="t-meta">{{ preg_replace('/^[+\-]\s*/u', '', $tc['menh']) }}</span></td>
                                 @endforeach
                             </tr>
                             <tr>

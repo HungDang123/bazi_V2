@@ -35,10 +35,8 @@
         @include('pdfs.partials.content-zone-styles')
 
         .content-zone {
-            left: 28mm;
-            width: 154mm;
-            top: 18mm;
-            height: 187.1mm;
+            position: absolute;
+            overflow: hidden;
         }
 
         /* UTM Davida 24px – PNG supersampling, giữ tỉ lệ (không ép height gây vỡ nét) */
@@ -92,7 +90,18 @@
             letter-spacing: 0;
             text-align: justify;
             color: #1A1A1A;
-            margin-bottom: 3px;
+            margin-bottom: 0;
+        }
+        .para-text p {
+            margin: 0;
+            padding-bottom: 0.8mm;
+            font-size: 14px;
+            line-height: 140%;
+            text-align: justify;
+            color: #1A1A1A;
+        }
+        .para-text p:last-child {
+            padding-bottom: 0;
         }
     </style>
 </head>
@@ -103,7 +112,7 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-zone">
+    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 18 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 252.45 }}mm; left: {{ $page['contentLeftMm'] ?? 28 }}mm; width: {{ $page['contentWidthMm'] ?? 154 }}mm;">
 
         @if (!empty($page['showTitle']) && !empty($page['titleImagePath']))
         <div class="hanh-title-wrap">
@@ -121,7 +130,13 @@
             @if ($block['type'] === 'item_title')
             <div class="item-title">{{ $block['text'] }}</div>
             @else
-            <div class="para-text">{{ $block['text'] }}</div>
+            <div class="para-text">
+                @include('pdfs.partials.pdf-text-chunks', [
+                    'text' => $block['text'] ?? '',
+                    'maxChars' => 75,
+                    'bulletPrefix' => false,
+                ])
+            </div>
             @endif
         @endforeach
 

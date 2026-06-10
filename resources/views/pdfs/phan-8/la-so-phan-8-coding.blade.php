@@ -98,7 +98,6 @@
             color: #6E0101;
             font-weight: bold;
             text-transform: uppercase;
-            border-bottom: 1px solid #C9A227;
             padding-bottom: 3px;
             margin-bottom: 6px;
             font-size: 16px;
@@ -170,73 +169,73 @@
 @foreach ($pages ?? [] as $page)
 <div class="page">
     <img class="bg-img" src="{{ $page['bgPath'] }}">
-    <div class="content-zone" style="left:24mm;width:162mm;top:{{ $page['contentZoneTopMm'] ?? 18 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 187.1 }}mm;">
-        @foreach ($page['preambleBlocks'] ?? [] as $block)
-            @php $pType = $block['type'] ?? 'para'; @endphp
-            @if ($pType === 'chapter_title')
-            <div class="preamble-title">{{ $block['text'] ?? '' }}</div>
-            @elseif (in_array($pType, ['sub_title', 'sub_ab'], true))
-            <div class="preamble-subtitle">{{ $block['text'] ?? '' }}</div>
-            @else
-            <div class="preamble-para">
-                @foreach (preg_split('/\r\n|\r|\n/', $block['text'] ?? '') ?: [] as $line)
-                    @if (trim($line) !== '')<p>{{ trim($line) }}</p>@endif
-                @endforeach
-            </div>
-            @endif
-        @endforeach
+    <div class="content-zone" style="left:24mm;width:162mm;top:{{ $page['contentZoneTopMm'] ?? 18 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 252.45 }}mm;">
+        @foreach ($page['items'] ?? [] as $it)
+            @php $kind = $it['kind'] ?? ''; @endphp
 
-        @if (!empty($page['showHeader']))
-            @if (!empty($page['truHeading']))
-            <div class="tru-heading">{{ $page['truHeading'] }}</div>
-            @endif
+            @if ($kind === 'preamble')
+                @php $block = $it['block'] ?? []; $pType = $block['type'] ?? 'para'; @endphp
+                @if ($pType === 'chapter_title')
+                <div class="preamble-title">{{ $block['text'] ?? '' }}</div>
+                @elseif (in_array($pType, ['sub_title', 'sub_ab'], true))
+                <div class="preamble-subtitle">{{ $block['text'] ?? '' }}</div>
+                @else
+                <div class="preamble-para">
+                    @foreach (preg_split('/\r\n|\r|\n/', $block['text'] ?? '') ?: [] as $line)
+                        @if (trim($line) !== '')<p>{{ trim($line) }}</p>@endif
+                    @endforeach
+                </div>
+                @endif
 
-            @if (!empty($page['blockLabel']))
-            <div class="block-label">{{ $page['blockLabel'] }}</div>
-            @endif
+            @elseif ($kind === 'header')
+                @php $hd = $it['data'] ?? []; @endphp
+                @if (!empty($hd['truHeading']))
+                <div class="tru-heading">{{ $hd['truHeading'] }}</div>
+                @endif
 
-            @if (!empty($page['titleImagePath']))
-            @php
-                $titleStyle = 'width:162mm;height:auto;object-fit:contain;';
-                if (!empty($page['titleImageHeightMm'])) {
-                    $titleStyle .= 'max-height:'.$page['titleImageHeightMm'].'mm;';
-                }
-            @endphp
-            <img class="golden-title-img" src="{{ $page['titleImagePath'] }}" style="{{ $titleStyle }}">
-            @elseif (!empty($page['title']))
-            <div class="golden-title">{{ $page['title'] }}</div>
-            @endif
+                @if (!empty($hd['titleImagePath']))
+                @php
+                    $titleStyle = 'width:162mm;height:auto;object-fit:contain;';
+                    if (!empty($hd['titleImageHeightMm'])) {
+                        $titleStyle .= 'max-height:'.$hd['titleImageHeightMm'].'mm;';
+                    }
+                @endphp
+                <img class="golden-title-img" src="{{ $hd['titleImagePath'] }}" style="{{ $titleStyle }}">
+                @elseif (!empty($hd['title']))
+                <div class="golden-title">{{ $hd['title'] }}</div>
+                @endif
 
-            @if (!empty($page['subtitle']))
-            <div class="golden-subtitle">{{ $page['subtitle'] }}</div>
-            @endif
+                @if (!empty($hd['subtitle']))
+                <div class="golden-subtitle">{{ $hd['subtitle'] }}</div>
+                @endif
 
-            @if (!empty($page['meta']))
-            <div class="meta-line">{{ $page['meta'] }}</div>
-            @endif
-        @elseif (!empty($page['contTitleImagePath']))
-            @php
-                $contStyle = 'width:162mm;height:auto;object-fit:contain;';
-                if (!empty($page['contTitleImageHeightMm'])) {
-                    $contStyle .= 'max-height:'.$page['contTitleImageHeightMm'].'mm;';
-                }
-            @endphp
-            <img class="golden-title-img" src="{{ $page['contTitleImagePath'] }}" style="{{ $contStyle }}">
-        @elseif (!empty($page['continuationTitle']))
-            <div class="continuation-title">{{ $page['continuationTitle'] }}</div>
-        @endif
+            @elseif ($kind === 'cont')
+                @php $cd = $it['data'] ?? []; @endphp
+                @if (!empty($cd['contTitleImagePath']))
+                @php
+                    $contStyle = 'width:162mm;height:auto;object-fit:contain;';
+                    if (!empty($cd['contTitleImageHeightMm'])) {
+                        $contStyle .= 'max-height:'.$cd['contTitleImageHeightMm'].'mm;';
+                    }
+                @endphp
+                <img class="golden-title-img" src="{{ $cd['contTitleImagePath'] }}" style="{{ $contStyle }}">
+                @elseif (!empty($cd['continuationTitle']))
+                <div class="continuation-title">{{ $cd['continuationTitle'] }}</div>
+                @endif
 
-        @foreach ($page['sections'] ?? [] as $sec)
-        <div class="section-block">
-            <div class="section-title">{{ $sec['label'] ?? '' }}</div>
-            <div class="section-box">
-                @include('pdfs.partials.pdf-text-chunks', [
-                    'text' => $sec['content'] ?? '',
-                    'maxChars' => 72,
-                    'bulletPrefix' => true,
-                ])
-            </div>
-        </div>
+            @elseif ($kind === 'section')
+                @php $sec = $it['section'] ?? []; @endphp
+                <div class="section-block">
+                    <div class="section-title">{{ $sec['label'] ?? '' }}</div>
+                    <div class="section-box">
+                        @include('pdfs.partials.pdf-text-chunks', [
+                            'text' => $sec['content'] ?? '',
+                            'maxChars' => 72,
+                            'bulletPrefix' => true,
+                        ])
+                    </div>
+                </div>
+            @endif
         @endforeach
     </div>
 </div>

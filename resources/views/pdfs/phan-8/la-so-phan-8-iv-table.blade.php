@@ -28,7 +28,7 @@
             left: 16mm;
             width: 178mm;
             top: 18mm;
-            height: 187.1mm;
+            height: 252.45mm;
         }
 
         .iv-intro-title {

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\Pdf\Phan3NguHanhBanMenhPaginator;
 use App\Services\Pdf\PdfPaginationConfig;
 use App\Services\Pdf\PdfTextSanitizer;
 use App\Services\Pdf\PdfTextWrapHelper;
@@ -32,67 +33,176 @@ class Phan8CodingPaginator
 
     private const CONT_TITLE_MM = 14.0;
 
-    /** Budget = zone × ratio — buffer chống tràn vùng overflow:hidden */
-    private const BUDGET_RATIO = 0.88;
+    /** Budget = zone × ratio — cùng ngưỡng Phần 3 (98% vùng 85% A4). */
+    private const BUDGET_RATIO = 0.98;
+
+    /**
+     * Phân trang NHIỀU block coding liên tiếp chảy liền nhau — mỗi block gồm
+     * (preamble +) header + sections; chỉ sang trang mới khi trang đầy.
+     *
+     * Mỗi page trả về: ['bgPath', 'items' => [...], 'contentZoneTopMm', 'contentZoneHeightMm'].
+     * Mỗi item: kind = preamble | header | cont | section.
+     *
+     * @param  array<int, array<string, mixed>>  $datas
+     * @return array<int, array<string, mixed>>
+     */
+    public static function paginateMany(array $datas): array
+    {
+        $zoneHeight = Phan3NguHanhBanMenhPaginator::CONTENT_ZONE_HEIGHT_MM;
+        $zoneBudget = round($zoneHeight * self::BUDGET_RATIO, 1);
+
+        $pages = [];
+        $items = [];
+        $used = 0.0;
+        $pageBg = '';
+
+        $flush = static function () use (&$pages, &$items, &$used, &$pageBg, $zoneHeight): void {
+            if ($items === []) {
+                return;
+            }
+            $pages[] = [
+                'bgPath' => $pageBg !== '' ? $pageBg : Phan8AssetService::codingBgPath(),
+                'items' => $items,
+                'contentZoneTopMm' => Phan3NguHanhBanMenhPaginator::CONTENT_ZONE_TOP_MM,
+                'contentZoneHeightMm' => $zoneHeight,
+            ];
+            $items = [];
+            $used = 0.0;
+            $pageBg = '';
+        };
+
+        foreach ($datas as $data) {
+            if (! is_array($data)) {
+                continue;
+            }
+            $data = PdfTextSanitizer::trimCodingData($data);
+            $sections = is_array($data['sections'] ?? null) ? $data['sections'] : [];
+            if ($sections === []) {
+                continue;
+            }
+
+            $dataBg = (string) ($data['bgPath'] ?? '');
+
+            // Preamble (Niên Vận có thể gắn intro vào coding) — Đại Vận intro đã ở trang content
+            foreach ((array) ($data['preambleBlocks'] ?? []) as $block) {
+                if (! is_array($block)) {
+                    continue;
+                }
+                $h = self::preambleHeightMm([$block]);
+                if ($items !== [] && ($used + $h) > $zoneBudget) {
+                    $flush();
+                }
+                if ($items === []) {
+                    $pageBg = $dataBg;
+                }
+                $items[] = ['kind' => 'preamble', 'block' => $block];
+                $used += $h;
+            }
+
+            $headerH = self::headerHeightMm($data);
+            $sectionsTotalH = array_sum(array_map(
+                static fn (array $s): float => self::sectionHeightMm($s),
+                $sections
+            ));
+            $blockTotalH = $headerH + $sectionsTotalH;
+
+            // Cả block (tiêu đề + 3 section) vừa 1 trang → gom một lần, hạn chế chuyển trang
+            if ($items !== [] && ($used + $blockTotalH) > $zoneBudget) {
+                $flush();
+            }
+            if ($items === []) {
+                $pageBg = $dataBg;
+            }
+            if ($blockTotalH <= $zoneBudget - $used) {
+                $items[] = [
+                    'kind' => 'header',
+                    'data' => self::headerData($data),
+                ];
+                $used += $headerH;
+                foreach ($sections as $sec) {
+                    $items[] = ['kind' => 'section', 'section' => $sec];
+                    $used += self::sectionHeightMm($sec);
+                }
+
+                continue;
+            }
+
+            // Header phải còn chỗ cho ít nhất 1 section nguyên khối
+            if ($items !== [] && ($used + $headerH + 25.0) > $zoneBudget) {
+                $flush();
+            }
+            if ($items === []) {
+                $pageBg = $dataBg;
+            }
+            $items[] = [
+                'kind' => 'header',
+                'data' => self::headerData($data),
+            ];
+            $used += $headerH;
+
+            $remaining = $sections;
+            $needCont = false;
+            while ($remaining !== []) {
+                if ($needCont) {
+                    $contImgH = (float) ($data['contTitleImageHeightMm'] ?? 0.0);
+                    if ($items === []) {
+                        $pageBg = $dataBg;
+                    }
+                    $items[] = [
+                        'kind' => 'cont',
+                        'data' => [
+                            'contTitleImagePath' => $data['contTitleImagePath'] ?? '',
+                            'contTitleImageHeightMm' => $contImgH,
+                            'continuationTitle' => trim((string) ($data['title'] ?? '')).' (tiếp)',
+                        ],
+                    ];
+                    $used += $contImgH > 0 ? $contImgH + 5.0 : self::CONT_TITLE_MM;
+                    $needCont = false;
+                }
+
+                [$chunk, $rest] = self::takeSections($remaining, max(25.0, $zoneBudget - $used));
+
+                if ($chunk === []) {
+                    $flush();
+                    $needCont = true;
+
+                    continue;
+                }
+
+                foreach ($chunk as $sec) {
+                    if ($items === []) {
+                        $pageBg = $dataBg;
+                    }
+                    $items[] = ['kind' => 'section', 'section' => $sec];
+                    $used += self::sectionHeightMm($sec);
+                }
+                $remaining = $rest;
+
+                if ($remaining !== []) {
+                    $flush();
+                    $needCont = true;
+                }
+            }
+        }
+
+        $flush();
+
+        return $pages;
+    }
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array<int, array<string, mixed>>
+     * @return array<string, mixed>
      */
-    public static function paginate(array $data): array
+    private static function headerData(array $data): array
     {
-        $data     = PdfTextSanitizer::trimCodingData($data);
-        $sections = is_array($data['sections'] ?? null) ? $data['sections'] : [];
-        if ($sections === []) {
-            return [];
-        }
-
-        $pages = [];
-        $remaining = $sections;
-        $pageIndex = 0;
-        $zoneHeight = PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM;
-
-        while ($remaining !== []) {
-            $budget = round($zoneHeight * self::BUDGET_RATIO, 1);
-            $showHeader = $pageIndex === 0;
-
-            if ($showHeader) {
-                $budget -= self::headerHeightMm($data);
-                $budget -= self::preambleHeightMm($data['preambleBlocks'] ?? []);
-            } else {
-                $contH = (float) ($data['contTitleImageHeightMm'] ?? 0.0);
-                $budget -= $contH > 0 ? $contH + 5.0 : self::CONT_TITLE_MM;
-            }
-
-            [$chunk, $remaining] = self::takeSections($remaining, max(25.0, $budget));
-
-            if ($chunk === []) {
-                break;
-            }
-
-            $pages[] = [
-                'bgPath' => $data['bgPath'] ?? Phan8AssetService::codingBgPath(),
-                'showHeader' => $showHeader,
-                'truHeading' => $showHeader ? ($data['truHeading'] ?? '') : '',
-                'blockLabel' => $showHeader ? ($data['blockLabel'] ?? '') : '',
-                'title' => $showHeader ? ($data['title'] ?? '') : '',
-                'titleImagePath' => $showHeader ? ($data['titleImagePath'] ?? '') : '',
-                'titleImageHeightMm' => $showHeader ? ($data['titleImageHeightMm'] ?? 0.0) : 0.0,
-                'subtitle' => $showHeader ? ($data['subtitle'] ?? '') : '',
-                'meta' => $showHeader ? ($data['meta'] ?? '') : '',
-                'preambleBlocks' => $showHeader ? ($data['preambleBlocks'] ?? []) : [],
-                'continuationTitle' => $showHeader ? '' : trim((string) ($data['title'] ?? '')).' (tiếp)',
-                'contTitleImagePath' => $showHeader ? '' : ($data['contTitleImagePath'] ?? ''),
-                'contTitleImageHeightMm' => $showHeader ? 0.0 : ($data['contTitleImageHeightMm'] ?? 0.0),
-                'sections' => $chunk,
-                'contentZoneTopMm' => PdfPaginationConfig::CONTENT_ZONE_TOP_MM,
-                'contentZoneHeightMm' => $zoneHeight,
-            ];
-
-            $pageIndex++;
-        }
-
-        return $pages;
+        return [
+            'truHeading' => $data['truHeading'] ?? '',
+            'title' => $data['title'] ?? '',
+            'titleImagePath' => $data['titleImagePath'] ?? '',
+            'titleImageHeightMm' => $data['titleImageHeightMm'] ?? 0.0,
+            'subtitle' => $data['subtitle'] ?? '',
+        ];
     }
 
     /**
@@ -105,11 +215,6 @@ class Phan8CodingPaginator
         $truHeading = trim((string) ($data['truHeading'] ?? ''));
         if ($truHeading !== '') {
             $h += 9.0;
-        }
-
-        $blockLabel = trim((string) ($data['blockLabel'] ?? ''));
-        if ($blockLabel !== '') {
-            $h += 6.0;
         }
 
         $titleImgH = (float) ($data['titleImageHeightMm'] ?? 0.0);
@@ -125,11 +230,6 @@ class Phan8CodingPaginator
         $subtitle = trim((string) ($data['subtitle'] ?? ''));
         if ($subtitle !== '') {
             $h += max(1, (int) ceil(mb_strlen($subtitle) / 40)) * self::SUBTITLE_LINE_MM + 5.0;
-        }
-
-        $meta = trim((string) ($data['meta'] ?? ''));
-        if ($meta !== '') {
-            $h += 9.0;
         }
 
         return $h;
@@ -178,19 +278,11 @@ class Phan8CodingPaginator
                 break;
             }
 
+            // Không tách section — cả khối (vd. Cơ hội và sự kiện) chuyển sang trang sau
             if ($chunk === [] && $need > $maxMm) {
-                [$head, $tail] = self::splitSection($sec, $maxMm);
-                if ($head !== null) {
-                    $chunk[] = $head;
-                    $used += self::sectionHeightMm($head);
-                }
+                $chunk[] = $sec;
+                $used += $need;
                 $idx++;
-                if ($tail !== null) {
-                    $rest = array_slice($sections, $idx);
-                    array_unshift($rest, $tail);
-
-                    return [$chunk, $rest];
-                }
 
                 break;
             }

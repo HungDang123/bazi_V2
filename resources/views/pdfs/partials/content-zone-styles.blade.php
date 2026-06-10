@@ -3,6 +3,7 @@
     overflow: hidden;
     background: transparent;
     z-index: 2;
+    color: #1A1A1A;
 }
 
 /* DomPDF: tránh overlay trắng — chỉ set transparent cho text, không ép toàn bộ con */
@@ -24,3 +25,5 @@
     color: #1A1A1A;
     background: transparent;
 }
+
+@include('pdfs.partials.pdf-justify-styles')

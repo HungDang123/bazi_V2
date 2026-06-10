@@ -132,7 +132,7 @@ class ImportPhan8DuBaoKhiaCanh extends Command
                 }
 
                 if ($d !== '' && $currentCase !== null) {
-                    $currentCase['parts'][] = $d;
+                    $currentCase['parts'][] = $this->stripBullets($d);
                 }
             }
 
@@ -213,14 +213,14 @@ class ImportPhan8DuBaoKhiaCanh extends Command
                         'parts' => [],
                     ];
                     if ($contentCol !== '' && ! $this->looksLikeDieuKien($contentCol)) {
-                        $currentCase['parts'][] = $contentCol;
+                        $currentCase['parts'][] = $this->stripBullets($contentCol);
                     }
                     continue;
                 }
 
                 $extra = $b !== '' ? $b : $c;
                 if ($extra !== '' && $currentCase !== null && ! $this->looksLikeDieuKien($extra)) {
-                    $currentCase['parts'][] = $extra;
+                    $currentCase['parts'][] = $this->stripBullets($extra);
                 }
             }
 
@@ -229,6 +229,17 @@ class ImportPhan8DuBaoKhiaCanh extends Command
         }
 
         return $totalInserted;
+    }
+
+    protected function stripBullets(string $text): string
+    {
+        $lines = preg_split('/\r\n|\r|\n/', $text) ?: [];
+
+        $lines = array_map(static function (string $line): string {
+            return preg_replace('/^[\x{2022}\x{2013}\x{2014}\-]\s*/u', '', $line) ?? $line;
+        }, $lines);
+
+        return implode("\n", array_map('trim', $lines));
     }
 
     protected function looksLikeDieuKien(string $text): bool

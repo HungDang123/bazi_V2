@@ -1,3 +1,4 @@
+@php use App\Services\NguHanhTitleRenderer; @endphp
 @if (!empty($keywords))
 <div class="kw-section">
     @if (!empty($label))
@@ -6,11 +7,16 @@
     <table class="kw-grid">
         <tr>
             @foreach ($keywords as $kw)
+            @php $kwImg = NguHanhTitleRenderer::keywordImagePath((string) $kw); @endphp
             <td class="kw-cell">
                 <div class="kw-box">
                     <img class="kw-frame" src="{{ $keywordFramePath }}" alt="">
                     <div class="kw-text">
-                        <span>{{ $kw }}</span>
+                        @if ($kwImg !== '')
+                        <img class="kw-text-img" src="{{ $kwImg }}" alt="{{ $kw }}">
+                        @else
+                        <span>{{ mb_strtoupper(trim((string) $kw)) }}</span>
+                        @endif
                     </div>
                 </div>
             </td>
