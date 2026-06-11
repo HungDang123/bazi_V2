@@ -36,7 +36,7 @@ class PdfRenderService
                 ->setOption('isHtml5ParserEnabled', true)
                 ->setOption('isPhpEnabled', false)
                 ->setOption('isJavascriptEnabled', false)
-                ->setOption('enable_font_subsetting', true)
+                ->setOption('enable_font_subsetting', false)
                 ->setOption('debugKeepTemp', false)
                 ->setOption('debugCss', false)
                 ->setOption('debugLayout', false)
