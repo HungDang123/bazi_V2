@@ -14,6 +14,35 @@
     </script>
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <style>
+        @font-face {
+            font-family: 'utm-davida';
+            src: url('{{ asset('fonts/UTM-Davida.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: block;
+        }
+        @font-face {
+            font-family: 'utm-davida';
+            src: url('{{ asset('fonts/UTM-Davida.ttf') }}') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+            font-display: block;
+        }
+        @font-face {
+            font-family: 'UTM Davida';
+            src: url('{{ asset('fonts/UTM-Davida.ttf') }}') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: block;
+        }
+        @font-face {
+            font-family: 'UTM Davida';
+            src: url('{{ asset('fonts/UTM-Davida.ttf') }}') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+            font-display: block;
+        }
+
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         body {
@@ -1016,10 +1045,12 @@
             display: inline-block;
             max-width: 100%;
             color: #D4AF37;
-            font-weight: 700;
-            font-size: 13px;
+            font-family: 'utm-davida', 'UTM Davida', 'Times New Roman', serif;
+            font-weight: normal;
+            font-size: 26px;
             line-height: 1.2;
             text-align: center;
+            text-transform: uppercase;
             word-wrap: break-word;
             word-break: break-word;
             white-space: normal;
