@@ -15,6 +15,7 @@ Route::get('/phan-8/nien-van', [TongQuanKhiaCanhController::class, 'nienVan']);
 Route::get('/phan-8/du-bao-khia-canh', [TongQuanKhiaCanhController::class, 'duBaoKhiaCanh']);
 Route::get('/phan-8/nhung-nam-can-chu-y', [TongQuanKhiaCanhController::class, 'nhungNamCanChuY']);
 Route::get('/phan-9/giai-phap', [TongQuanKhiaCanhController::class, 'phan9GiaiPhap']);
+Route::get('/phan-9b/giai-phap-can-bang', [TongQuanKhiaCanhController::class, 'phan9bGiaiPhapCanBang']);
 
 Route::get('/bazi/calc', [Bazicontroller::class, 'calc']);
 Route::get('/phan-2/chi-so-khia-canh-than-sat', [Bazicontroller::class, 'phan2ChiSoKhiaCanhThanSat']);

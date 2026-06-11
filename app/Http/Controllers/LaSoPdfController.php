@@ -29,6 +29,12 @@ class LaSoPdfController extends Controller
             'birth_date'       => 'nullable|string|max:100',
             'bat_tu'           => 'nullable|string|max:500',
             'uknow_birthdate'  => 'nullable|in:0,1',
+            'chat_luong_thap_than' => 'nullable|array',
+            'bieu_do_ngu_hanh'     => 'nullable|array',
+            'ngu_hanh_dong'        => 'nullable|array',
+            'chi_so_bieu_do_cot'   => 'nullable|array',
+            'phan_tram_nien_van'   => 'nullable|array',
+            'hanh_noi_dung_nien_van' => 'nullable|array',
         ]);
 
         $params = $generator->normalizeParams($validated);

@@ -3,6 +3,7 @@
 namespace App\Services\Pdf;
 
 use App\Services\Phan7PdfService;
+use App\Services\Phan9PdfService;
 
 /**
  * Preset cấu hình phân trang theo từng Phần PDF.
@@ -137,11 +138,15 @@ class PdfPaginationProfiles
                 'keywords'           => 70.0,
                 'table'              => 92.0,
             ],
-            'blockHeightResolver' => static function (array $block): float {
+            'blockHeightResolver' => static function (array $block) use ($contentWidth): float {
                 $type = (string) ($block['type'] ?? '');
 
                 if ($type === 'traits') {
-                    return self::traitsHeightMm($block);
+                    return Phan5TraitLayout::blockHeightMm(
+                        (string) ($block['tichCuc'] ?? ''),
+                        (string) ($block['tieuCuc'] ?? ''),
+                        $contentWidth
+                    );
                 }
 
                 if ($type === 'keywords') {
@@ -246,22 +251,137 @@ class PdfPaginationProfiles
         ]);
     }
 
+    /** Vùng nội dung Phần 8 trên page-content-bg — chừa ~39mm cho footer overlay. */
+    public const PHAN8_CONTENT_ZONE_HEIGHT_MM = 240.0;
+
+    public const PHAN8_CONTENT_BUDGET_RATIO = 0.92;
+
+    /** Cuốn 2 — NHẬT CHỦ chapter (trang 19–21): cùng vùng an toàn footer như Phần 8. */
+    public static function quyen2NhatChuChapter(
+        string $firstBgPath,
+        string $contBgPath,
+        string $chapterTitle
+    ): PdfPaginationConfig {
+        $zoneHeight   = self::PHAN8_CONTENT_ZONE_HEIGHT_MM;
+        $zoneTop      = Phan3NguHanhBanMenhPaginator::CONTENT_ZONE_TOP_MM;
+        $baseBudget   = round($zoneHeight * 0.96, 1);
+        $chapterTitle = trim($chapterTitle);
+
+        return new PdfPaginationConfig([
+            'charsPerLine'        => 75,
+            'lineMm'              => 5.3,
+            'lineWidthThreshold'  => 1.0,
+            'blockGapMm'          => 1.5,
+            'paraLinePaddingMm'   => 0.8,
+            'splitOversizedPara'  => true,
+            'contentZoneTopMm'    => $zoneTop,
+            'contentHeightMm'     => $baseBudget,
+            'contentZoneHeightMm' => $zoneHeight,
+            'contentLeftMm'       => 28.0,
+            'contentWidthMm'      => 154.0,
+            'fixedBlockHeights'   => [
+                'sub_title'      => 10.0,
+                'chapter_title'  => 14.0,
+            ],
+            'blockHeightResolver' => static function (array $block): float {
+                return 0.0;
+            },
+            'bgResolver' => static fn (int $pageIndex): string => $pageIndex === 0
+                ? $firstBgPath
+                : $contBgPath,
+            'budgetAdjustResolver' => static function (int $pageIndex, array $remaining, float $budget): float {
+                if ($pageIndex === 0) {
+                    return $budget - 14.0;
+                }
+
+                return $budget;
+            },
+            'pageMetaResolver' => static function (int $pageIndex, array $page) use ($chapterTitle, $zoneTop, $zoneHeight): array {
+                return [
+                    'chapterTitle'        => $pageIndex === 0 ? $chapterTitle : '',
+                    'contentZoneTopMm'    => $zoneTop,
+                    'contentZoneHeightMm' => $zoneHeight,
+                    'contentLeftMm'       => 28.0,
+                    'contentWidthMm'      => 154.0,
+                ];
+            },
+        ]);
+    }
+
+    /** Cuốn 2 — trang 17 Lý tổng quan (vùng trắng dưới scroll, top 66mm). */
+    public const QUYEN2_TONGQUAN_ZONE_TOP_MM = 66.0;
+
+    public const QUYEN2_TONGQUAN_ZONE_HEIGHT_MM = 192.0;
+
+    public static function quyen2TongQuan(string $firstBgPath, string $contBgPath): PdfPaginationConfig
+    {
+        $firstZoneHeight = self::QUYEN2_TONGQUAN_ZONE_HEIGHT_MM;
+        $contZoneHeight  = self::PHAN8_CONTENT_ZONE_HEIGHT_MM;
+        $firstZoneTop    = self::QUYEN2_TONGQUAN_ZONE_TOP_MM;
+        $contZoneTop     = Phan3NguHanhBanMenhPaginator::CONTENT_ZONE_TOP_MM;
+        $contBudget      = round($contZoneHeight * 0.96, 1);
+
+        return new PdfPaginationConfig([
+            'charsPerLine'        => 75,
+            'lineMm'              => 5.3,
+            'lineWidthThreshold'  => 1.0,
+            'blockGapMm'          => 1.5,
+            'paraLinePaddingMm'   => 0.8,
+            'splitOversizedPara'  => true,
+            'contentZoneTopMm'    => $contZoneTop,
+            'contentHeightMm'     => $contBudget,
+            'contentZoneHeightMm' => $contZoneHeight,
+            'contentLeftMm'       => 28.0,
+            'contentWidthMm'      => 154.0,
+            'fixedBlockHeights'   => [
+                'sub_title'     => 10.0,
+                'chapter_title' => 14.0,
+            ],
+            'blockHeightResolver' => static function (array $block): float {
+                return 0.0;
+            },
+            'bgResolver' => static fn (int $pageIndex): string => $pageIndex === 0
+                ? $firstBgPath
+                : $contBgPath,
+            'budgetAdjustResolver' => static function (int $pageIndex, array $remaining, float $budget) use ($firstZoneHeight, $contBudget): float {
+                if ($pageIndex === 0) {
+                    return round($firstZoneHeight * 0.96, 1);
+                }
+
+                return $contBudget;
+            },
+            'pageMetaResolver' => static function (int $pageIndex, array $page) use ($firstZoneTop, $firstZoneHeight, $contZoneTop, $contZoneHeight): array {
+                $isFirst = $pageIndex === 0;
+
+                return [
+                    'chapterTitle'        => '',
+                    'contentZoneTopMm'    => $isFirst ? $firstZoneTop : $contZoneTop,
+                    'contentZoneHeightMm' => $isFirst ? $firstZoneHeight : $contZoneHeight,
+                    'contentLeftMm'       => 28.0,
+                    'contentWidthMm'      => 154.0,
+                ];
+            },
+        ]);
+    }
+
     public static function phan8(string $bgPath, float $contentHeightMm = 0.0): PdfPaginationConfig
     {
         $base = self::phan68Base($bgPath);
 
         $zoneHeight = $contentHeightMm > 0
             ? $contentHeightMm
-            : Phan3NguHanhBanMenhPaginator::CONTENT_ZONE_HEIGHT_MM;
+            : self::PHAN8_CONTENT_ZONE_HEIGHT_MM;
 
         $zoneTop = Phan3NguHanhBanMenhPaginator::CONTENT_ZONE_TOP_MM;
 
-        $base->contentHeightMm     = round($zoneHeight * 0.96, 1);
+        $base->contentHeightMm     = round($zoneHeight * self::PHAN8_CONTENT_BUDGET_RATIO, 1);
         $base->contentZoneHeightMm = $zoneHeight;
         $base->contentZoneTopMm    = $zoneTop;
         $base->blockGapMm          = 2.0;
         $base->lineMm              = 5.3; // 15pt line-height = 5.29mm
         $base->paraLinePaddingMm   = 2.0;
+        $base->fixedBlockHeights['sub_title'] = 12.0;
+        $base->fixedBlockHeights['sub_ab']    = 12.0;
         $base->blockHeightResolver = static function (array $block): float {
             // para → 0.0: rơi về paraHeightMm (đo bằng font metrics thật)
             return self::phan68BlockHeight($block);
@@ -270,9 +390,81 @@ class PdfPaginationProfiles
         return $base;
     }
 
+    /** LBTV-119 — nền page-content-bg.png, vùng nội dung giống Phần 5 mục III+. */
     public static function phan9(string $bgPath): PdfPaginationConfig
     {
-        return self::phan8($bgPath);
+        $base = self::phan68Base($bgPath);
+
+        $zoneTop = self::contentZoneTopForLayout('lbtv119');
+        [$contentLeft, $contentWidth] = self::contentBoxForLayout('lbtv119');
+        $zoneHeight = PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM;
+
+        $base->contentHeightMm     = round($zoneHeight * 0.96, 1);
+        $base->contentZoneHeightMm = $zoneHeight;
+        $base->contentZoneTopMm    = $zoneTop;
+        $base->contentLeftMm       = $contentLeft;
+        $base->contentWidthMm      = $contentWidth;
+        $base->blockHeightResolver = static function (array $block): float {
+            return self::phan68BlockHeight($block);
+        };
+
+        return $base;
+    }
+
+    /**
+     * Phần 9 — trang đầu: giai-phap-bg.png + mục I; các trang sau: page-content-bg.png.
+     */
+    public static function phan9WithIntro(string $contentBgPath, string $introBgPath): PdfPaginationConfig
+    {
+        $base = self::phan9($contentBgPath);
+        $introTop = Phan9PdfService::INTRO_FIRST_PAGE_TOP_MM;
+        $zoneTop = $base->contentZoneTopMm;
+        $zoneHeight = $base->contentZoneHeightMm;
+        $hasIntroBg = $introBgPath !== '' && $introBgPath !== $contentBgPath;
+        $bottomSafe = 18.0;
+        $introZoneHeight = min($zoneHeight, PdfPaginationConfig::PAGE_HEIGHT_MM - $introTop - $bottomSafe);
+        $originalBudget = $base->contentHeightMm;
+
+        $base->bgResolver = static fn (int $pageIndex): string => ($hasIntroBg && $pageIndex === 0)
+            ? $introBgPath
+            : $contentBgPath;
+
+        $base->budgetAdjustResolver = static function (int $pageIndex, array $remaining, float $budget) use (
+            $hasIntroBg,
+            $introTop,
+            $introZoneHeight,
+            $originalBudget
+        ) {
+            if ($hasIntroBg && $pageIndex === 0) {
+                $firstBudget = round($introZoneHeight * 0.96, 1);
+
+                return self::chapterBudgetAdjust($pageIndex, $remaining, $firstBudget);
+            }
+
+            return self::chapterBudgetAdjust($pageIndex, $remaining, $originalBudget);
+        };
+
+        $base->pageMetaResolver = static function (int $pageIndex, array $page) use (
+            $hasIntroBg,
+            $introTop,
+            $introZoneHeight,
+            $zoneTop,
+            $zoneHeight
+        ): array {
+            if ($hasIntroBg && $pageIndex === 0) {
+                return [
+                    'contentZoneTopMm'    => $introTop,
+                    'contentZoneHeightMm' => $introZoneHeight,
+                ];
+            }
+
+            return [
+                'contentZoneTopMm'    => $zoneTop,
+                'contentZoneHeightMm' => $zoneHeight,
+            ];
+        };
+
+        return $base;
     }
 
     /** @deprecated Dùng CONTENT_ZONE_HEIGHT_MM — giữ để tương thích Phan5PdfPaginator. */
@@ -381,14 +573,5 @@ class PdfPaginationProfiles
         }
 
         return $h;
-    }
-
-    /** @param array<string, mixed> $block */
-    private static function traitsHeightMm(array $block): float
-    {
-        return Phan5TraitLayout::blockHeightMm(
-            (string) ($block['tichCuc'] ?? ''),
-            (string) ($block['tieuCuc'] ?? '')
-        );
     }
 }

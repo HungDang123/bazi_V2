@@ -29,11 +29,11 @@
             width: 210mm; height: 297mm;
         }
 
-        /* Vùng kem cuộn lịch — canh giữa vùng parchment LBTV-143 */
+        /* Vùng kem cuộn lịch — canh giữa vùng parchment LBTV-494 */
         .val-block {
             position: absolute;
-            left: 27mm;
-            width: 156mm;
+            left: 28mm;
+            width: 154mm;
             text-align: center;
         }
 
@@ -51,15 +51,15 @@
         }
 
         .val-name {
-            font-size: 18px;
-            line-height: 122%;
+            font-size: 17px;
+            line-height: 115%;
             text-transform: uppercase;
             letter-spacing: 0.2px;
         }
 
         .val-text {
-            font-size: 15px;
-            line-height: 132%;
+            font-size: 14px;
+            line-height: 115%;
         }
 
         .val-text strong {
@@ -68,8 +68,8 @@
         }
 
         .val-bat-tu {
-            font-size: 13px;
-            line-height: 138%;
+            font-size: 12px;
+            line-height: 120%;
         }
     </style>
 </head>
@@ -78,32 +78,27 @@
 
     <img class="bg-img" src="{{ $templatePath }}">
 
-    {{-- Vị trí giá trị theo label in sẵn page-02-bg.png (LBTV-143) --}}
-    {{-- HỌ & TÊN: label ~113mm → value 122mm --}}
-    <div class="val-block" style="top: 122mm;">
+    {{-- Vị trí giá trị — dưới nhãn in sẵn LBTV-494 (5 hàng ~32mm) --}}
+    <div class="val-block" style="top: 118mm;">
         <p class="val-name">{{ $fullName }}</p>
     </div>
 
-    {{-- GIỚI TÍNH: label ~151mm → value 160mm --}}
-    <div class="val-block" style="top: 160mm;">
+    <div class="val-block" style="top: 150mm;">
         <p class="val-text">{{ $gender }}</p>
     </div>
 
-    {{-- NGÀY SINH DƯƠNG LỊCH: label ~181mm → value 190mm --}}
-    <div class="val-block" style="top: 190mm;">
+    <div class="val-block" style="top: 182mm;">
         <p class="val-text">{{ $birthDate }}</p>
     </div>
 
-    {{-- BÁT TỰ SINH THẦN: label ~214mm → value 223mm --}}
     @if (!empty($batTu))
-    <div class="val-block" style="top: 223mm;">
+    <div class="val-block" style="top: 214mm;">
         <p class="val-text val-bat-tu">{!! $batTu !!}</p>
     </div>
     @endif
 
-    {{-- ĐỊA CHỈ: label ~246mm → value 255mm --}}
     @if (!empty($address))
-    <div class="val-block" style="top: 255mm;">
+    <div class="val-block" style="top: 246mm;">
         <p class="val-text">{{ $address }}</p>
     </div>
     @endif

@@ -116,7 +116,9 @@
         @endif
 
         @foreach ($page['blocks'] as $block)
-            @if (($block['type'] ?? 'para') === 'sub_title')
+            @if (($block['type'] ?? 'para') === 'chapter_title')
+            <div class="chapter-title">{{ $block['text'] ?? '' }}</div>
+            @elseif (($block['type'] ?? 'para') === 'sub_title')
             <div class="block-sub-title">
                 <div class="sub-title">{{ $block['text'] ?? '' }}</div>
             </div>

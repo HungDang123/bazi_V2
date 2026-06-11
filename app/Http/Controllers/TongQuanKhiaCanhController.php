@@ -18,11 +18,13 @@ use App\Models\Phan6LaSoBatTu;
 use App\Models\Phan5Trang;
 use App\Models\Phan9aNgoaiLuc;
 use App\Models\Phan9aNoiLuc;
+use App\Models\Phan9bGiaiPhapCanBang;
 use App\Models\YNghiaTuTru;
 use App\Services\BaZiServiceV2;
 use App\Services\Phan5KhiaCanhService;
 use App\Services\Phan8TruSectionService;
 use App\Services\Phan9aService;
+use App\Services\Phan9bService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -274,6 +276,107 @@ class TongQuanKhiaCanhController extends Controller
                 ],
                 'phan_2' => $phan2,
                 'transition_phan9a' => $transitionPhan9a,
+            ],
+        ]);
+    }
+
+    /**
+     * PHẦN 9B — I. Giải pháp cân bằng (Thân Vượng / Thân Nhược).
+     */
+    public function phan9bGiaiPhapCanBang(Request $req): JsonResponse
+    {
+        $unknowBirthtime = $req->input('uknow_birthdate') == 1;
+        $rules = [
+            'full_name' => 'nullable|string|max:255',
+            'y' => 'required|numeric|min:1940|max:2031',
+            'm' => 'required|numeric|min:1|max:12',
+            'd' => 'required|numeric|min:1|max:31',
+            'g' => 'required|string|in:male,female',
+            'uknow_birthdate' => 'nullable|in:0,1',
+        ];
+        if (! $unknowBirthtime) {
+            $rules['h'] = 'required|numeric|min:0|max:23';
+            $rules['minute'] = 'required|numeric|min:0|max:59';
+        } else {
+            $rules['h'] = 'nullable|numeric|min:0|max:23';
+            $rules['minute'] = 'nullable|numeric|min:0|max:59';
+        }
+        $validated = $req->validate($rules);
+        $fullName = (string) ($validated['full_name'] ?? '');
+        $y = (int) $validated['y'];
+        $m = (int) $validated['m'];
+        $d = (int) $validated['d'];
+        $h = isset($validated['h']) && $validated['h'] !== null ? (int) $validated['h'] : null;
+        $minute = isset($validated['minute']) && $validated['minute'] !== null ? (int) $validated['minute'] : null;
+        $g = (string) $validated['g'];
+
+        $result = $this->bazi->calc($fullName, $y, $m, $d, $h, $minute, $g, needStrength: true);
+        $batTu = $result['bat_tu'] ?? [];
+        $dayStem = trim((string) ($batTu['day']['can']['thien_can'] ?? ''));
+        $monthBranch = trim((string) ($batTu['month']['chi']['dia_chi'] ?? ''));
+
+        $chatLuongThapThan = $result['chat_luong_thap_than'] ?? null;
+        if ($req->filled('chat_luong_thap_than')) {
+            $decoded = json_decode($req->string('chat_luong_thap_than'), true);
+            if (is_array($decoded)) {
+                $chatLuongThapThan = $decoded;
+            }
+        }
+        $thapThanCaoNhat = Phan9bService::resolveTop2ThapThanBanMenh(
+            is_array($chatLuongThapThan) ? $chatLuongThapThan : null
+        );
+
+        $nguHanhBanMenh = $this->resolveNguHanhBanMenhForPhan9($req, $result);
+        $nguHanhYeuNhat = Phan9bService::resolveYeuNhatBanMenh($nguHanhBanMenh);
+
+        $hyKyThan = HyKyThan::findByThienCanDiaChi($dayStem, $monthBranch);
+        $thanTrangThai = Phan9bService::resolveThanTrangThai($hyKyThan);
+        $boNguHanh = Phan9bService::resolveBoHyThanNguHanh($dayStem, $hyKyThan);
+
+        $display = $thanTrangThai !== null
+            ? Phan9bService::buildDisplay($thanTrangThai, $boNguHanh)
+            : null;
+
+        $transition = DongChayGioiThieu::query()
+            ->where('tru_loai', 'transition_phan9b')
+            ->first();
+        $transitionPhan9b = null;
+        if ($transition !== null && trim((string) $transition->noi_dung) !== '') {
+            $transitionPhan9b = [
+                'noi_dung' => trim((string) $transition->noi_dung),
+            ];
+        }
+
+        $thanLabel = $thanTrangThai !== null
+            ? (Phan9bGiaiPhapCanBang::THAN_LABELS[$thanTrangThai] ?? $thanTrangThai)
+            : null;
+
+        $noiLuc = Phan9bService::buildNoiLucDisplay();
+        $thapThan = Phan9bService::buildThapThanDisplay($thapThanCaoNhat);
+        $ngoaiLuc = Phan9bService::buildNgoaiLucDisplay();
+        $lucThan = is_array($result['luc_than'] ?? null) ? $result['luc_than'] : null;
+        $hieuQua = Phan9bService::buildHieuQuaDisplay($lucThan, $g);
+        $nguHanhChuyenHoaChart = Phan9bService::computeNguHanhChuyenHoaChart($nguHanhBanMenh);
+
+        return response()->json([
+            'data' => [
+                'than_trang_thai' => $thanTrangThai !== null ? [
+                    'slug' => $thanTrangThai,
+                    'label' => $thanLabel,
+                ] : null,
+                'hy_than_ngu_hanh' => $hyKyThan?->hy_than_ngu_hanh,
+                'bo_hy_than_ngu_hanh' => $boNguHanh,
+                'noi_dung' => $display,
+                'noi_luc' => $noiLuc,
+                'thap_than' => $thapThan,
+                'ngoai_luc' => $ngoaiLuc,
+                'hieu_qua' => $hieuQua,
+                'ngu_hanh_chuyen_hoa_chart' => $nguHanhChuyenHoaChart,
+                'thap_than_cao_nhat' => $thapThanCaoNhat,
+                'thap_than_cao_nhat_label' => Phan9bService::formatThapThanCaoNhat($thapThanCaoNhat),
+                'ngu_hanh_ban_menh' => $nguHanhBanMenh,
+                'ngu_hanh_yeu_nhat' => $nguHanhYeuNhat,
+                'transition_phan9b' => $transitionPhan9b,
             ],
         ]);
     }

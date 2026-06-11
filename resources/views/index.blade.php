@@ -326,6 +326,92 @@
             }
         }
 
+        .phan9-muc1-sheet {
+            position: relative;
+            max-width: 42rem;
+            margin: 0 auto 1.5rem;
+            background: #fff url('{{ asset('images/phan-9/giai-phap-bg.png') }}') no-repeat top center;
+            background-size: 100% auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            padding: 11.5rem 1.5rem 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .phan9-muc1-sheet {
+                padding-top: 9rem;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+
+        .phan9b-beam-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 18px 4px 8px;
+            max-width: 100%;
+        }
+
+        .phan9b-beam-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .phan9b-beam-lbl {
+            display: flex;
+            align-items: center;
+            width: 82px;
+            flex-shrink: 0;
+        }
+
+        .phan9b-beam-lbl img {
+            display: block;
+            height: 30px;
+            width: auto;
+            max-width: 82px;
+            object-fit: contain;
+        }
+
+        .phan9b-beam-track-area {
+            flex: 1;
+            position: relative;
+            height: 36px;
+            min-width: 0;
+        }
+
+        .phan9b-beam-canvas {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 36px;
+            display: block;
+        }
+
+        .phan9b-beam-badge {
+            font-size: 13px;
+            font-weight: 500;
+            min-width: 96px;
+            text-align: right;
+            flex-shrink: 0;
+            letter-spacing: -0.01em;
+            line-height: 1.35;
+        }
+
+        @media (max-width: 640px) {
+            .phan9b-beam-lbl {
+                width: 68px;
+            }
+
+            .phan9b-beam-badge {
+                min-width: 88px;
+                font-size: 12px;
+            }
+        }
+
         .result-container {
             display: none;
             margin-top: 30px;
@@ -1648,18 +1734,34 @@
             <div id="phan8Group"></div>
 
             <div id="phan9Section" class="quyen-section mt-6 mb-6" style="display: none;">
-                <h3 class="text-xl font-bold mb-4 form-title">
-                    <i class="fas fa-book-open mr-2"></i>
-                    PHẦN 9A — GIẢI PHÁP TỐI ƯU
-                </h3>
-                <div id="phan9TransitionContainer" class="mb-4" style="display: none;">
-                    <div id="phan9TransitionContent" class="text-sm text-gray-700 bg-amber-50 border border-amber-200 rounded-lg p-4"></div>
+                {{-- Bìa + cuộn thư (giống PDF Phần 9 / 9B) --}}
+                <div id="phan9SharedCovers" class="mb-6 max-w-2xl mx-auto" style="display: none;">
+                    <img src="{{ asset('images/phan-9/bia-phan-9.png') }}" alt="PHẦN 9 — Giải pháp tối ưu" class="w-full rounded-lg shadow-lg">
                 </div>
-                <div id="phan9Ma1Container" class="bg-white rounded-lg shadow-lg p-6 text-sm text-gray-700 mb-6" style="display: none;">
-                    <div id="phan9Ma1Content"></div>
+                <div id="phan9aBlock" data-phan9-quyen="1">
+                    <h3 class="text-xl font-bold mb-4 form-title">
+                        <i class="fas fa-book-open mr-2"></i>
+                        PHẦN 9A — GIẢI PHÁP TỐI ƯU
+                    </h3>
+                    <div id="phan9TransitionContainer" class="mb-4" style="display: none;">
+                        <div id="phan9TransitionContent" class="text-sm text-gray-700 bg-amber-50 border border-amber-200 rounded-lg p-4"></div>
+                    </div>
+                    <div id="phan9Ma1Container" class="phan9-muc1-sheet text-sm text-gray-700 mb-6" style="display: none;">
+                        <div id="phan9Ma1Content"></div>
+                    </div>
+                    <div id="phan9Ma2Container" class="bg-white rounded-lg shadow-lg p-6 text-sm text-gray-700" style="display: none;">
+                        <div id="phan9Ma2Content"></div>
+                    </div>
                 </div>
-                <div id="phan9Ma2Container" class="bg-white rounded-lg shadow-lg p-6 text-sm text-gray-700" style="display: none;">
-                    <div id="phan9Ma2Content"></div>
+                <div id="phan9bBlock" data-phan9-quyen="2" style="display: none;">
+                    <h3 class="text-xl font-bold mb-4 form-title">
+                        <i class="fas fa-balance-scale mr-2"></i>
+                        PHẦN 9B — GIẢI PHÁP CÂN BẰNG
+                    </h3>
+                    <div id="phan9bTransitionContainer" class="mb-4" style="display: none;">
+                        <div id="phan9bTransitionContent" class="text-sm text-gray-700 bg-amber-50 border border-amber-200 rounded-lg p-4"></div>
+                    </div>
+                    <div id="phan9bContent" class="space-y-4"></div>
                 </div>
             </div>
 
@@ -2018,6 +2120,7 @@
                         }
                     });
                     refreshPhan8QuyenVisibility();
+                    refreshPhan9QuyenVisibility();
                 }
 
                 function mountPhan9Section() {
@@ -2049,6 +2152,26 @@
                  * Cuốn 1 (8A) — Đại Vận, IV. Năm cần chú ý
                  * Cuốn 2 (8B) — Niên Vận tiếp theo, III. Dự báo khía cạnh
                  */
+                function refreshPhan9QuyenVisibility() {
+                    const isCuon1 = activeQuyenCuon === 1;
+                    const isCuon2 = activeQuyenCuon === 2;
+                    const $section = $('#phan9Section');
+
+                    if (!$section.data('quyen-was-shown')) {
+                        return;
+                    }
+
+                    const has9a = !!$section.data('phan9a-has-content');
+                    const has9b = !!$section.data('phan9b-has-content');
+
+                    $('#phan9aBlock').toggle(isCuon1 && has9a);
+                    $('#phan9bBlock').toggle(isCuon2 && has9b);
+
+                    $('#phan9SharedCovers').toggle(
+                        (isCuon1 && has9a) || (isCuon2 && has9b)
+                    );
+                }
+
                 function refreshPhan8QuyenVisibility() {
                     const isCuon1 = activeQuyenCuon === 1;
                     const isCuon2 = activeQuyenCuon === 2;
@@ -2097,6 +2220,7 @@
                         .attr('aria-selected', 'true');
                     mountPhan8Group();
                     refreshQuyenSectionsVisibility();
+                    refreshPhan9QuyenVisibility();
                 }
 
                 (function patchQuyenSectionShow() {
@@ -2238,7 +2362,7 @@
                         }
                     });
 
-                    function buildPdfQueuePayload(params, result) {
+                    function buildPdfQueuePayload(params, result, phan2Data) {
                         const payload = Object.assign({}, params);
                         payload.full_name = payload.full_name || $('input[name="full_name"]').val() || '';
                         payload.address = payload.address || $('input[name="address"]').val() || '';
@@ -2249,6 +2373,18 @@
                             payload.birth_date = `ngày ${String(payload.d).padStart(2, '0')} thg ${String(payload.m).padStart(2, '0')}, ${payload.y}`;
                         } else {
                             payload.birth_date = `${String(payload.h).padStart(2, '0')}:${minute} – ngày ${String(payload.d).padStart(2, '0')} thg ${String(payload.m).padStart(2, '0')}, ${payload.y}`;
+                        }
+
+                        if (result) {
+                            payload.chat_luong_thap_than = result.chat_luong_thap_than || [];
+                            payload.bieu_do_ngu_hanh = result.bieu_do_ngu_hanh || [];
+                            payload.ngu_hanh_dong = result.ngu_hanh_dong || [];
+                            payload.phan_tram_nien_van = result.phan_tram_nien_van || [];
+                            payload.hanh_noi_dung_nien_van = result.hanh_noi_dung_nien_van || [];
+                        }
+
+                        if (phan2Data && phan2Data.chi_so_bieu_do_cot) {
+                            payload.chi_so_bieu_do_cot = phan2Data.chi_so_bieu_do_cot;
                         }
 
                         const order = [
@@ -2427,7 +2563,8 @@
                         $.ajax({
                             url: '/api/la-so/pdf/queue',
                             method: 'POST',
-                            data: payload,
+                            contentType: 'application/json',
+                            data: JSON.stringify(payload),
                             dataType: 'json'
                         }).done(function(res) {
                             currentPdfExportId = res.export_id;
@@ -2474,9 +2611,10 @@
                                     return;
                                 }
 
-                                // Hiển thị kết quả
-                                displayResults(params, response);
-                                queuePdfExport(buildPdfQueuePayload(params, response));
+                                // Hiển thị kết quả (xếp hàng PDF sau khi PHẦN 2 load xong)
+                                displayResults(params, response, function(phan2Data) {
+                                    queuePdfExport(buildPdfQueuePayload(params, response, phan2Data));
+                                });
 
                                 // Khôi phục trạng thái nút
                                 $submitBtn.prop('disabled', false);
@@ -2645,6 +2783,527 @@
                         }).join('');
                     }
 
+                    const PHAN9B_BEAM_THEMES = {
+                        moc: { color: '#3a9e20', colorLight: '#a8dc6a', trackBg: '#d8f0b4', badgeUp: '#2e7d12', badgeDown: '#c03018' },
+                        hoa: { color: '#d63b1c', colorLight: '#f5a088', trackBg: '#fcd8d0', badgeUp: '#c03018', badgeDown: '#c03018' },
+                        tho: { color: '#c98020', colorLight: '#f0c060', trackBg: '#f5e0b0', badgeUp: '#a06010', badgeDown: '#c03018' },
+                        kim: { color: '#606060', colorLight: '#b8b8b4', trackBg: '#dcdcd8', badgeUp: '#4a4a46', badgeDown: '#c03018' },
+                        thuy: { color: '#1460a5', colorLight: '#80bce8', trackBg: '#cce4f8', badgeUp: '#0d4a8a', badgeDown: '#c03018' }
+                    };
+
+                    const PHAN9B_THUMB_R_BIG = 13;
+                    const PHAN9B_THUMB_R_SMALL = 6;
+                    const PHAN9B_TRACK_H = 7;
+
+                    function drawPhan9bBeamSmallThumb(ctx, x, cy, item) {
+                        ctx.beginPath();
+                        ctx.arc(x, cy, PHAN9B_THUMB_R_SMALL, 0, Math.PI * 2);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fill();
+                        ctx.strokeStyle = item.color + '99';
+                        ctx.lineWidth = 1.5;
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(x, cy, PHAN9B_THUMB_R_SMALL - 3, 0, Math.PI * 2);
+                        ctx.fillStyle = item.color + '55';
+                        ctx.fill();
+                    }
+
+                    function drawPhan9bBeamBigThumb(ctx, x, cy, item) {
+                        ctx.beginPath();
+                        ctx.arc(x, cy, PHAN9B_THUMB_R_BIG, 0, Math.PI * 2);
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fill();
+                        ctx.strokeStyle = item.color + '55';
+                        ctx.lineWidth = 1.5;
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(x, cy, PHAN9B_THUMB_R_BIG - 4, 0, Math.PI * 2);
+                        const gThumb = ctx.createRadialGradient(x - 2, cy - 2, 1, x, cy, PHAN9B_THUMB_R_BIG - 4);
+                        gThumb.addColorStop(0, item.colorLight);
+                        gThumb.addColorStop(1, item.color);
+                        ctx.fillStyle = gThumb;
+                        ctx.fill();
+                    }
+
+                    function drawPhan9bBeamSlider(canvas, item, W, H) {
+                        const dpr = window.devicePixelRatio || 1;
+                        canvas.width = Math.round(W * dpr);
+                        canvas.height = Math.round(H * dpr);
+                        canvas.style.width = W + 'px';
+                        canvas.style.height = H + 'px';
+                        const ctx = canvas.getContext('2d');
+                        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                        const cy = H / 2;
+                        const PAD_L = PHAN9B_THUMB_R_BIG + 2;
+                        const PAD_R = PHAN9B_THUMB_R_BIG + 2;
+                        const trackW = W - PAD_L - PAD_R;
+                        const xLeft = PAD_L;
+
+                        const before = Math.max(0, Math.min(100, Number(item.before) || 0));
+                        const after = Math.max(0, Math.min(100, Number(item.after) || 0));
+                        const isStable = item.direction === 'stable' || before === after;
+                        const isGiam = item.direction === 'giam';
+
+                        const initX = xLeft + trackW * (before / 100);
+                        const valX = xLeft + trackW * (after / 100);
+                        const smallX = isGiam ? valX : initX;
+                        const bigX = isGiam ? initX : valX;
+
+                        ctx.clearRect(0, 0, W, H);
+                        const trackY = cy - PHAN9B_TRACK_H / 2;
+
+                        ctx.beginPath();
+                        ctx.roundRect(xLeft, trackY, trackW, PHAN9B_TRACK_H, PHAN9B_TRACK_H / 2);
+                        ctx.fillStyle = item.trackBg;
+                        ctx.fill();
+
+                        if (!isStable) {
+                            const fillLeft = Math.min(initX, valX);
+                            const fillW = Math.abs(valX - initX);
+                            if (fillW > 0.5) {
+                                ctx.beginPath();
+                                ctx.roundRect(fillLeft, trackY, fillW, PHAN9B_TRACK_H, PHAN9B_TRACK_H / 2);
+                                const gFill = ctx.createLinearGradient(fillLeft, 0, fillLeft + fillW, 0);
+                                gFill.addColorStop(0, item.colorLight + '88');
+                                gFill.addColorStop(1, item.color);
+                                ctx.fillStyle = gFill;
+                                ctx.fill();
+                            }
+
+                            const coneW = Math.min(Math.abs(bigX - smallX) * 0.85, trackW * 0.55);
+                            const coneH = 22;
+                            if (coneW > 4) {
+                                ctx.save();
+                                ctx.beginPath();
+                                if (bigX >= smallX) {
+                                    ctx.moveTo(bigX - coneW, cy - 2);
+                                    ctx.lineTo(bigX - coneW, cy + 2);
+                                    ctx.lineTo(bigX, cy + coneH / 2);
+                                    ctx.lineTo(bigX, cy - coneH / 2);
+                                    const gCone = ctx.createLinearGradient(bigX - coneW, 0, bigX, 0);
+                                    gCone.addColorStop(0, item.color + '00');
+                                    gCone.addColorStop(1, item.color + '66');
+                                    ctx.fillStyle = gCone;
+                                } else {
+                                    ctx.moveTo(bigX + coneW, cy - 2);
+                                    ctx.lineTo(bigX + coneW, cy + 2);
+                                    ctx.lineTo(bigX, cy + coneH / 2);
+                                    ctx.lineTo(bigX, cy - coneH / 2);
+                                    const gCone = ctx.createLinearGradient(bigX, 0, bigX + coneW, 0);
+                                    gCone.addColorStop(0, item.color + '66');
+                                    gCone.addColorStop(1, item.color + '00');
+                                    ctx.fillStyle = gCone;
+                                }
+                                ctx.closePath();
+                                ctx.fill();
+                                ctx.restore();
+                            }
+
+                            if (Math.abs(smallX - bigX) > 1) {
+                                drawPhan9bBeamSmallThumb(ctx, smallX, cy, item);
+                            }
+                            drawPhan9bBeamBigThumb(ctx, bigX, cy, item);
+                        } else {
+                            drawPhan9bBeamBigThumb(ctx, initX, cy, item);
+                        }
+                    }
+
+                    function initPhan9bBeamCharts(root) {
+                        const $root = root ? $(root) : $('#phan9bContent');
+                        $root.find('.phan9b-beam-chart').each(function() {
+                            $(this).find('.phan9b-beam-row').each(function() {
+                                const $row = $(this);
+                                let item;
+                                try {
+                                    item = JSON.parse($row.attr('data-beam-item') || '{}');
+                                } catch (e) {
+                                    return;
+                                }
+                                const canvas = $row.find('canvas.phan9b-beam-canvas')[0];
+                                const $ta = $row.find('.phan9b-beam-track-area');
+                                if (!canvas || !$ta.length) return;
+
+                                function redraw() {
+                                    const W = $ta.innerWidth();
+                                    if (W <= 0) return;
+                                    drawPhan9bBeamSlider(canvas, item, W, 36);
+                                }
+
+                                redraw();
+                                if (typeof ResizeObserver !== 'undefined') {
+                                    const ro = new ResizeObserver(function() { redraw(); });
+                                    ro.observe($ta[0]);
+                                    $row.data('beam-ro', ro);
+                                }
+                            });
+                        });
+                    }
+
+                    function renderPhan9bBeamChart(chartData) {
+                        if (!chartData || !chartData.rows || !chartData.rows.length) {
+                            return '<p class="text-gray-500 text-sm italic">Chưa có dữ liệu biểu đồ chuyển hóa.</p>';
+                        }
+
+                        let html = '<div class="phan9b-beam-chart">';
+
+                        chartData.rows.forEach(function(row, idx) {
+                            const theme = PHAN9B_BEAM_THEMES[row.slug] || PHAN9B_BEAM_THEMES.kim;
+                            const before = Math.max(0, Math.min(100, Number(row.before) || 0));
+                            const after = Math.max(0, Math.min(100, Number(row.after) || 0));
+                            const dir = row.direction || 'stable';
+                            const isTang = dir === 'tang';
+                            const isGiam = dir === 'giam';
+
+                            const delta = after - before;
+                            const deltaAbs = Math.abs(Math.round(delta));
+
+                            const item = Object.assign({
+                                slug: row.slug,
+                                before: before,
+                                after: after,
+                                direction: dir,
+                                delta: Math.round(delta)
+                            }, theme);
+
+                            let badgeText = '— 0%';
+                            let badgeColor = '#9ca3af';
+                            if (isTang) {
+                                badgeText = '↑ (Tăng) +' + deltaAbs + '%';
+                                badgeColor = theme.badgeUp;
+                            } else if (isGiam) {
+                                badgeText = '↓ (Giảm) -' + deltaAbs + '%';
+                                badgeColor = theme.badgeDown;
+                            }
+
+                            html += '<div class="phan9b-beam-row" data-beam-item="' +
+                                escapeHtml(JSON.stringify(item)) + '">';
+                            html += '<div class="phan9b-beam-lbl">';
+                            html += '<img src="/images/ngu-hanh/' + escapeHtml(row.slug) +
+                                '.svg" alt="' + escapeHtml(row.ten) + '">';
+                            html += '</div>';
+                            html += '<div class="phan9b-beam-track-area">';
+                            html += '<canvas class="phan9b-beam-canvas"></canvas>';
+                            html += '</div>';
+                            html += '<div class="phan9b-beam-badge" style="color:' + badgeColor + '">' +
+                                escapeHtml(badgeText) + '</div>';
+                            html += '</div>';
+                        });
+
+                        html += '</div>';
+                        return html;
+                    }
+
+                    function renderPhan9bNoiLucParagraphs(text) {
+                        if (!text) return '';
+                        return String(text).split('\n').map(function(line) {
+                            line = line.trim();
+                            if (!line) return '';
+                            return '<p class="mb-2 text-gray-700 leading-relaxed pl-3 border-l-2 border-gray-200">' +
+                                escapeHtml(line) + '</p>';
+                        }).join('');
+                    }
+
+                    function renderPhan9bContent(data) {
+                        if (!data) {
+                            return '<p class="text-gray-500">Chưa có dữ liệu PHẦN 9B.</p>';
+                        }
+
+                        let html = '';
+
+                        if (data.than_trang_thai && data.than_trang_thai.label) {
+                            html += '<div class="mb-4 p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-indigo-900">' +
+                                '<span class="font-semibold">Trạng thái Nhật Chủ:</span> ' +
+                                escapeHtml(data.than_trang_thai.label) + '</div>';
+                        }
+
+                        if (data.ngu_hanh_yeu_nhat && data.ngu_hanh_yeu_nhat.ten) {
+                            html += '<div class="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg text-orange-900">' +
+                                '<span class="font-semibold">Ngũ hành Bản Mệnh yếu nhất:</span> ' +
+                                escapeHtml(data.ngu_hanh_yeu_nhat.ten) + ' — ' +
+                                escapeHtml(String(data.ngu_hanh_yeu_nhat.phan_tram)) + '%</div>';
+                        }
+
+                        const block = data.noi_dung;
+                        if (block) {
+                            html += '<div class="phan9-muc1-sheet mb-4">';
+                            html += '<h4 class="text-lg font-bold mb-4 form-title">' +
+                                escapeHtml(block.tieu_de || 'I. GIẢI PHÁP CÂN BẰNG') + '</h4>';
+
+                            (block.sections || []).forEach(function(sec) {
+                                if (sec.tieu_de) {
+                                    html += '<h5 class="text-base font-bold text-gray-800 mt-5 mb-3">' +
+                                        escapeHtml(sec.tieu_de) + '</h5>';
+                                }
+                                (sec.doan || []).forEach(function(item) {
+                                    const text = item.noi_dung || '';
+                                    if (!text) return;
+                                    if (item.is_hanh_dong) {
+                                        html += '<p class="font-semibold text-indigo-800 mb-2 leading-relaxed">' +
+                                            escapeHtml(text) + '</p>';
+                                    } else {
+                                        html += '<p class="mb-3 text-gray-700 leading-relaxed">' +
+                                            escapeHtml(text) + '</p>';
+                                    }
+                                });
+                            });
+
+                            html += '</div>';
+                        }
+
+                        const nl = data.noi_luc;
+                        const tt = data.thap_than;
+                        if (nl || tt) {
+                            html += '<div class="bg-white rounded-lg shadow-lg p-6 mb-4 border-l-4 border-amber-300">';
+                            html += '<h4 class="text-lg font-bold mb-4 form-title">' +
+                                escapeHtml((nl && nl.tieu_de) ? nl.tieu_de : 'II. NỘI LỰC TỰ THÂN') + '</h4>';
+
+                            if (nl && nl.intro && nl.intro.length) {
+                                html += '<div class="mb-5 space-y-3">' +
+                                    renderPhan9Paragraphs(nl.intro) + '</div>';
+                            }
+
+                            if (nl && nl.muc) {
+                                html += '<h5 class="text-base font-bold text-gray-800 mb-4">' +
+                                    escapeHtml(nl.muc) + '</h5>';
+                            }
+
+                            if (nl && nl.hanh) {
+                                (nl.hanh || []).forEach(function(hanh) {
+                                    html += '<div class="mb-6 pb-6 border-b border-gray-100 last:border-0">';
+                                    if (hanh.ngu_hanh && hanh.ngu_hanh.ten) {
+                                        html += '<h5 class="text-base font-bold text-indigo-800 mb-2">' +
+                                            escapeHtml(hanh.ngu_hanh.ten) + '</h5>';
+                                    }
+                                    if (hanh.tieu_de_chinh) {
+                                        html += '<p class="font-semibold text-gray-800 mb-3">' +
+                                            escapeHtml(hanh.tieu_de_chinh) + '</p>';
+                                    }
+                                    (hanh.sections || []).forEach(function(sec) {
+                                        if (sec.tieu_de) {
+                                            html += '<h6 class="font-semibold text-gray-700 mt-4 mb-2">' +
+                                                escapeHtml(sec.tieu_de) + '</h6>';
+                                        }
+                                        (sec.doan || []).forEach(function(para) {
+                                            if (!para) return;
+                                            html += renderPhan9bNoiLucParagraphs(para);
+                                        });
+                                    });
+                                    html += '</div>';
+                                });
+                            }
+
+                            if (tt) {
+                                if (data.thap_than_cao_nhat_label) {
+                                    html += '<div class="mb-4 p-3 bg-violet-50 border border-violet-200 rounded-lg text-violet-900">' +
+                                        '<span class="font-semibold">Thập Thần bản mệnh cao nhất:</span> ' +
+                                        escapeHtml(data.thap_than_cao_nhat_label) + '</div>';
+                                }
+
+                                if (tt.intro && tt.intro.length) {
+                                    html += '<div class="mb-5 space-y-3">' +
+                                        renderPhan9Paragraphs(tt.intro) + '</div>';
+                                }
+
+                                if (tt.muc) {
+                                    html += '<h5 class="text-base font-bold text-gray-800 mb-4 mt-6 pt-4 border-t border-gray-200">' +
+                                        escapeHtml(tt.muc) + '</h5>';
+                                }
+
+                                (tt.thap_than || []).forEach(function(item) {
+                                    const topClass = item.is_top
+                                        ? 'border-violet-300 bg-violet-50/40'
+                                        : 'border-gray-100';
+                                    html += '<div class="mb-6 pb-6 border rounded-lg p-4 ' + topClass + '">';
+                                    if (item.bo) {
+                                        html += '<p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">' +
+                                            escapeHtml(item.bo) + '</p>';
+                                    }
+                                    if (item.thap_than && item.thap_than.ten) {
+                                        html += '<h5 class="text-base font-bold text-indigo-800 mb-1">' +
+                                            escapeHtml(item.thap_than.ten);
+                                        if (item.is_top) {
+                                            html += ' <span class="text-xs font-semibold text-violet-700 bg-violet-100 px-2 py-0.5 rounded-full ml-1">Bản mệnh cao</span>';
+                                        }
+                                        html += '</h5>';
+                                    }
+                                    if (item.tagline) {
+                                        html += '<p class="font-semibold text-gray-800 mb-3 italic">' +
+                                            escapeHtml(item.tagline) + '</p>';
+                                    }
+                                    if (item.intro) {
+                                        html += '<p class="mb-4 text-gray-700 leading-relaxed">' +
+                                            escapeHtml(item.intro) + '</p>';
+                                    }
+                                    (item.sections || []).forEach(function(sec) {
+                                        if (sec.tieu_de) {
+                                            html += '<h6 class="font-semibold text-gray-700 mt-4 mb-2">' +
+                                                escapeHtml(sec.tieu_de) + '</h6>';
+                                        }
+                                        (sec.doan || []).forEach(function(para) {
+                                            if (!para) return;
+                                            html += renderPhan9bNoiLucParagraphs(para);
+                                        });
+                                    });
+                                    html += '</div>';
+                                });
+                            }
+
+                            html += '</div>';
+                        }
+
+                        const nluc = data.ngoai_luc;
+                        if (nluc) {
+                            html += '<div class="bg-white rounded-lg shadow-lg p-6 mb-4 border-l-4 border-teal-400">';
+                            html += '<h4 class="text-lg font-bold mb-2 form-title">' +
+                                escapeHtml(nluc.tieu_de || 'III. NGOẠI LỰC - CÔNG CỤ HỖ TRỢ') + '</h4>';
+                            if (nluc.subtitle) {
+                                html += '<p class="text-sm text-gray-600 italic mb-4">' +
+                                    escapeHtml(nluc.subtitle) + '</p>';
+                            }
+                            if (nluc.intro && nluc.intro.length) {
+                                html += '<div class="mb-5 space-y-3">' +
+                                    renderPhan9Paragraphs(nluc.intro) + '</div>';
+                            }
+                            (nluc.sections || []).forEach(function(sec) {
+                                html += '<div class="mb-6 pb-5 border-b border-gray-100 last:border-0">';
+                                if (sec.tieu_de) {
+                                    html += '<h5 class="text-base font-bold text-teal-800 mb-3">' +
+                                        escapeHtml(sec.tieu_de) + '</h5>';
+                                }
+                                (sec.items || []).forEach(function(item) {
+                                    if (!item) return;
+                                    const isLabel = /^[^:]{1,80}:/u.test(item) &&
+                                        !/^Nếu bạn cần nạp/u.test(item);
+                                    if (isLabel) {
+                                        html += '<p class="font-semibold text-gray-800 mt-3 mb-1 leading-relaxed">' +
+                                            escapeHtml(item) + '</p>';
+                                    } else if (/^Nếu bạn cần nạp/u.test(item) || /^Cần nạp/u.test(item)) {
+                                        html += '<p class="text-gray-700 mb-2 leading-relaxed pl-3 border-l-2 border-teal-200">' +
+                                            escapeHtml(item) + '</p>';
+                                    } else {
+                                        html += '<p class="text-gray-700 mb-2 leading-relaxed">' +
+                                            escapeHtml(item) + '</p>';
+                                    }
+                                });
+                                html += '</div>';
+                            });
+                            html += '</div>';
+                        }
+
+                        const hq = data.hieu_qua;
+                        const chartData = data.ngu_hanh_chuyen_hoa_chart;
+                        if (hq) {
+                            html += '<div class="bg-white rounded-lg shadow-lg p-6 mb-4 border-l-4 border-rose-400">';
+                            html += '<h4 class="text-lg font-bold mb-2 form-title">' +
+                                escapeHtml(hq.tieu_de || 'IV. HIỆU QUẢ CHUYỂN HÓA') + '</h4>';
+                            if (hq.subtitle) {
+                                html += '<p class="text-sm text-gray-600 italic mb-4">' +
+                                    escapeHtml(hq.subtitle) + '</p>';
+                            }
+                            (hq.sections || []).forEach(function(sec) {
+                                html += '<div class="mb-6 pb-5 border-b border-gray-100 last:border-0">';
+                                if (sec.tieu_de) {
+                                    html += '<h5 class="text-base font-bold text-rose-800 mb-3">' +
+                                        escapeHtml(sec.tieu_de) + '</h5>';
+                                }
+                                if (sec.intro) {
+                                    html += '<p class="mb-4 text-gray-700 leading-relaxed">' +
+                                        escapeHtml(sec.intro) + '</p>';
+                                }
+                                (sec.items || []).forEach(function(item) {
+                                    if (!item) return;
+                                    if (item.type === 'chart') {
+                                        html += renderPhan9bBeamChart(chartData);
+                                        return;
+                                    }
+                                    const text = item.noi_dung || '';
+                                    if (!text.trim()) return;
+                                    const isLabel = /^Về\s+/u.test(text);
+                                    if (isLabel) {
+                                        html += '<p class="font-semibold text-gray-800 mt-3 mb-1 leading-relaxed">' +
+                                            escapeHtml(text) + '</p>';
+                                    } else {
+                                        html += '<p class="text-gray-700 mb-2 leading-relaxed">' +
+                                            escapeHtml(text) + '</p>';
+                                    }
+                                });
+                                html += '</div>';
+                            });
+                            html += '</div>';
+                        }
+
+                        if (!html) {
+                            return '<p class="text-gray-500">Chưa có dữ liệu PHẦN 9B.</p>';
+                        }
+
+                        return html;
+                    }
+
+                    function loadPhan9b(params, chatLuongThapThan, baziResult) {
+                        const section = $('#phan9Section');
+                        const block = $('#phan9bBlock');
+                        const content = $('#phan9bContent');
+                        const transitionBox = $('#phan9bTransitionContainer');
+                        const transitionContent = $('#phan9bTransitionContent');
+
+                        block.hide();
+                        content.empty();
+                        transitionBox.hide();
+                        transitionContent.empty();
+                        section.removeData('phan9b-has-content');
+
+                        const apiParams = Object.assign({}, params);
+                        if (chatLuongThapThan && chatLuongThapThan.length) {
+                            apiParams.chat_luong_thap_than = JSON.stringify(chatLuongThapThan);
+                        }
+                        const nhd = baziResult && baziResult.ngu_hanh_dong ? baziResult.ngu_hanh_dong : null;
+                        if (nhd && typeof nhd === 'object') {
+                            ['kim', 'moc', 'thuy', 'hoa', 'tho'].forEach(function(key) {
+                                if (nhd[key] !== undefined && nhd[key] !== null) {
+                                    apiParams[key] = nhd[key];
+                                }
+                            });
+                        }
+
+                        $.ajax({
+                            url: '/api/phan-9b/giai-phap-can-bang',
+                            method: 'GET',
+                            data: apiParams,
+                            error: function(xhr, status, err) {
+                                console.error('loadPhan9b API error:', status, err);
+                            },
+                            success: function(res) {
+                                const data = (res && res.data) ? res.data : (res || {});
+                                let shown = false;
+
+                                if (data.transition_phan9b && data.transition_phan9b.noi_dung) {
+                                    transitionContent.html(
+                                        '<div class="leading-relaxed whitespace-pre-line">' +
+                                        escapeHtml(data.transition_phan9b.noi_dung) + '</div>');
+                                    transitionBox.show();
+                                    shown = true;
+                                }
+
+                                if (data.noi_dung || data.noi_luc || data.thap_than || data.ngoai_luc || data.hieu_qua) {
+                                    content.html(renderPhan9bContent(data));
+                                    initPhan9bBeamCharts(content);
+                                    shown = true;
+                                }
+
+                                if (shown) {
+                                    section.data('phan9b-has-content', true);
+                                    section.data('quyen-was-shown', true);
+                                    refreshPhan9QuyenVisibility();
+                                    if (isQuyenSectionAllowed(section)) {
+                                        section.show();
+                                    }
+                                }
+                            }
+                        });
+                    }
+
                     function renderPhan9Ma1(p1) {
                         if (!p1) return '<p class="text-gray-500">Chưa có dữ liệu Mã 1.</p>';
                         let html = '<h4 class="text-lg font-bold text-indigo-800 mb-4">' +
@@ -2702,6 +3361,7 @@
 
                     function loadPhan9(params, baziResult) {
                         const section = $('#phan9Section');
+                        const block = $('#phan9aBlock');
                         const ma1Box = $('#phan9Ma1Container');
                         const ma2Box = $('#phan9Ma2Container');
                         const ma1Content = $('#phan9Ma1Content');
@@ -2709,13 +3369,14 @@
                         const transitionBox = $('#phan9TransitionContainer');
                         const transitionContent = $('#phan9TransitionContent');
 
-                        section.hide();
+                        block.hide();
                         ma1Box.hide();
                         ma2Box.hide();
                         transitionBox.hide();
                         ma1Content.empty();
                         ma2Content.empty();
                         transitionContent.empty();
+                        section.removeData('phan9a-has-content');
 
                         const ajaxData = Object.assign({}, params);
                         const nhd = baziResult && baziResult.ngu_hanh_dong ? baziResult.ngu_hanh_dong : null;
@@ -2759,7 +3420,12 @@
                                 }
 
                                 if (shown) {
-                                    section.show();
+                                    section.data('phan9a-has-content', true);
+                                    section.data('quyen-was-shown', true);
+                                    refreshPhan9QuyenVisibility();
+                                    if (isQuyenSectionAllowed(section)) {
+                                        section.show();
+                                    }
                                 }
                             }
                         });
@@ -4154,7 +4820,7 @@
                     }
 
                     // Hàm hiển thị kết quả
-                    function displayResults(params, result) {
+                    function displayResults(params, result, onPhan2Ready) {
                         // Hiển thị container kết quả
                         $('#resultContainer').show();
                         $('#quyenTabBar').addClass('is-visible');
@@ -4175,7 +4841,7 @@
                         loadTongQuanKhiaCanh();
 
                         // PHẦN 2: BIỂU ĐỒ 6 KHÍA CẠNH + Thần Sát (API riêng, không lấy từ bazi/calc)
-                        loadPhan2(params);
+                        loadPhan2(params, onPhan2Ready);
 
                         // Load Sự nghiệp Thập Thần từ API riêng (có dùng ngày giờ sinh)
                         loadSuNghiepThapThan(params, result.bat_tu, result.chat_luong_thap_than);
@@ -4186,8 +4852,9 @@
                         // Load PHẦN 6: Mã 1 Ý nghĩa tứ trụ + Mã 2,3,4 Dòng chảy năng lượng
                         loadPhan6(params);
 
-                        // Load PHẦN 9A: Nội lực (hành yếu nhất) + Ngoại lực
+                        // Load PHẦN 9A (cuốn 1) + PHẦN 9B (cuốn 2)
                         loadPhan9(params, result);
+                        loadPhan9b(params, result.chat_luong_thap_than, result);
 
                         // Load PHẦN 8: Đại Vận – mối quan hệ TC/ĐC Đại Vận với 4 Trụ
                         loadPhan8(params);
@@ -4205,6 +4872,7 @@
                         setTimeout(function() {
                             refreshQuyenSectionsVisibility();
                             refreshPhan8QuyenVisibility();
+                            refreshPhan9QuyenVisibility();
                         }, 3500);
 
                         // Điền dữ liệu Dương lịch
@@ -4354,7 +5022,7 @@
                     }
 
                     /** PHẦN 2: chi_so_bieu_do_cot + quy_nhan_van_xuong (gọi lại bazi->calc phía server). */
-                    function loadPhan2(params) {
+                    function loadPhan2(params, onComplete) {
                         $.ajax({
                             url: '/api/phan-2/chi-so-khia-canh-than-sat',
                             method: 'GET',
@@ -4364,10 +5032,16 @@
                                 const d = (res && res.data) ? res.data : {};
                                 displayChiSoBieuDoCot(d.chi_so_bieu_do_cot, params.g);
                                 displayQuyNhanVanXuong(d.quy_nhan_van_xuong);
+                                if (typeof onComplete === 'function') {
+                                    onComplete(d);
+                                }
                             },
                             error: function() {
                                 displayChiSoBieuDoCot(null, params.g);
                                 displayQuyNhanVanXuong(null);
+                                if (typeof onComplete === 'function') {
+                                    onComplete(null);
+                                }
                             }
                         });
                     }

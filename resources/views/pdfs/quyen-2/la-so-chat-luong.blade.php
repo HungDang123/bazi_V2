@@ -18,38 +18,18 @@
         .page { position: relative; width: 210mm; height: 297mm; overflow: hidden; }
         .bg-img { position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; }
 
-        /* Chart image centered */
+        /* Radar — tỉ lệ 1.5 giống Chart.js desktop */
         .chart-img-wrap {
             position: absolute;
-            top: 38mm;
+            top: 36mm;
             left: 0;
             width: 210mm;
             text-align: center;
         }
-        .chart-img-wrap img { width: 124mm; height: auto; }
-
-        /* Icons quanh radar */
-        .icon-wrap {
-            position: absolute;
-            text-align: center;
-        }
-        .icon-wrap img { width: 12mm; height: 12mm; display: block; margin: 0 auto 0.8mm; }
-        .icon-lbl-nh { font-size: 6.5pt; font-weight: bold; color: #333; white-space: nowrap; }
-
-        /* Legend */
-        .legend {
-            position: absolute;
-            top: 154mm;
-            left: 28mm;
-            font-size: 6.5pt;
-            color: #444;
-        }
-        .legend-box {
+        .chart-img-wrap img {
+            width: 138mm;
+            height: auto;
             display: inline-block;
-            width: 13px;
-            height: 9px;
-            vertical-align: middle;
-            margin-right: 3px;
         }
 
         /* Bảng THẬP THẦN */
@@ -116,7 +96,7 @@
             margin: 0 0 0.5mm;
         }
         .bar-fill-bm {
-            background: #0479FD;
+            background: #4169E1;
             border-radius: 2.4mm;
             height: 4.8mm;
             min-width: 8mm;
@@ -128,7 +108,7 @@
             padding: 0;
         }
         .bar-fill-nv {
-            background: #6E0101;
+            background: #8B4513;
             border-radius: 2.4mm;
             height: 4.8mm;
             min-width: 8mm;
@@ -155,200 +135,17 @@
     <img class="bg-img" src="{{ $templatePath }}">
 
     @php
-        // ═══════════════════════════════════════════════════
-        // GD RADAR CHART — matching reference style
-        // ═══════════════════════════════════════════════════
-        $GW  = 600;
-        $GH  = 500;
-        $gcx = 300;
-        $gcy = 252;
-        $gR  = 182;  // outer radius
+        use App\Services\NguHanhRadarChartService;
 
-        $gAxes = [];
-        for ($i = 0; $i < 5; $i++) {
-            $gAxes[] = -M_PI / 2 + $i * 2 * M_PI / 5;
-        }
-
-        // Point on axis i at radius r
-        $gpt = function (int $i, float $r) use ($gcx, $gcy, $gAxes): array {
-            return [
-                (int) round($gcx + $r * cos($gAxes[$i])),
-                (int) round($gcy + $r * sin($gAxes[$i])),
-            ];
-        };
-
-        $im = imagecreatetruecolor($GW, $GH);
-
-        // Colors
-        $bgC     = imagecolorallocate($im, 255, 255, 255);
-        $goldC   = imagecolorallocate($im, 198, 158, 60);    // gold outer ring
-        $gridC   = imagecolorallocate($im, 205, 200, 178);   // inner grid (tan)
-        $axisC   = imagecolorallocate($im, 200, 194, 170);   // spoke lines
-        $txtC    = imagecolorallocate($im, 125, 118, 95);    // label text
-        $bmLine  = imagecolorallocate($im, 60, 145, 210);    // blue line
-        $bmFill  = imagecolorallocatealpha($im, 60, 145, 210, 85);
-        $nvLine  = imagecolorallocate($im, 138, 42, 42);     // dark-red line
-        $nvFill  = imagecolorallocatealpha($im, 138, 42, 42, 85);
-
-        imagefill($im, 0, 0, $bgC);
-        imagealphablending($im, true);
-
-        // 1. Spoke lines (axis)
-        imagesetthickness($im, 1);
-        for ($i = 0; $i < 5; $i++) {
-            [$ex, $ey] = $gpt($i, $gR);
-            imageline($im, $gcx, $gcy, $ex, $ey, $axisC);
-        }
-
-        // 2. Inner grid rings (4 levels: 20 40 60 80)
-        foreach ([20, 40, 60, 80] as $pct) {
-            $r = $gR * $pct / 100;
-            $p = [];
-            for ($i = 0; $i < 5; $i++) {
-                [$px, $py] = $gpt($i, $r);
-                $p[] = $px; $p[] = $py;
-            }
-            if (PHP_MAJOR_VERSION >= 8) imagepolygon($im, $p, $gridC);
-            else imagepolygon($im, $p, 5, $gridC);
-        }
-
-        // 3. Outer pentagon (thick gold)
-        imagesetthickness($im, 4);
-        for ($i = 0; $i < 5; $i++) {
-            [$x1, $y1] = $gpt($i, $gR);
-            [$x2, $y2] = $gpt(($i + 1) % 5, $gR);
-            imageline($im, $x1, $y1, $x2, $y2, $goldC);
-        }
-        imagesetthickness($im, 1);
-
-        // 4. Labels on all 5 axes at each grid level
-        $fIdx = 2;
-        $fW   = imagefontwidth($fIdx);
-        $fH   = imagefontheight($fIdx);
-
-        foreach ([20, 40, 60, 80, 100] as $pct) {
-            for ($i = 0; $i < 5; $i++) {
-                $r   = $gR * $pct / 100;
-                $a   = $gAxes[$i];
-                $px  = (int) round($gcx + $r * cos($a));
-                $py  = (int) round($gcy + $r * sin($a));
-                $lbl = (string) $pct;
-                $lw  = $fW * strlen($lbl);
-
-                // Offset label relative to axis direction
-                if (abs(cos($a)) < 0.1) {
-                    // Near-vertical axis (top): label to the right
-                    $ox = 3;
-                    $oy = -(int)($fH / 2) - 1;
-                } else {
-                    $ox = cos($a) > 0 ? 3 : -($lw + 3);
-                    $oy = sin($a) > 0 ? 2 : -($fH + 2);
-                }
-
-                imagestring($im, $fIdx, $px + $ox, $py + $oy, $lbl, $txtC);
-            }
-        }
-
-        // 5. Data polygons
-        $hasData = count($bieuDoNguHanh) >= 5;
-
-        if ($hasData) {
-            // Niên Vận (draw first / behind)
-            $nvP = [];
-            foreach (array_values($bieuDoNguHanh) as $idx => $ax) {
-                $v = min(100, max(0, (float)($ax['diem_nien_van'] ?? 0)));
-                [$px, $py] = $gpt($idx, $gR * $v / 100);
-                $nvP[] = $px; $nvP[] = $py;
-            }
-            if (PHP_MAJOR_VERSION >= 8) { imagefilledpolygon($im, $nvP, $nvFill); imagepolygon($im, $nvP, $nvLine); }
-            else { imagefilledpolygon($im, $nvP, 5, $nvFill); imagepolygon($im, $nvP, 5, $nvLine); }
-
-            // Bản Mệnh (draw on top)
-            $bmP = [];
-            foreach (array_values($bieuDoNguHanh) as $idx => $ax) {
-                $v = min(100, max(0, (float)($ax['diem_ngu_hanh'] ?? 0)));
-                [$px, $py] = $gpt($idx, $gR * $v / 100);
-                $bmP[] = $px; $bmP[] = $py;
-            }
-            if (PHP_MAJOR_VERSION >= 8) { imagefilledpolygon($im, $bmP, $bmFill); imagepolygon($im, $bmP, $bmLine); }
-            else { imagefilledpolygon($im, $bmP, 5, $bmFill); imagepolygon($im, $bmP, 5, $bmLine); }
-        }
-
-        // Encode PNG as base64
-        ob_start();
-        imagepng($im);
-        $chartPng = 'data:image/png;base64,' . base64_encode(ob_get_clean());
-        imagedestroy($im);
-
-        // ═══════════════════════════════════════════════════
-        // Icon positions on the PDF page (mm)
-        // Chart image: width=124mm, top=38mm, centered
-        // ═══════════════════════════════════════════════════
-        $cImgW    = 124.0;
-        $cImgLeft = (210.0 - $cImgW) / 2.0;
-        $cImgTop  = 38.0;
-        $cImgH    = $cImgW * ($GH / $GW);
-
-        // Chart center in page mm
-        $pCX = $cImgLeft + $cImgW * ($gcx / $GW);   // 40+65 = 105mm
-        $pCY = $cImgTop  + $cImgH * ($gcy / $GH);   // 34+54.6 = 88.6mm
-
-        // Pentagon outer radius in mm
-        $pRX = $cImgW * ($gR / $GW);   // 130*182/600 = 39.4mm
-        $pRY = $cImgH * ($gR / $GH);   // 108.3*182/500 = 39.4mm
-
-        // Icon offset beyond pentagon edge
-        $offMm = 13.5;
-
-        $iconMap = [
-            'Thê Tài'  => 'the-tai',  'Thể Tài'  => 'the-tai',  'Thê tài'  => 'the-tai',
-            'Quan Quỷ' => 'quan-quy', 'Quan quỷ' => 'quan-quy',
-            'Phụ Mẫu'  => 'phu-mau',  'Phụ mẫu'  => 'phu-mau',
-            'Huynh Đệ' => 'huynh-de', 'Huynh đệ' => 'huynh-de',
-            'Tử Tôn'   => 'tu-ton',   'Tử tôn'   => 'tu-ton',
-        ];
-
-        $iW    = 12;   // icon img mm
-        $lblW  = 26;   // container width mm
-
-        $iconPositions = [];
-        foreach (array_values($bieuDoNguHanh) as $idx => $ax) {
-            $a     = $gAxes[$idx];
-            $icX   = $pCX + ($pRX + $offMm) * cos($a);
-            $icY   = $pCY + ($pRY + $offMm) * sin($a);
-            $iconPositions[] = [
-                'left' => round($icX - $lblW / 2, 2),
-                'top'  => round($icY - $iW / 2 - 1, 2),
-                'ax'   => $ax,
-            ];
-        }
-
+        $chartPng = NguHanhRadarChartService::toDataUri($bieuDoNguHanh ?? []);
         $nienMenhYear = $nienVanYear ?? date('Y');
         $rowIdx = 0;
     @endphp
 
-    {{-- ── Radar chart image ── --}}
     <div class="chart-img-wrap">
-        <img src="{{ $chartPng }}">
+        <img src="{{ $chartPng }}" alt="">
     </div>
 
-    {{-- ── Icons quanh chart ── --}}
-    @foreach($iconPositions as $pos)
-    @php
-        $ax       = $pos['ax'];
-        $lucThan  = $ax['luc_than']     ?? '';
-        $nguHanh  = $ax['ten_ngu_hanh'] ?? '';
-        $iconFile = $iconMap[$lucThan]   ?? 'the-tai';
-        $iconPath = $iconDir . '/' . $iconFile . '.png';
-    @endphp
-    <div class="icon-wrap"
-         style="left:{{ $pos['left'] }}mm; top:{{ $pos['top'] }}mm; width:26mm;">
-        <img src="{{ $iconPath }}">
-        <div class="icon-lbl-nh">{{ $lucThan }}</div>
-    </div>
-    @endforeach
-
-    {{-- ── CHẤT LƯỢNG THẬP THẦN ── --}}
     <div class="ts-table-wrap">
         <table class="ts-tbl">
             <colgroup>

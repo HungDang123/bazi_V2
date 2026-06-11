@@ -7,6 +7,7 @@ use App\Models\NhatChuTruNgay;
 use App\Services\BaZiServiceV2;
 use App\Services\ChatLuongNhatChuService;
 use App\Services\HanhNoiDungService;
+use App\Services\NhatChuChapterPdfService;
 use App\Services\Phan3PdfPaginator;
 use App\Services\Phan5PdfService;
 use App\Services\Phan6PdfService;
@@ -15,6 +16,7 @@ use App\Services\Phan7MucIPdfService;
 use App\Services\Phan7PdfService;
 use App\Services\Phan8PdfService;
 use App\Services\Phan9PdfService;
+use App\Services\Phan9bPdfService;
 use App\Services\Phan9aService;
 use App\Services\PdfDownloadService;
 use App\Services\PdfFooterService;
@@ -134,11 +136,22 @@ class PdfExportController extends Controller
             } catch (\Throwable $e) {
                 Log::error('PdfExport Q1: BaZiServiceV2::calc lỗi – ' . $e->getMessage());
             }
+
+            $this->applyPrecomputedStrengthData(
+                $req,
+                $batTuData,
+                $bieuDoNguHanh,
+                $chatLuongThapThan,
+                $chiSoBieuDoCot,
+                $nguHanhDong
+            );
+
             PdfExportMetrics::addBaziMs((microtime(true) - $baziT0) * 1000);
         }
 
         $pdfsToMerge = [];
         $tempFiles   = [];
+        $footerSegments = [];
 
         // ── Trang 1: PDF tĩnh ───────────────────────────────────────────────
         self::appendStaticPage($pdfsToMerge, $pdfDir . '/page-01.pdf', 'Q1 page-01.pdf');
@@ -259,6 +272,7 @@ class PdfExportController extends Controller
             'pdf-justify-v2',
             'trait-pill-img-v1',
             'traits-height-fix-v2',
+            'traits-height-cal-v1',
             'abc-label-bold-traits-split-v1',
             'phan8-no-title-underline-v1',
             'phan8-coding-flow-with-text-v1',
@@ -425,7 +439,7 @@ class PdfExportController extends Controller
             $tempFiles[]   = $pagePhan8Path;
         }
 
-        // ── PHẦN 9: bìa (LBTV-236 tĩnh) + nội dung (LBTV-119) ───────────────
+        // ── PHẦN 9: bìa tĩnh (LBTV-236) + nội dung (LBTV-119) (y hệt Q1) ────
         self::appendStaticPage(
             $pdfsToMerge,
             Phan9PdfService::coverImagePath(),
@@ -440,37 +454,10 @@ class PdfExportController extends Controller
             $tempFiles[]   = $pagePhan9Path;
         }
 
-        // ── Kết bài: 562 → 563 → 564 → 566 → … → 581 (theo stt tên ảnh) ─────
+        // ── Kết bài: 562–564 (bìa) + 566–569, 572, 581 (worksheet — tên footer đen) ─
         $phan9Dir      = resource_path('views/pdfs/phan-9');
         $q1AppendixDir = resource_path('views/pdfs/q2-appendix');
-        $ketBaiBundle  = PdfStaticPageCache::resolveBundle('q1-ket-bai-v3', [
-            $q1AppendixDir . '/page-562.png',
-            $q1AppendixDir . '/page-563.png',
-            $q1AppendixDir . '/page-564.png',
-            $phan9Dir . '/page-566.png',
-            $phan9Dir . '/page-567.png',
-            $phan9Dir . '/page-568.png',
-            $phan9Dir . '/page-569.png',
-            $q1AppendixDir . '/page-572.png',
-            $phan9Dir . '/page-581.png',
-        ]);
-        if ($ketBaiBundle !== null) {
-            $pdfsToMerge[] = $ketBaiBundle;
-        } else {
-            foreach ([
-                [$q1AppendixDir, 'page-562.png'],
-                [$q1AppendixDir, 'page-563.png'],
-                [$q1AppendixDir, 'page-564.png'],
-                [$phan9Dir, 'page-566.png'],
-                [$phan9Dir, 'page-567.png'],
-                [$phan9Dir, 'page-568.png'],
-                [$phan9Dir, 'page-569.png'],
-                [$q1AppendixDir, 'page-572.png'],
-                [$phan9Dir, 'page-581.png'],
-            ] as [$dir, $fname]) {
-                self::appendStaticPage($pdfsToMerge, $dir . '/' . $fname, "q1-ket-bai-{$dir}-$fname");
-            }
-        }
+        self::appendPhan9KetBaiSegments($pdfsToMerge, $footerSegments, $phan9Dir, $q1AppendixDir);
 
         // ── Merge + footer (banner 08.png, số trang, tên người nhập) ─────────
         $mergedTemp = $tempDir.'/merged-q1-'.$uid.'.pdf';
@@ -487,8 +474,17 @@ class PdfExportController extends Controller
         }
 
         $fullName = trim((string) $req->input('full_name', ''));
+        $darkNamePages = PdfFooterService::resolveDarkNamePages($footerSegments);
         $tFooter  = microtime(true);
-        if (! PdfFooterService::applyToMergedPdf($mergedTemp, $finalPath, $fullName)) {
+        if (! PdfFooterService::applyToMergedPdf(
+            $mergedTemp,
+            $finalPath,
+            $fullName,
+            PdfFooterService::FIRST_FOOTER_PAGE,
+            PdfFooterService::FIRST_DISPLAY_PAGE_NUMBER,
+            [],
+            $darkNamePages
+        )) {
             Log::warning('Gắn footer PDF Quyển 1 thất bại — xuất PDF không footer', [
                 'uid' => $uid,
                 'full_name' => $fullName,
@@ -580,7 +576,7 @@ class PdfExportController extends Controller
         $uid    = Str::random(10);
         $pdfDir = resource_path('views/pdfs/quyen-2');
 
-        $pdfsToMerge = [];
+        $mergeSegments = [];
         $tempFiles   = [];
 
         // ── Trang 1: page-01.png (cache) ────────────────────────────────────
@@ -588,7 +584,7 @@ class PdfExportController extends Controller
         if ($page1Path === null) {
             throw new \RuntimeException('Không tìm thấy page-01.png');
         }
-        $pdfsToMerge[] = $page1Path;
+        self::pushMergeSegment($mergeSegments, $page1Path);
 
         // ── Trang 2: blade cuộn lịch ─────────────────────────────────────────
         $batTuRaw = $req->input('bat_tu', '');
@@ -605,7 +601,7 @@ class PdfExportController extends Controller
             'batTu'        => $batTu,
             'address'      => $req->input('address', ''),
         ], $page2Path);
-        $pdfsToMerge[] = $page2Path;
+        self::pushMergeSegment($mergeSegments, $page2Path);
         $tempFiles[]     = $page2Path;
 
         // ── Trang 3–11: bundle PDF tĩnh (cache) ─────────────────────────────
@@ -621,7 +617,8 @@ class PdfExportController extends Controller
             $pdfDir . '/page-11.png',
         ]);
         if ($staticMid !== null) {
-            $pdfsToMerge[] = $staticMid;
+            // Trang 11 trong cuốn = trang bìa section (trang thứ 9 trong bundle 3–11)
+            self::pushMergeSegment($mergeSegments, $staticMid, [9]);
         } else {
             Log::warning('PdfExport Q2: không tạo được bundle trang 3–11');
         }
@@ -687,6 +684,16 @@ class PdfExportController extends Controller
             } catch (\Throwable $e) {
                 Log::error('PdfExport: BaZiServiceV2::calc lỗi – ' . $e->getMessage());
             }
+
+            $this->applyPrecomputedStrengthData(
+                $req,
+                $batTuData,
+                $bieuDoNguHanh,
+                $chatLuongThapThan,
+                $chiSoBieuDoCot,
+                $nguHanhDong
+            );
+
             PdfExportMetrics::addBaziMs((microtime(true) - $baziT0) * 1000);
         }
 
@@ -697,7 +704,7 @@ class PdfExportController extends Controller
             'batTu'           => $batTuData,
             'quyNhanVanXuong' => $quyNhanVanXuong,
         ], $page12Path);
-        $pdfsToMerge[] = $page12Path;
+        self::pushMergeSegment($mergeSegments, $page12Path);
         $tempFiles[]     = $page12Path;
 
         // ── Trang 13: la-so-dai-van (Đại Vận) ───────────────────────────────
@@ -706,7 +713,7 @@ class PdfExportController extends Controller
             'templatePath' => $pdfDir . '/page-13-bg.png',
             'bangDaiVan'   => $bangDaiVan,
         ], $page13Path);
-        $pdfsToMerge[] = $page13Path;
+        self::pushMergeSegment($mergeSegments, $page13Path);
         $tempFiles[]     = $page13Path;
 
         // ── Trang 13b: la-so-nien-van (Niên Vận) ────────────────────────────
@@ -715,7 +722,7 @@ class PdfExportController extends Controller
             'templatePath' => $pdfDir . '/page-13-bg.png',
             'nienVan'      => $nienVan,
         ], $page13bPath);
-        $pdfsToMerge[] = $page13bPath;
+        self::pushMergeSegment($mergeSegments, $page13bPath);
         $tempFiles[]     = $page13bPath;
 
         // ── Trang 14: la-so-chat-luong ───────────────────────────────────────
@@ -728,7 +735,7 @@ class PdfExportController extends Controller
             'chatLuongThapThan' => $chatLuongThapThan,
             'nienVanYear'       => $nienMenhYear,
         ], $page14Path);
-        $pdfsToMerge[] = $page14Path;
+        self::pushMergeSegment($mergeSegments, $page14Path);
         $tempFiles[]     = $page14Path;
 
         // ── Trang 15: la-so-6-khia-canh ─────────────────────────────────────
@@ -738,21 +745,37 @@ class PdfExportController extends Controller
             'chiSoBieuDoCot' => $chiSoBieuDoCot,
             'gender'         => $req->input('g', 'male'),
         ], $page15Path);
-        $pdfsToMerge[] = $page15Path;
+        self::pushMergeSegment($mergeSegments, $page15Path);
         $tempFiles[]     = $page15Path;
 
         // ── Trang 16: page-16.png (PHẦN 4 cover, cache) ─────────────────────
-        self::appendStaticPage($pdfsToMerge, $pdfDir . '/page-16.png', 'Q2 page-16.png');
+        $page16Cover = PdfStaticPageCache::resolve($pdfDir . '/page-16.png');
+        if ($page16Cover !== null) {
+            self::pushMergeSegment($mergeSegments, $page16Cover, 'all');
+        } else {
+            Log::warning('PdfExport Q2: không tìm thấy page-16.png');
+        }
 
-        // ── Trang 17: la-so-tong-quan-nhat-chu ──────────────────────────────
-        $page17Path = $tempDir . '/p17-' . $uid . '.pdf';
-        PdfRenderService::saveView('pdfs.quyen-2.la-so-tong-quan-nhat-chu', [
-            'templatePath' => $pdfDir . '/page-17-bg.png',
-            'nhatChuTitle' => $nhatChuTitle,
-            'chapters'     => $nhatChuChapters,
-        ], $page17Path);
-        $pdfsToMerge[] = $page17Path;
-        $tempFiles[]     = $page17Path;
+        // ── Trang 17: la-so-tong-quan-nhat-chu (phân trang) ─────────────────
+        self::appendNhatChuChapterPdf(
+            $mergeSegments,
+            $tempFiles,
+            $tempDir,
+            $uid,
+            NhatChuChapterPdfService::buildTongQuanPages($nhatChuChapters, $pdfDir),
+            'p17',
+            'pdfs.quyen-2.la-so-tong-quan-nhat-chu',
+            [
+                'templatePath' => $pdfDir.'/page-17-bg.png',
+                'nhatChuTitle' => $nhatChuTitle,
+                'chapters'     => $nhatChuChapters,
+            ],
+            'pdfs.quyen-2.la-so-tong-quan-nhat-chu-paginated',
+            [
+                'templatePath' => $pdfDir.'/page-17-bg.png',
+                'nhatChuTitle' => $nhatChuTitle,
+            ]
+        );
 
         // ── Trang 18: la-so-phan-tich-nhat-chu ──────────────────────────────
         $page18Path = $tempDir . '/p18-' . $uid . '.pdf';
@@ -761,44 +784,54 @@ class PdfExportController extends Controller
             'tuyHyPath'    => $pdfDir . '/tuy hy.png',
             'chapters'     => $nhatChuChapters,
         ], $page18Path);
-        $pdfsToMerge[] = $page18Path;
+        self::pushMergeSegment($mergeSegments, $page18Path);
         $tempFiles[]     = $page18Path;
 
-        // ── Trang 19: la-so-xu-huong-tinh-cach ──────────────────────────────
-        $page19Path = $tempDir . '/p19-' . $uid . '.pdf';
-        PdfRenderService::saveView('pdfs.quyen-2.la-so-xu-huong-tinh-cach', [
-            'templatePath' => $pdfDir . '/page-19-bg.png',
-            'chapters'     => $nhatChuChapters,
-        ], $page19Path);
-        $pdfsToMerge[] = $page19Path;
-        $tempFiles[]     = $page19Path;
+        // ── Trang 19–21: NHẬT CHỦ chapter II–IV (phân trang, chừa footer) ───
+        self::appendNhatChuChapterPdf(
+            $mergeSegments,
+            $tempFiles,
+            $tempDir,
+            $uid,
+            NhatChuChapterPdfService::buildXuHuongPages($nhatChuChapters, $pdfDir),
+            'p19',
+            'pdfs.quyen-2.la-so-xu-huong-tinh-cach',
+            ['templatePath' => $pdfDir.'/page-19-bg.png', 'chapters' => $nhatChuChapters]
+        );
 
-        // ── Trang 20: la-so-chapter-iii ───────────────────────────────────────
-        $page20Path = $tempDir . '/p20-' . $uid . '.pdf';
-        PdfRenderService::saveView('pdfs.quyen-2.la-so-chapter-iii', [
-            'templatePath' => $pdfDir . '/page-20-bg.png',
-            'chapters'     => $nhatChuChapters,
-        ], $page20Path);
-        $pdfsToMerge[] = $page20Path;
-        $tempFiles[]     = $page20Path;
+        self::appendNhatChuChapterPdf(
+            $mergeSegments,
+            $tempFiles,
+            $tempDir,
+            $uid,
+            NhatChuChapterPdfService::buildChapterIiiPages($nhatChuChapters, $pdfDir),
+            'p20',
+            'pdfs.quyen-2.la-so-chapter-iii',
+            ['templatePath' => $pdfDir.'/page-20-bg.png', 'chapters' => $nhatChuChapters]
+        );
 
-        // ── Trang 21: la-so-chapter-iv ────────────────────────────────────────
-        $page21Path = $tempDir . '/p21-' . $uid . '.pdf';
-        PdfRenderService::saveView('pdfs.quyen-2.la-so-chapter-iv', [
-            'templatePath' => $pdfDir . '/page-21-bg.png',
-            'chapters'     => $nhatChuChapters,
-        ], $page21Path);
-        $pdfsToMerge[] = $page21Path;
-        $tempFiles[]     = $page21Path;
+        self::appendNhatChuChapterPdf(
+            $mergeSegments,
+            $tempFiles,
+            $tempDir,
+            $uid,
+            NhatChuChapterPdfService::buildChapterIvPages($nhatChuChapters, $pdfDir),
+            'p21',
+            'pdfs.quyen-2.la-so-chapter-iv',
+            ['templatePath' => $pdfDir.'/page-21-bg.png', 'chapters' => $nhatChuChapters]
+        );
 
         // ── PHẦN 7: bìa + trang mở đầu Mục I (tĩnh) ─────────────────────────────
         $phan7Pages = Phan7PdfService::staticPagePaths();
         $phan7Bundle = PdfStaticPageCache::resolveBundle(Phan7PdfService::bundleCacheKey(), $phan7Pages);
         if ($phan7Bundle !== null) {
-            $pdfsToMerge[] = $phan7Bundle;
+            self::pushMergeSegment($mergeSegments, $phan7Bundle, 'all');
         } else {
             foreach ($phan7Pages as $phan7Path) {
-                self::appendStaticPage($pdfsToMerge, $phan7Path, 'phan7-'.basename($phan7Path));
+                $resolved = PdfStaticPageCache::resolve($phan7Path);
+                if ($resolved !== null) {
+                    self::pushMergeSegment($mergeSegments, $resolved, 'all');
+                }
             }
         }
 
@@ -807,7 +840,7 @@ class PdfExportController extends Controller
         if ($phan7Muc1Spec !== null) {
             $pagePhan7Muc1Path = $tempDir . '/q2p-phan7-muc1-' . $uid . '.pdf';
             PdfRenderService::saveView($phan7Muc1Spec['view'], $phan7Muc1Spec['data'], $pagePhan7Muc1Path);
-            $pdfsToMerge[] = $pagePhan7Muc1Path;
+            self::pushMergeSegment($mergeSegments, $pagePhan7Muc1Path);
             $tempFiles[]   = $pagePhan7Muc1Path;
         }
 
@@ -816,7 +849,7 @@ class PdfExportController extends Controller
         if ($phan7Muc2Spec !== null) {
             $pagePhan7Muc2Path = $tempDir . '/q2p-phan7-muc2-' . $uid . '.pdf';
             PdfRenderService::saveView($phan7Muc2Spec['view'], $phan7Muc2Spec['data'], $pagePhan7Muc2Path);
-            $pdfsToMerge[] = $pagePhan7Muc2Path;
+            self::pushMergeSegment($mergeSegments, $pagePhan7Muc2Path);
             $tempFiles[]   = $pagePhan7Muc2Path;
         }
 
@@ -825,7 +858,7 @@ class PdfExportController extends Controller
         if ($phan7Muc1CuoiSpec !== null) {
             $pagePhan7Muc1CuoiPath = $tempDir . '/q2p-phan7-muc1-cuoi-' . $uid . '.pdf';
             PdfRenderService::saveView($phan7Muc1CuoiSpec['view'], $phan7Muc1CuoiSpec['data'], $pagePhan7Muc1CuoiPath);
-            $pdfsToMerge[] = $pagePhan7Muc1CuoiPath;
+            self::pushMergeSegment($mergeSegments, $pagePhan7Muc1CuoiPath);
             $tempFiles[]   = $pagePhan7Muc1CuoiPath;
         }
 
@@ -834,41 +867,33 @@ class PdfExportController extends Controller
         foreach (Phan8PdfService::buildPdfPages($req, '8b') as $idx => $phan8Page) {
             $pagePhan8Path = $tempDir . '/q2p-phan8-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan8Page['view'], $phan8Page['data'], $pagePhan8Path);
-            $pdfsToMerge[] = $pagePhan8Path;
+            $isCover = ($phan8Page['view'] ?? '') === 'pdfs.phan-8.la-so-phan-8-nien-van-cover';
+            self::pushMergeSegment($mergeSegments, $pagePhan8Path, $isCover ? 'all' : null);
             $tempFiles[]   = $pagePhan8Path;
         }
 
-        // ── PHẦN 9: bìa tĩnh (LBTV-236) + nội dung (LBTV-119) (y hệt Q1) ────
-        self::appendStaticPage(
-            $pdfsToMerge,
-            Phan9PdfService::coverImagePath(),
-            'Q2 phan9-bia'
-        );
+        // ── PHẦN 9B: bìa + cuộn thư + nội dung (Cuốn 2) ─────────────────────
+        $phan9Bia = PdfStaticPageCache::resolve(Phan9bPdfService::coverImagePath());
+        if ($phan9Bia !== null) {
+            self::pushMergeSegment($mergeSegments, $phan9Bia, 'all');
+        } else {
+            Log::warning('PdfExport Q2: không tìm thấy bìa Phần 9B');
+        }
 
-        $phan9NguHanh = Phan9aService::normalizeNguHanhDong($nguHanhDong);
-        foreach (Phan9PdfService::buildPdfPages($phan9NguHanh) as $idx => $phan9Page) {
-            $pagePhan9Path = $tempDir . '/q2p-phan9-' . $idx . '-' . $uid . '.pdf';
+        foreach (Phan9bPdfService::buildPdfPages($req, $nguHanhDong, $chatLuongThapThan) as $idx => $phan9Page) {
+            $pagePhan9Path = $tempDir . '/q2p-phan9b-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan9Page['view'], $phan9Page['data'], $pagePhan9Path);
-            $pdfsToMerge[] = $pagePhan9Path;
+            self::pushMergeSegment($mergeSegments, $pagePhan9Path);
             $tempFiles[]   = $pagePhan9Path;
         }
 
-        // ── Phụ lục Q2: 562 → 563 → 564 → 572 → 581 (theo stt tên ảnh) ───────
+        // ── Phụ lục Q2: 562–564 (bìa) + 572, 581 (worksheet — tên footer đen) ─
         $q2AppendixDir = resource_path('views/pdfs/q2-appendix');
-        $q2AppendixBundle = PdfStaticPageCache::resolveBundle('q2-appendix-v1', [
-            $q2AppendixDir . '/page-562.png',
-            $q2AppendixDir . '/page-563.png',
-            $q2AppendixDir . '/page-564.png',
-            $q2AppendixDir . '/page-572.png',
-            $q2AppendixDir . '/page-581.png',
-        ]);
-        if ($q2AppendixBundle !== null) {
-            $pdfsToMerge[] = $q2AppendixBundle;
-        } else {
-            foreach (['page-562.png', 'page-563.png', 'page-564.png', 'page-572.png', 'page-581.png'] as $fname) {
-                self::appendStaticPage($pdfsToMerge, $q2AppendixDir . '/' . $fname, "q2-appendix-$fname");
-            }
-        }
+        self::appendQ2AppendixSegments($mergeSegments, $q2AppendixDir);
+
+        $pdfsToMerge = array_column($mergeSegments, 'path');
+        $whiteNamePages = PdfFooterService::resolveCoverNamePages($mergeSegments);
+        $darkNamePages = PdfFooterService::resolveDarkNamePages($mergeSegments);
 
         // ── Merge + footer (banner 08.png, số trang, tên người nhập) ─────────
         $mergedTemp = $tempDir.'/merged-q2-'.$uid.'.pdf';
@@ -886,7 +911,15 @@ class PdfExportController extends Controller
 
         $fullName = trim((string) $req->input('full_name', ''));
         $tFooter  = microtime(true);
-        if (! PdfFooterService::applyToMergedPdf($mergedTemp, $finalPath, $fullName)) {
+        if (! PdfFooterService::applyToMergedPdf(
+            $mergedTemp,
+            $finalPath,
+            $fullName,
+            PdfFooterService::FIRST_FOOTER_PAGE,
+            PdfFooterService::FIRST_DISPLAY_PAGE_NUMBER,
+            $whiteNamePages,
+            $darkNamePages
+        )) {
             Log::warning('Gắn footer PDF Quyển 2 thất bại — xuất PDF không footer', [
                 'uid' => $uid,
                 'full_name' => $fullName,
@@ -907,6 +940,157 @@ class PdfExportController extends Controller
             'merge_driver'  => PdfMergeService::lastMergeDriver(),
             'segments'      => count($pdfsToMerge),
         ]);
+    }
+
+    /**
+     * @param  array<int, array{path: string, coverPages?: 'all'|array<int, int>}>  $segments
+     */
+    /**
+     * Render NHẬT CHỦ chapter đã phân trang; fallback blade 1 trang nếu không có dữ liệu.
+     *
+     * @param  array<int, array<string, mixed>>  $segments
+     * @param  array<int, string>  $tempFiles
+     * @param  array<int, array<string, mixed>>  $pages
+     * @param  array<string, mixed>  $fallbackData
+     */
+    private static function appendNhatChuChapterPdf(
+        array &$segments,
+        array &$tempFiles,
+        string $tempDir,
+        string $uid,
+        array $pages,
+        string $filePrefix,
+        string $fallbackView,
+        array $fallbackData,
+        ?string $paginatedView = null,
+        array $paginatedExtra = []
+    ): void {
+        $path = $tempDir.'/'.$filePrefix.'-'.$uid.'.pdf';
+
+        if ($pages !== []) {
+            $view = $paginatedView ?? 'pdfs.quyen-1.la-so-bocuc-ngu-hanh';
+            PdfRenderService::saveView($view, array_merge(['pages' => $pages], $paginatedExtra), $path);
+        } else {
+            PdfRenderService::saveView($fallbackView, $fallbackData, $path);
+        }
+
+        self::pushMergeSegment($segments, $path);
+        $tempFiles[] = $path;
+    }
+
+    private static function pushMergeSegment(array &$segments, string $path, $coverPages = null): void
+    {
+        if ($path === '' || ! is_file($path)) {
+            return;
+        }
+
+        $entry = ['path' => $path];
+        if ($coverPages === 'darkName') {
+            $entry['darkNamePages'] = 'all';
+        } elseif ($coverPages !== null) {
+            $entry['coverPages'] = $coverPages;
+        }
+
+        $segments[] = $entry;
+    }
+
+    /**
+     * Kết bài Phần 9 — bìa tối (562–564) + worksheet nền sáng (566–569, 572, 581).
+     *
+     * @param  array<int, string>  $pdfsToMerge
+     * @param  array<int, array{path: string, coverPages?: mixed, darkNamePages?: mixed}>  $mergeSegments
+     */
+    private static function appendPhan9KetBaiSegments(
+        array &$pdfsToMerge,
+        array &$mergeSegments,
+        string $phan9Dir,
+        string $appendixDir
+    ): void {
+        $coverSources = [
+            $appendixDir . '/page-562.png',
+            $appendixDir . '/page-563.png',
+            $appendixDir . '/page-564.png',
+        ];
+
+        $worksheetSources = [
+            $phan9Dir . '/page-566.png',
+            $phan9Dir . '/page-567.png',
+            $phan9Dir . '/page-568.png',
+            $phan9Dir . '/page-569.png',
+            $appendixDir . '/page-572.png',
+            $phan9Dir . '/page-581.png',
+        ];
+
+        $coverBundle = PdfStaticPageCache::resolveBundle('q1-ket-bai-covers-v1', $coverSources);
+        if ($coverBundle !== null) {
+            $pdfsToMerge[] = $coverBundle;
+            self::pushMergeSegment($mergeSegments, $coverBundle, 'all');
+        } else {
+            foreach ($coverSources as $source) {
+                $resolved = PdfStaticPageCache::resolve($source);
+                if ($resolved !== null) {
+                    $pdfsToMerge[] = $resolved;
+                    self::pushMergeSegment($mergeSegments, $resolved, 'all');
+                }
+            }
+        }
+
+        $worksheetBundle = PdfStaticPageCache::resolveBundle('q1-ket-bai-worksheets-v1', $worksheetSources);
+        if ($worksheetBundle !== null) {
+            $pdfsToMerge[] = $worksheetBundle;
+            self::pushMergeSegment($mergeSegments, $worksheetBundle, 'darkName');
+        } else {
+            foreach ($worksheetSources as $source) {
+                $resolved = PdfStaticPageCache::resolve($source);
+                if ($resolved !== null) {
+                    $pdfsToMerge[] = $resolved;
+                    self::pushMergeSegment($mergeSegments, $resolved, 'darkName');
+                }
+            }
+        }
+    }
+
+    /**
+     * Phụ lục cuối Cuốn 2 — bìa tối (562–564) + worksheet nền sáng (572, 581).
+     *
+     * @param  array<int, array{path: string, coverPages?: mixed, darkNamePages?: mixed}>  $mergeSegments
+     */
+    private static function appendQ2AppendixSegments(array &$mergeSegments, string $appendixDir): void
+    {
+        $coverSources = [
+            $appendixDir . '/page-562.png',
+            $appendixDir . '/page-563.png',
+            $appendixDir . '/page-564.png',
+        ];
+
+        $worksheetSources = [
+            $appendixDir . '/page-572.png',
+            $appendixDir . '/page-581.png',
+        ];
+
+        $coverBundle = PdfStaticPageCache::resolveBundle('q2-appendix-covers-v1', $coverSources);
+        if ($coverBundle !== null) {
+            self::pushMergeSegment($mergeSegments, $coverBundle, 'all');
+        } else {
+            foreach ($coverSources as $source) {
+                $resolved = PdfStaticPageCache::resolve($source);
+                if ($resolved !== null) {
+                    self::pushMergeSegment($mergeSegments, $resolved, 'all');
+                }
+            }
+        }
+
+        $worksheetBundle = PdfStaticPageCache::resolveBundle('q2-appendix-worksheets-v1', $worksheetSources);
+        if ($worksheetBundle !== null) {
+            self::pushMergeSegment($mergeSegments, $worksheetBundle, 'darkName');
+        } else {
+            foreach ($worksheetSources as $source) {
+                $resolved = PdfStaticPageCache::resolve($source);
+                if ($resolved !== null) {
+                    self::pushMergeSegment($mergeSegments, $resolved, 'darkName');
+                }
+            }
+        }
     }
 
     /**
@@ -1129,5 +1313,151 @@ class PdfExportController extends Controller
         }
 
         return array_values($paragraphs);
+    }
+
+    /**
+     * Ưu tiên dữ liệu chất lượng đã tính trên web (payload queue PDF) khi job nền
+     * không crawl được Joey Yap hoặc cache calc thiếu strength.
+     *
+     * @param  array<string, mixed>  $batTuData
+     * @param  array<int|string, mixed>  $bieuDoNguHanh
+     * @param  array<int, mixed>  $chatLuongThapThan
+     * @param  array<string, mixed>  $chiSoBieuDoCot
+     * @param  array<string, mixed>  $nguHanhDong
+     */
+    private function applyPrecomputedStrengthData(
+        Request $req,
+        array $batTuData,
+        array &$bieuDoNguHanh,
+        array &$chatLuongThapThan,
+        array &$chiSoBieuDoCot,
+        array &$nguHanhDong
+    ): void {
+        $fromPayload = static fn (string $key): array => self::normalizeStrengthPayload($req->input($key));
+
+        $payloadChatLuong = $fromPayload('chat_luong_thap_than');
+        if ($payloadChatLuong !== [] && ! self::isStrengthDataEmpty($payloadChatLuong)) {
+            $chatLuongThapThan = $payloadChatLuong;
+        }
+
+        $payloadNguHanh = $fromPayload('ngu_hanh_dong');
+        if ($payloadNguHanh !== [] && ! self::isStrengthDataEmpty($payloadNguHanh)) {
+            $nguHanhDong = $payloadNguHanh;
+        } elseif (self::isStrengthDataEmpty($nguHanhDong)) {
+            $rebuilt = self::nguHanhDongFromHanhNoiDungPayload($fromPayload('hanh_noi_dung_nien_van'));
+            if ($rebuilt !== []) {
+                $nguHanhDong = $rebuilt;
+            }
+        }
+
+        $payloadBieuDo = $fromPayload('bieu_do_ngu_hanh');
+        if ($payloadBieuDo !== [] && ! self::isStrengthDataEmpty($payloadBieuDo)) {
+            $bieuDoNguHanh = $payloadBieuDo;
+        }
+
+        $payloadChiSo = $fromPayload('chi_so_bieu_do_cot');
+        if ($payloadChiSo !== [] && self::chiSoBieuDoCotHasData($payloadChiSo)) {
+            $chiSoBieuDoCot = $payloadChiSo;
+        }
+
+        if (
+            ! self::chiSoBieuDoCotHasData($chiSoBieuDoCot)
+            && ! self::isStrengthDataEmpty($chatLuongThapThan)
+            && ! self::isStrengthDataEmpty($nguHanhDong)
+            && $batTuData !== []
+        ) {
+            $chiSoBieuDoCot = BaZiServiceV2::computeChiSoBieuDoCot(
+                $batTuData,
+                $chatLuongThapThan,
+                $nguHanhDong
+            );
+        }
+    }
+
+    /**
+     * @param  mixed  $value
+     * @return array<int|string, mixed>
+     */
+    private static function normalizeStrengthPayload(mixed $value): array
+    {
+        if (! is_array($value)) {
+            return [];
+        }
+
+        return array_filter($value, static fn ($item) => $item !== null);
+    }
+
+    /**
+     * @param  array<int, mixed>  $hanhNoiDung
+     * @return array<string, int>
+     */
+    private static function nguHanhDongFromHanhNoiDungPayload(array $hanhNoiDung): array
+    {
+        $out = [];
+
+        foreach ($hanhNoiDung as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $slug = trim((string) ($item['hanh_slug'] ?? ''));
+            if ($slug === '') {
+                continue;
+            }
+
+            $out[$slug] = (int) ($item['percent'] ?? 0);
+        }
+
+        return self::isStrengthDataEmpty($out) ? [] : $out;
+    }
+
+    /**
+     * @param  array<int|string, mixed>  $data
+     */
+    private static function isStrengthDataEmpty(array $data): bool
+    {
+        if ($data === []) {
+            return true;
+        }
+
+        foreach ($data as $item) {
+            if (is_array($item)) {
+                if ((int) ($item['natal'] ?? 0) > 0 || (int) ($item['annual'] ?? 0) > 0) {
+                    return false;
+                }
+                if (array_filter($item, static fn ($v) => is_numeric($v) && (float) $v > 0) !== []) {
+                    return false;
+                }
+            } elseif (is_numeric($item) && (float) $item > 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param  array<string, mixed>  $chiSo
+     */
+    private static function chiSoBieuDoCotHasData(array $chiSo): bool
+    {
+        if ($chiSo === []) {
+            return false;
+        }
+
+        foreach (['natal', 'annual'] as $scope) {
+            $bucket = $chiSo[$scope] ?? null;
+            if (! is_array($bucket)) {
+                continue;
+            }
+
+            foreach ($bucket as $value) {
+                if (is_numeric($value) && (float) $value > 0) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

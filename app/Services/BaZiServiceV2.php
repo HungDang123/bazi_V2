@@ -6701,7 +6701,7 @@ class BaZiServiceV2
 
         $cacheKey = self::buildCalcCacheKey($fullName, $y, $m, $d, $hour, $minute, $g, $y_detail, $needStrength);
         $cached = Cache::get($cacheKey);
-        if (is_array($cached) && $cached !== []) {
+        if (is_array($cached) && $cached !== [] && self::isCalcCacheHit($cached, $needStrength)) {
             return $cached;
         }
 
@@ -6719,12 +6719,12 @@ class BaZiServiceV2
                 $needStrength
             ): array {
                 $cached = Cache::get($cacheKey);
-                if (is_array($cached) && $cached !== []) {
+                if (is_array($cached) && $cached !== [] && self::isCalcCacheHit($cached, $needStrength)) {
                     return $cached;
                 }
 
                 $result = self::doCalc($fullName, $y, $m, $d, $hour, $minute, $g, $y_detail, $needStrength);
-                if ($result !== []) {
+                if ($result !== [] && self::shouldPersistCalcCache($result, $needStrength)) {
                     $ttl = (int) config('bazi.calc_cache_ttl_seconds', 21600);
                     Cache::put($cacheKey, $result, now()->addSeconds($ttl));
                 }
@@ -6734,6 +6734,83 @@ class BaZiServiceV2
         } catch (LockTimeoutException) {
             return self::doCalc($fullName, $y, $m, $d, $hour, $minute, $g, $y_detail, $needStrength);
         }
+    }
+
+    protected static function isCalcCacheHit(array $cached, bool $needStrength): bool
+    {
+        return ! $needStrength || ! self::calcResultStrengthEmpty($cached);
+    }
+
+    protected static function shouldPersistCalcCache(array $result, bool $needStrength): bool
+    {
+        return ! $needStrength || ! self::calcResultStrengthEmpty($result);
+    }
+
+    protected static function calcResultStrengthEmpty(array $result): bool
+    {
+        return self::isNguHanhDongEmpty($result['ngu_hanh_dong'] ?? [])
+            && self::isChatLuongThapThanEmpty($result['chat_luong_thap_than'] ?? []);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected static function isNguHanhDongEmpty(array $data): bool
+    {
+        if ($data === []) {
+            return true;
+        }
+
+        foreach ($data as $value) {
+            if (is_numeric($value) && (float) $value > 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param  array<int, mixed>  $data
+     */
+    protected static function isChatLuongThapThanEmpty(array $data): bool
+    {
+        if ($data === []) {
+            return true;
+        }
+
+        foreach ($data as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            if ((int) ($item['natal'] ?? 0) > 0 || (int) ($item['annual'] ?? 0) > 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    protected static function buildCrawlerCacheKey(
+        int $y,
+        int $m,
+        int $d,
+        ?int $hour,
+        ?int $minute,
+        bool $unknownTime,
+        int $genderCode
+    ): string {
+        return sprintf(
+            'bazi_crawl:%04d-%02d-%02d:%s:%s:%d:%d',
+            $y,
+            $m,
+            $d,
+            $hour === null ? 'x' : $hour,
+            $minute === null ? 'x' : $minute,
+            $unknownTime ? 1 : 0,
+            $genderCode
+        );
     }
 
     protected static function calcCacheEnabled(): bool
@@ -6929,25 +7006,17 @@ class BaZiServiceV2
         $phantramnienvan = [];
         $chatluongthapthan = [];
         if ($needStrength && !request()->has('export_pdf') && !request()->has('calc_sim')) {
+            $genderCode = $g == 'male' ? 0 : 1;
+            $unknownTime = $hour === null;
+            $crawlerCacheKey = self::buildCrawlerCacheKey($y, $m, $d, $hour, $minute, $unknownTime, $genderCode);
+
             try {
-                $genderCode = $g == 'male' ? 0 : 1;
-                $unknownTime = $hour === null;
-                $cacheKey = sprintf(
-                    'bazi_crawl:%04d-%02d-%02d:%s:%s:%d:%d',
-                    $y,
-                    $m,
-                    $d,
-                    $hour === null ? 'x' : $hour,
-                    $minute === null ? 'x' : $minute,
-                    $unknownTime ? 1 : 0,
-                    $genderCode
-                );
                 $crawlerData = \Illuminate\Support\Facades\Cache::remember(
-                    $cacheKey,
+                    $crawlerCacheKey,
                     now()->addHours(24),
                     function () use ($d, $m, $y, $hour, $minute, $unknownTime, $genderCode) {
                         $crawler = new JoeyYapCrawlerService();
-                        return $crawler->queryProfilesStrengthChart(
+                        $data = $crawler->queryProfilesStrengthChart(
                             day: $d,
                             month: $m,
                             year: $y,
@@ -6956,6 +7025,12 @@ class BaZiServiceV2
                             isTimeOfBirthUnknown: $unknownTime,
                             gender: $genderCode,
                         );
+
+                        if (! isset($data['five_structures'], $data['strength_data'])) {
+                            throw new \RuntimeException('Crawler response thiếu five_structures/strength_data');
+                        }
+
+                        return $data;
                     }
                 );
                 $chatluongnguhanh = self::chatluongnguhanh(Str::slug($arrMenh['day']['can']), $crawlerData);
@@ -6963,6 +7038,7 @@ class BaZiServiceV2
                 $phantramnienvan = $chatluongnguhanh['nienvan'];
                 $chatluongthapthan = $chatluongnguhanh['chatluongthapthan'];
             } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Cache::forget($crawlerCacheKey);
                 \Illuminate\Support\Facades\Log::warning('BaZiServiceV2: Crawler thất bại – ' . $e->getMessage());
             }
         }
@@ -7049,6 +7125,13 @@ class BaZiServiceV2
             'chat_luong_thap_than' => $chatluongthapthan,
             'bieu_do_ngu_hanh' => $bieuDoNguHanh,
         ];
+    }
+
+    public static function computeChiSoBieuDoCot(array $batTu, array $chatLuongThapThan, array $nguHanhDong): array
+    {
+        $dayStem = trim((string) ($batTu['day']['can']['thien_can'] ?? ''));
+
+        return self::tinhChiSoBieuDoCot($batTu, $chatLuongThapThan, $nguHanhDong, $dayStem);
     }
 
     protected static function tinhChiSoBieuDoCot(array $batTu, array $chatLuongThapThan, array $nguHanhDong, string $dayStem): array

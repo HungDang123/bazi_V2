@@ -49,13 +49,18 @@ class PdfFooterService
 
     /**
      * Gắn footer (banner 08.png + số trang + tên) lên từng trang PDF đã merge.
+     *
+     * @param  array<int, int>  $whiteNamePhysicalPages  Số trang vật lý (1-based) dùng chữ trắng cho tên
+     * @param  array<int, int>  $darkNamePhysicalPages   Số trang vật lý (1-based) luôn dùng chữ đen (ghi đè trang cuối / bìa)
      */
     public static function applyToMergedPdf(
         string $inputPdf,
         string $outputPdf,
         string $fullName,
         int $firstFooterPage = self::FIRST_FOOTER_PAGE,
-        int $firstDisplayPage = self::FIRST_DISPLAY_PAGE_NUMBER
+        int $firstDisplayPage = self::FIRST_DISPLAY_PAGE_NUMBER,
+        array $whiteNamePhysicalPages = [],
+        array $darkNamePhysicalPages = []
     ): bool {
         if (! file_exists($inputPdf)) {
             return false;
@@ -91,7 +96,18 @@ class PdfFooterService
 
                 $displayPage = $firstDisplayPage + ($pageNo - $firstFooterPage);
                 $isLastPage  = $pageNo === $pageCount;
-                self::drawFooterOnPage($pdf, $pageW, $pageH, $displayPage, $fullName, $opaqueBanner, $isLastPage);
+                self::drawFooterOnPage(
+                    $pdf,
+                    $pageW,
+                    $pageH,
+                    $displayPage,
+                    $fullName,
+                    $opaqueBanner,
+                    $isLastPage,
+                    $pageNo,
+                    $whiteNamePhysicalPages,
+                    $darkNamePhysicalPages
+                );
             }
 
             $outputDir = dirname($outputPdf);
@@ -113,7 +129,102 @@ class PdfFooterService
     }
 
     /**
+     * @param  array<int, array{path: string, coverPages?: 'all'|array<int, int>}>  $segments
+     * @return array<int, int>
+     */
+    public static function resolveCoverNamePages(array $segments, int $firstFooterPage = self::FIRST_FOOTER_PAGE): array
+    {
+        $white = [];
+        $physical = 0;
+
+        foreach ($segments as $segment) {
+            $path = (string) ($segment['path'] ?? '');
+            if ($path === '' || ! is_file($path)) {
+                continue;
+            }
+
+            $pageCount  = self::countPdfPages($path);
+            $coverPages = $segment['coverPages'] ?? null;
+
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $physical++;
+
+                if ($physical < $firstFooterPage) {
+                    continue;
+                }
+
+                $isCover = $coverPages === 'all'
+                    || (is_array($coverPages) && in_array($i, $coverPages, true));
+
+                if ($isCover) {
+                    $white[] = $physical;
+                }
+            }
+        }
+
+        return $white;
+    }
+
+    /**
+     * Trang worksheet nền sáng — luôn chữ đen (ghi đè quy tắc trang cuối / bìa).
+     *
+     * @param  array<int, array{path: string, coverPages?: 'all'|array<int, int>, darkNamePages?: 'all'|array<int, int>}>  $segments
+     * @return array<int, int>
+     */
+    public static function resolveDarkNamePages(array $segments, int $firstFooterPage = self::FIRST_FOOTER_PAGE): array
+    {
+        $dark = [];
+        $physical = 0;
+
+        foreach ($segments as $segment) {
+            $path = (string) ($segment['path'] ?? '');
+            if ($path === '' || ! is_file($path)) {
+                continue;
+            }
+
+            $pageCount     = self::countPdfPages($path);
+            $darkNamePages = $segment['darkNamePages'] ?? null;
+
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $physical++;
+
+                if ($physical < $firstFooterPage) {
+                    continue;
+                }
+
+                $forceDark = $darkNamePages === 'all'
+                    || (is_array($darkNamePages) && in_array($i, $darkNamePages, true));
+
+                if ($forceDark) {
+                    $dark[] = $physical;
+                }
+            }
+        }
+
+        return $dark;
+    }
+
+    public static function countPdfPages(string $path): int
+    {
+        if (! is_file($path)) {
+            return 0;
+        }
+
+        try {
+            $pdf = new Fpdi();
+            $count = $pdf->setSourceFile($path);
+
+            return max(0, (int) $count);
+        } catch (\Throwable) {
+            return 0;
+        }
+    }
+
+    /**
      * Đặt badge (SVG → Imagick transparent PNG) + tên (Imagick transparent PNG) lên trang PDF.
+     *
+     * @param  array<int, int>  $whiteNamePhysicalPages
+     * @param  array<int, int>  $darkNamePhysicalPages
      */
     private static function drawFooterOnPage(
         Fpdi $pdf,
@@ -122,7 +233,10 @@ class PdfFooterService
         int $displayPage,
         string $fullName,
         string $opaqueBanner,
-        bool $isLastPage = false
+        bool $isLastPage = false,
+        int $physicalPageNo = 0,
+        array $whiteNamePhysicalPages = [],
+        array $darkNamePhysicalPages = []
     ): void {
         $badgePath = self::renderBadgeStrip($displayPage, $opaqueBanner);
         if ($badgePath === null || ! file_exists($badgePath)) {
@@ -140,8 +254,13 @@ class PdfFooterService
 
         $displayName = trim($fullName) !== '' ? mb_strtoupper(trim($fullName), 'UTF-8') : '';
 
-        // Trang đầu + trang cuối thường nền tối → chữ trắng; các trang giữa → chữ đen
-        $whiteText = $isLastPage || ($displayPage === self::FIRST_DISPLAY_PAGE_NUMBER);
+        // Trang đầu + trang cuối + trang bìa (nền tối) → chữ trắng; worksheet nền sáng → luôn chữ đen
+        $forceDarkName = $physicalPageNo > 0 && in_array($physicalPageNo, $darkNamePhysicalPages, true);
+        $whiteText = ! $forceDarkName && (
+            $isLastPage
+            || ($displayPage === self::FIRST_DISPLAY_PAGE_NUMBER)
+            || ($physicalPageNo > 0 && in_array($physicalPageNo, $whiteNamePhysicalPages, true))
+        );
         $namePath  = $displayName !== '' ? self::renderNameStrip($displayName, $whiteText) : null;
         $nameWmm  = 0.0;
         $nameHmm  = 0.0;

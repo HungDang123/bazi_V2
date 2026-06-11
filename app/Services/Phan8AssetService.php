@@ -25,7 +25,7 @@ class Phan8AssetService
         return self::resourceDir().'/dai-van-coding-bg.png';
     }
 
-    /** Nền nội dung II. Niên Vận (LBTV-577). */
+    /** Nền nội dung Niên Vận + Phần 6 (Cuốn 1) — nien-van-bg.png. */
     public static function nienVanBgPath(): string
     {
         return self::resourceDir().'/nien-van-bg.png';

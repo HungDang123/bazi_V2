@@ -7,6 +7,9 @@ namespace App\Services\Pdf;
  */
 class PdfContentPaginator
 {
+    /** Slack mm khi đặt cả khối traits sau khi split thất bại. */
+    private const TRAITS_WHOLE_BLOCK_SLACK_MM = 4.0;
+
     /**
      * @param  array<int, array<string, mixed>>  $blocks
      * @return array<int, array<string, mixed>>
@@ -142,7 +145,8 @@ class PdfContentPaginator
             if ($chunk !== [] && ($used + $need) > $maxMm) {
                 // Traits không vừa phần còn lại → tách phần đầu vào trang này
                 if ($type === 'traits') {
-                    [$head, $tail] = self::splitTraitsBlock($block, $maxMm - $used);
+                    $available = $maxMm - $used;
+                    [$head, $tail] = self::splitTraitsBlock($block, $available, $config);
                     if ($head !== null) {
                         $chunk[] = $head;
                         $used   += self::blockHeightMm($head, $config);
@@ -153,6 +157,14 @@ class PdfContentPaginator
                         }
 
                         return [$chunk, $rest, $used];
+                    }
+
+                    if ($need <= $available + self::TRAITS_WHOLE_BLOCK_SLACK_MM) {
+                        $chunk[] = $block;
+                        $used   += $need;
+                        $idx++;
+
+                        return [$chunk, array_slice($blocks, $idx), $used];
                     }
 
                     break;
@@ -198,7 +210,7 @@ class PdfContentPaginator
 
             if ($chunk === [] && $need > $maxMm && $type === 'traits') {
                 // Traits cao hơn cả trang — tách, phần dư qua trang sau (tránh clip chữ)
-                [$head, $tail] = self::splitTraitsBlock($block, $maxMm);
+                [$head, $tail] = self::splitTraitsBlock($block, $maxMm, $config);
                 if ($head !== null) {
                     $chunk[] = $head;
                     $used   += self::blockHeightMm($head, $config);
@@ -252,12 +264,13 @@ class PdfContentPaginator
      * @param  array<string, mixed>  $block
      * @return array{0: array<string, mixed>|null, 1: array<string, mixed>|null}
      */
-    private static function splitTraitsBlock(array $block, float $availableMm): array
+    private static function splitTraitsBlock(array $block, float $availableMm, PdfPaginationConfig $config): array
     {
         $split = Phan5TraitLayout::splitByHeight(
             (string) ($block['tichCuc'] ?? ''),
             (string) ($block['tieuCuc'] ?? ''),
-            $availableMm
+            $availableMm,
+            $config->contentWidthMm
         );
 
         if ($split === null) {
@@ -283,6 +296,7 @@ class PdfContentPaginator
             'chien_luoc_title',
             'red_title',
             'huong_label',
+            'chapter_title',
         ], true)) {
             return true;
         }
@@ -324,9 +338,14 @@ class PdfContentPaginator
             return $need;
         }
 
-        // Label-like blocks: chỉ cần ~12mm theo sau (1–2 dòng đầu)
-        $labelTypes = ['muc_label', 'sub_title', 'section_title', 'chien_luoc_title', 'red_title', 'huong_label'];
+        // Label-like blocks: tránh orphan heading — sub_title phải kèm toàn bộ đoạn kế tiếp
+        $labelTypes = ['muc_label', 'sub_title', 'section_title', 'chien_luoc_title', 'red_title', 'huong_label', 'chapter_title'];
         if (in_array($type, $labelTypes, true)) {
+            $nextType = (string) ($next['type'] ?? '');
+            if (in_array($type, ['sub_title', 'chapter_title'], true) && in_array($nextType, ['para', 'sub_title'], true)) {
+                return $need;
+            }
+
             return min($need, 12.0);
         }
 

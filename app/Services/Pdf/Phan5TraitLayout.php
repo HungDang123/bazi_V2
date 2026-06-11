@@ -3,59 +3,76 @@
 namespace App\Services\Pdf;
 
 /**
- * Chiều cao khối Tích cực / Tiêu cực — đo bằng font metrics thật (khớp DomPDF).
+ * Chiều cao khối Tích cực / Tiêu cực — đo bằng font metrics DomPDF (cùng helper với para Phần 5).
  */
 class Phan5TraitLayout
 {
-    /**
-     * Độ rộng text 1 cột — hẹp hơn thực tế một chút để ước lượng đủ dòng (tránh clip).
-     * (166mm − spacing)/2 − border − padding ≈ 66–68mm; dùng 66mm an toàn.
-     */
-    public const COL_TEXT_WIDTH_MM = 66.0;
+    /** Khớp phan5 profile — 14px × 140% line-height. */
+    public const LINE_MM = 5.3;
 
-    /** 14px × 140% line-height ≈ 5.2mm + buffer DomPDF justify. */
-    public const LINE_MM = 5.85;
-
-    /** margin-bottom 2.5mm giữa các <p>. */
+    /** margin-bottom 2.5mm giữa các <p> — khớp .trait-body-cell p */
     public const P_MARGIN_MM = 2.5;
 
-    /** padding-bottom 4mm + buffer dưới cùng. */
+    /** padding-bottom 4mm + buffer nhỏ dưới body. */
     public const BODY_PADDING_MM = 10.0;
 
-    /** Đệm cuối — box ép height, thiếu 2–3mm sẽ clip dòng cuối. */
-    public const BOX_SAFETY_MM = 3.0;
+    /** Đệm chống clip dòng cuối khi box ép height. */
+    public const BOX_SAFETY_MM = 1.5;
 
     public const ROW_MARGIN_MM = 6.0;
 
-    /** Chiều cao phần body 1 cột (đo từng đoạn bằng độ rộng thật). */
-    public static function bodyHeightMm(?string $text): float
+    /** border-spacing giữa 2 cột traits-row. */
+    public const COL_SPACING_MM = 4.0;
+
+    /** padding ngang .trait-body-cell (4mm × 2). */
+    public const COL_BODY_PADDING_H_MM = 8.0;
+
+    /** border 0.5mm × 2 mỗi cột. */
+    public const COL_BORDER_MM = 1.0;
+
+    public const DEFAULT_CONTENT_WIDTH_MM = 166.0;
+
+    /**
+     * Độ rộng vùng text 1 cột — khớp CSS traits-row (table 166mm, 50% col, padding, border).
+     */
+    public static function colTextWidthMm(float $contentWidthMm = self::DEFAULT_CONTENT_WIDTH_MM): float
+    {
+        $colInner = ($contentWidthMm - self::COL_SPACING_MM) / 2.0;
+
+        return max(50.0, $colInner - self::COL_BODY_PADDING_H_MM - self::COL_BORDER_MM);
+    }
+
+    /** Chiều cao phần body 1 cột (DomPDF font metrics). */
+    public static function bodyHeightMm(?string $text, float $contentWidthMm = self::DEFAULT_CONTENT_WIDTH_MM): float
     {
         if ($text === null || trim($text) === '') {
             return 0.0;
         }
 
-        $paras = [];
+        $colWidth = self::colTextWidthMm($contentWidthMm);
+        $lines    = [];
         foreach (preg_split('/\r\n|\r|\n/', $text) ?: [] as $line) {
             $line = trim($line);
-            if ($line !== '') {
-                $paras[] = $line;
+            if ($line === '') {
+                continue;
             }
-        }
-
-        if ($paras === []) {
-            return 0.0;
-        }
-
-        $height = 0.0;
-        $lastIdx = count($paras) - 1;
-        foreach ($paras as $i => $line) {
             if (preg_match('/^[-–•]\s*/u', $line)) {
                 $line = preg_replace('/^[-–•]\s*/u', '– ', $line);
             } else {
                 $line = '– '.$line;
             }
-            $lines = PdfTextWrapHelper::lineCountByWidth($line, self::COL_TEXT_WIDTH_MM);
-            $height += $lines * self::LINE_MM;
+            $lines[] = $line;
+        }
+
+        if ($lines === []) {
+            return 0.0;
+        }
+
+        $height = 0.0;
+        $lastIdx = count($lines) - 1;
+        foreach ($lines as $i => $line) {
+            $lineCount = PdfTextWrapHelper::lineCountByWidth($line, $colWidth);
+            $height += $lineCount * self::LINE_MM;
             if ($i < $lastIdx) {
                 $height += self::P_MARGIN_MM;
             }
@@ -69,9 +86,17 @@ class Phan5TraitLayout
         return round(2.5 + $pillHeightMm + 2.0 + 1.5, 2);
     }
 
-    public static function boxHeightMm(?string $tichCuc, ?string $tieuCuc, float $pillHeightMm = 11.0): float
-    {
-        $maxBody = max(self::bodyHeightMm($tichCuc), self::bodyHeightMm($tieuCuc), self::LINE_MM);
+    public static function boxHeightMm(
+        ?string $tichCuc,
+        ?string $tieuCuc,
+        float $pillHeightMm = 11.0,
+        float $contentWidthMm = self::DEFAULT_CONTENT_WIDTH_MM
+    ): float {
+        $maxBody = max(
+            self::bodyHeightMm($tichCuc, $contentWidthMm),
+            self::bodyHeightMm($tieuCuc, $contentWidthMm),
+            self::LINE_MM
+        );
 
         return round(
             self::pillSectionHeightMm($pillHeightMm) + $maxBody + self::BODY_PADDING_MM + self::BOX_SAFETY_MM,
@@ -79,9 +104,12 @@ class Phan5TraitLayout
         );
     }
 
-    public static function blockHeightMm(?string $tichCuc, ?string $tieuCuc): float
-    {
-        return self::boxHeightMm($tichCuc, $tieuCuc) + self::ROW_MARGIN_MM;
+    public static function blockHeightMm(
+        ?string $tichCuc,
+        ?string $tieuCuc,
+        float $contentWidthMm = self::DEFAULT_CONTENT_WIDTH_MM
+    ): float {
+        return self::boxHeightMm($tichCuc, $tieuCuc, 11.0, $contentWidthMm) + self::ROW_MARGIN_MM;
     }
 
     /**
@@ -91,23 +119,31 @@ class Phan5TraitLayout
      * @return array{0: string, 1: string, 2: string, 3: string}|null
      *         [headTich, headTieu, tailTich, tailTieu] — null nếu không cần/không thể tách
      */
-    public static function splitByHeight(?string $tichCuc, ?string $tieuCuc, float $availableMm): ?array
-    {
-        $bodyBudget = $availableMm - self::pillSectionHeightMm() - self::BODY_PADDING_MM - self::BOX_SAFETY_MM - self::ROW_MARGIN_MM;
+    public static function splitByHeight(
+        ?string $tichCuc,
+        ?string $tieuCuc,
+        float $availableMm,
+        float $contentWidthMm = self::DEFAULT_CONTENT_WIDTH_MM
+    ): ?array {
+        $bodyBudget = $availableMm
+            - self::pillSectionHeightMm()
+            - self::BODY_PADDING_MM
+            - self::BOX_SAFETY_MM
+            - self::ROW_MARGIN_MM;
 
-        // Dưới ~3 dòng thì không đáng tách — đẩy nguyên khối sang trang sau
-        if ($bodyBudget < self::LINE_MM * 3 + self::P_MARGIN_MM) {
+        // Dưới ~2 dòng thì không tách — paginator sẽ thử đặt cả khối hoặc sang trang sau
+        if ($bodyBudget < self::LINE_MM * 2 + self::P_MARGIN_MM) {
             return null;
         }
 
-        [$headTich, $tailTich] = self::takeParas($tichCuc, $bodyBudget);
-        [$headTieu, $tailTieu] = self::takeParas($tieuCuc, $bodyBudget);
+        [$headTich, $tailTich] = self::takeParas($tichCuc, $bodyBudget, $contentWidthMm);
+        [$headTieu, $tailTieu] = self::takeParas($tieuCuc, $bodyBudget, $contentWidthMm);
 
         if ($tailTich === '' && $tailTieu === '') {
-            return null; // vừa nguyên khối, không cần tách
+            return null;
         }
         if ($headTich === '' && $headTieu === '') {
-            return null; // không nhét được đoạn nào
+            return null;
         }
 
         return [$headTich, $headTieu, $tailTich, $tailTieu];
@@ -118,15 +154,20 @@ class Phan5TraitLayout
      *
      * @return array{0: string, 1: string}
      */
-    protected static function takeParas(?string $text, float $budgetMm): array
-    {
+    protected static function takeParas(
+        ?string $text,
+        float $budgetMm,
+        float $contentWidthMm = self::DEFAULT_CONTENT_WIDTH_MM
+    ): array {
         if ($text === null || trim($text) === '') {
             return ['', ''];
         }
 
-        $head = [];
-        $tail = [];
-        $height = 0.0;
+        $colWidth = self::colTextWidthMm($contentWidthMm);
+        $head     = [];
+        $tail     = [];
+        $height   = 0.0;
+
         foreach (preg_split('/\r\n|\r|\n/', $text) ?: [] as $line) {
             $line = trim($line);
             if ($line === '') {
@@ -137,11 +178,13 @@ class Phan5TraitLayout
 
                 continue;
             }
-            $lines = PdfTextWrapHelper::lineCountByWidth(
-                preg_match('/^[-–•]\s*/u', $line) ? preg_replace('/^[-–•]\s*/u', '– ', $line) : '– '.$line,
-                self::COL_TEXT_WIDTH_MM
-            );
-            $h = ($lines * self::LINE_MM) + self::P_MARGIN_MM;
+
+            $formatted = preg_match('/^[-–•]\s*/u', $line)
+                ? preg_replace('/^[-–•]\s*/u', '– ', $line)
+                : '– '.$line;
+            $lineCount = PdfTextWrapHelper::lineCountByWidth($formatted, $colWidth);
+            $h         = ($lineCount * self::LINE_MM) + self::P_MARGIN_MM;
+
             if ($height + $h > $budgetMm + 0.01) {
                 $tail[] = $line;
             } else {

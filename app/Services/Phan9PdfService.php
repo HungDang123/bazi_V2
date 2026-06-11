@@ -11,11 +11,15 @@ use App\Models\Phan9aNoiLuc;
 /**
  * Xây dựng trang PDF Phần 9 – Giải Pháp Tối Ưu Để Kiến Tạo Vận Mệnh.
  *
- * Bìa   : LBTV-236 (ảnh tĩnh) – xử lý ở PdfExportController.
- * Nội dung: LBTV-119 (page-content-bg.png) + la-so-phan-8-content (tái sử dụng).
+ * Bìa   : LBTV-236 (bia-phan-9.png) – xử lý ở PdfExportController.
+ * Trang 2: giai-phap-bg.png + mục I (nội dung render lên nền cuộn thư).
+ * Tiếp  : page-content-bg.png + la-so-phan-8-content.
  */
 class Phan9PdfService
 {
+    /** Vùng nội dung dưới cuộn thư trên giai-phap-bg.png (giống LBTV-583 Phần 7). */
+    public const INTRO_FIRST_PAGE_TOP_MM = 74.0;
+
     public static function coverImagePath(): string
     {
         return resource_path('views/pdfs/phan-9/bia-phan-9.png');
@@ -24,6 +28,12 @@ class Phan9PdfService
     public static function contentBgPath(): string
     {
         return resource_path('views/pdfs/phan-9/page-content-bg.png');
+    }
+
+    /** Trang cuộn thư trước Mục I (LBTV). */
+    public static function introScrollPath(): string
+    {
+        return resource_path('views/pdfs/phan-9/giai-phap-bg.png');
     }
 
     /**
@@ -40,7 +50,10 @@ class Phan9PdfService
         }
 
         $bgPath = self::contentBgPath();
-        $pages = PdfContentPaginator::paginate($blocks, PdfPaginationProfiles::phan9($bgPath));
+        $pages = PdfContentPaginator::paginate(
+            $blocks,
+            PdfPaginationProfiles::phan9WithIntro($bgPath, self::introScrollPath())
+        );
 
         if ($pages === []) {
             return [];

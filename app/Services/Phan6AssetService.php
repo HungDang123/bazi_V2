@@ -39,9 +39,7 @@ class Phan6AssetService
 
     public static function contentBgPath(): string
     {
-        $path = self::resourceDir().'/page-content-bg.png';
-
-        return is_file($path) ? $path : $path;
+        return Phan8AssetService::nienVanBgPath();
     }
 
     public static function resolveImagePath(?string $urlOrPath): ?string
