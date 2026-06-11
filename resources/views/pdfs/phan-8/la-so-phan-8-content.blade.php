@@ -28,7 +28,6 @@
             color: #6E0101;
             font-weight: bold;
             text-transform: uppercase;
-            border-bottom: 1px solid #C9A227;
             padding-bottom: 3px;
             margin-bottom: 8px;
             font-size: 16px;
@@ -59,6 +58,7 @@
             padding-bottom: 2mm;
             color: #1A1A1A;
             background: transparent;
+            text-align: justify;
         }
         .para-text p:last-child { padding-bottom: 0; }
 
@@ -72,7 +72,7 @@
 @foreach ($pages as $page)
 <div class="page">
     <img class="bg-img" src="{{ $page['bgPath'] }}">
-    <div class="content-zone" style="left:{{ $page['contentLeftMm'] ?? 24 }}mm;width:{{ $page['contentWidthMm'] ?? 162 }}mm;top:{{ $page['contentZoneTopMm'] ?? 18 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 187.1 }}mm;">
+    <div class="content-zone" style="left:{{ $page['contentLeftMm'] ?? 24 }}mm;width:{{ $page['contentWidthMm'] ?? 162 }}mm;top:{{ $page['contentZoneTopMm'] ?? 18 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 252.45 }}mm;">
 @if (!empty($page['chapterTitle']))
         <div class="chapter-title">{{ $page['chapterTitle'] }}</div>
         @endif

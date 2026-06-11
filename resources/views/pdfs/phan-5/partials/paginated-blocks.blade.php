@@ -22,9 +22,14 @@
     ])
     @elseif ($type === 'image')
     @php
-        $imgStyle = 'display:block;width:100%;height:auto;margin:0 auto 4mm;object-fit:contain;';
-        if (! empty($block['maxHeightMm'])) {
-            $imgStyle .= 'max-height:'.$block['maxHeightMm'].'mm;';
+        if (! empty($block['renderWidthMm']) && ! empty($block['renderHeightMm'])) {
+            $imgStyle = sprintf(
+                'display:block;width:%smm;height:%smm;margin:0 auto 4mm;',
+                $block['renderWidthMm'],
+                $block['renderHeightMm']
+            );
+        } else {
+            $imgStyle = 'display:block;width:100%;height:auto;margin:0 auto 4mm;';
         }
     @endphp
     <img class="content-img{{ ($imageClass ?? '') !== '' ? ' '.$imageClass : '' }}"

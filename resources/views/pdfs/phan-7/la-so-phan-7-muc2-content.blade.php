@@ -87,10 +87,10 @@
         /* ── Thập Thần illustration image ── */
         .content-img {
             display: block;
-            width: 154mm;
-            max-width: 154mm;
+            width: 162mm;
+            max-width: 162mm;
             height: auto;
-            margin: 2mm 0 3mm;
+            margin: 2mm auto 3mm;
         }
     </style>
 </head>
@@ -118,12 +118,21 @@
             <div class="section-label">{{ $block['text'] ?? '' }}</div>
 
             @elseif ($type === 'image')
-            <img class="content-img"
-                 src="{{ $block['path'] }}"
-                 @if (!empty($block['maxHeightMm']))
-                 style="max-height: {{ $block['maxHeightMm'] }}mm;"
-                 @endif
-            >
+            @php
+                if (! empty($block['renderWidthMm']) && ! empty($block['renderHeightMm'])) {
+                    $imgStyle = sprintf(
+                        'display:block;width:%smm;height:%smm;margin:2mm auto 3mm;',
+                        $block['renderWidthMm'],
+                        $block['renderHeightMm']
+                    );
+                } else {
+                    $imgStyle = 'display:block;width:162mm;max-width:162mm;height:auto;margin:2mm auto 3mm;';
+                    if (! empty($block['maxHeightMm'])) {
+                        $imgStyle .= 'max-height:'.$block['maxHeightMm'].'mm;';
+                    }
+                }
+            @endphp
+            <img class="content-img" style="{{ $imgStyle }}" src="{{ $block['path'] }}" alt="">
 
             @else
             <div class="para-text">

@@ -119,6 +119,202 @@ class NguHanhTitleRenderer
     }
 
     /**
+     * Render nút pill (Tích cực / Tiêu cực) — gradient + bóng đổ, chữ trắng đậm.
+     * DomPDF không hỗ trợ box-shadow/linear-gradient nên phải dùng ảnh.
+     *
+     * @param array{0: int, 1: int, 2: int} $colorTop
+     * @param array{0: int, 1: int, 2: int} $colorBottom
+     */
+    public static function pillImagePath(
+        string $text,
+        array $colorTop,
+        array $colorBottom,
+        int $fontPx = 12
+    ): string {
+        $text = trim($text);
+        if ($text === '' || ! function_exists('imagettfbbox')) {
+            return '';
+        }
+
+        $font = \App\Services\PdfFontService::boldFontPath();
+        if ($font === '' || ! is_file($font)) {
+            return '';
+        }
+
+        $cacheKey = 'pill|'.$text.'|'.implode(',', $colorTop).'|'.implode(',', $colorBottom).'|'.$fontPx;
+        $cacheDir = storage_path('app/pdf-cache/titles');
+        if (! is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+
+        $file = $cacheDir.DIRECTORY_SEPARATOR.hash('xxh128', $cacheKey).'.png';
+        if (is_file($file)) {
+            return $file;
+        }
+
+        $scale    = self::RENDER_SCALE;
+        $fontSize = $fontPx * $scale;
+
+        $bbox  = imagettfbbox($fontSize, 0, $font, $text);
+        $textW = abs($bbox[2] - $bbox[0]);
+        $textH = abs($bbox[7] - $bbox[1]);
+
+        $padX = (int) round($fontSize * 1.6);
+        $padY = (int) round($fontSize * 0.55);
+
+        $pillW = $textW + $padX * 2;
+        $pillH = $textH + $padY * 2;
+        $radius = (int) floor($pillH / 2);
+
+        // Lề cho bóng đổ
+        $shadowOffset = (int) round($scale * 2.2);
+        $margin = $shadowOffset * 3;
+
+        $w = $pillW + $margin * 2;
+        $h = $pillH + $margin * 2;
+
+        $im = imagecreatetruecolor($w, $h);
+        imagesavealpha($im, true);
+        imagealphablending($im, false);
+        imagefill($im, 0, 0, imagecolorallocatealpha($im, 0, 0, 0, 127));
+        imagealphablending($im, true);
+
+        $x0 = $margin;
+        $y0 = $margin;
+
+        // Bóng đổ: vẽ pill đen mờ lệch xuống, làm mềm bằng gaussian blur
+        $shadow = imagecolorallocatealpha($im, 0, 0, 0, 88);
+        self::filledRoundRect($im, $x0 + $shadowOffset, $y0 + $shadowOffset * 2, $pillW, $pillH, $radius, $shadow);
+        for ($i = 0; $i < 6; $i++) {
+            imagefilter($im, IMG_FILTER_GAUSSIAN_BLUR);
+        }
+
+        // Pill gradient dọc
+        for ($row = 0; $row < $pillH; $row++) {
+            $t = $pillH > 1 ? $row / ($pillH - 1) : 0;
+            $r = (int) round($colorTop[0] + ($colorBottom[0] - $colorTop[0]) * $t);
+            $g = (int) round($colorTop[1] + ($colorBottom[1] - $colorTop[1]) * $t);
+            $b = (int) round($colorTop[2] + ($colorBottom[2] - $colorTop[2]) * $t);
+            $color = imagecolorallocate($im, $r, $g, $b);
+
+            $dy = $row - $radius;
+            if ($row < $radius) {
+                $dx = (int) round($radius - sqrt(max(0, $radius ** 2 - $dy ** 2)));
+            } elseif ($row >= $pillH - $radius) {
+                $dy = $row - ($pillH - $radius - 1);
+                $dx = (int) round($radius - sqrt(max(0, $radius ** 2 - $dy ** 2)));
+            } else {
+                $dx = 0;
+            }
+
+            imageline($im, $x0 + $dx, $y0 + $row, $x0 + $pillW - 1 - $dx, $y0 + $row, $color);
+        }
+
+        // Chữ trắng căn giữa
+        $white = imagecolorallocate($im, 255, 255, 255);
+        $tx = $x0 + (int) round(($pillW - $textW) / 2) - $bbox[0];
+        $ty = $y0 + (int) round(($pillH - $textH) / 2) + (int) abs($bbox[7]);
+        imagettftext($im, $fontSize, 0, $tx, $ty, $white, $font, $text);
+
+        imagepng($im, $file);
+        imagedestroy($im);
+
+        return $file;
+    }
+
+    /** Kích thước hiển thị pill (mm) — tỉ lệ từ PNG đã render. */
+    public static function pillDisplaySizeMm(string $path, float $heightMm = 11.0): array
+    {
+        $info = @getimagesize($path);
+        if ($info === false || ($info[1] ?? 0) <= 0) {
+            return ['widthMm' => 30.0, 'heightMm' => $heightMm];
+        }
+
+        return [
+            'widthMm' => round($heightMm * $info[0] / $info[1], 2),
+            'heightMm' => $heightMm,
+        ];
+    }
+
+    private static function filledRoundRect($im, int $x, int $y, int $w, int $h, int $radius, int $color): void
+    {
+        imagefilledrectangle($im, $x + $radius, $y, $x + $w - 1 - $radius, $y + $h - 1, $color);
+        imagefilledrectangle($im, $x, $y + $radius, $x + $w - 1, $y + $h - 1 - $radius, $color);
+        imagefilledellipse($im, $x + $radius, $y + $radius, $radius * 2, $radius * 2, $color);
+        imagefilledellipse($im, $x + $w - 1 - $radius, $y + $radius, $radius * 2, $radius * 2, $color);
+        imagefilledellipse($im, $x + $radius, $y + $h - 1 - $radius, $radius * 2, $radius * 2, $color);
+        imagefilledellipse($im, $x + $w - 1 - $radius, $y + $h - 1 - $radius, $radius * 2, $radius * 2, $color);
+    }
+
+    /**
+     * Render 1 từ khóa bằng font UTM-Davida → PNG vàng trong suốt (căn giữa cả 2 chiều).
+     * DomPDF không nạp được glyph tiếng Việt của Davida nên phải dùng ảnh.
+     */
+    public static function keywordImagePath(
+        string $text,
+        float $widthMm = 27.0,
+        float $heightMm = 34.0,
+        int $fontPx = 20
+    ): string {
+        $text = mb_strtoupper(trim($text), 'UTF-8');
+        $text = (string) preg_replace('/[\x{2012}\x{2013}\x{2014}\x{2015}\x{2212}]/u', '-', $text);
+
+        if ($text === '' || ! function_exists('imagettfbbox')) {
+            return '';
+        }
+
+        $font = self::resolveFontPath();
+        if ($font === null) {
+            return '';
+        }
+
+        $cacheKey = 'kw|'.$text.'|'.$widthMm.'|'.$heightMm.'|'.$fontPx;
+        $cacheDir = storage_path('app/pdf-cache/titles');
+        if (! is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+
+        $file = $cacheDir.DIRECTORY_SEPARATOR.hash('xxh128', $cacheKey).'.png';
+        if (is_file($file)) {
+            return $file;
+        }
+
+        $scale    = self::RENDER_SCALE;
+        $fontSize = $fontPx * $scale;
+        $w        = (int) round($widthMm / 25.4 * 96 * $scale);
+        $h        = (int) round($heightMm / 25.4 * 96 * $scale);
+
+        $lines = self::wrapLines($text, $fontSize, $font, $w);
+
+        $sample     = imagettfbbox($fontSize, 0, $font, 'ÂĐQGẶàjgyÀ');
+        $ascDesc    = max(1, abs($sample[7] - $sample[1]));
+        $lineHeight = (int) round($ascDesc * 1.15);
+        $blockH     = $lineHeight * count($lines);
+
+        $im = imagecreatetruecolor($w, $h);
+        imagesavealpha($im, true);
+        imagealphablending($im, false);
+        imagefill($im, 0, 0, imagecolorallocatealpha($im, 0, 0, 0, 127));
+        imagealphablending($im, true);
+
+        $gold = imagecolorallocate($im, 0xD4, 0xAF, 0x37);
+
+        $y = (int) round(($h - $blockH) / 2 + $ascDesc * 0.85);
+        foreach ($lines as $line) {
+            $bbox  = imagettfbbox($fontSize, 0, $font, $line);
+            $lineW = abs($bbox[2] - $bbox[0]);
+            $x     = (int) round(($w - $lineW) / 2) - $bbox[0];
+            imagettftext($im, $fontSize, 0, $x, $y, $gold, $font, $line);
+            $y += $lineHeight;
+        }
+
+        imagepng($im, $file);
+        imagedestroy($im);
+
+        return $file;
+    }
+
+    /**
      * Ngắt dòng theo chiều rộng tối đa (px) dựa trên bbox font thực tế.
      *
      * @return array<int, string>
@@ -170,6 +366,24 @@ class NguHanhTitleRenderer
         }
 
         return self::$pathCache[$cacheKey] = $file;
+    }
+
+    /** Chiều cao hiển thị tiêu đề HÀNH X XX% (mm) — khớp blade + paginator. */
+    public static function titleDisplayHeightMm(string $hanhName, int $percent): float
+    {
+        $path = self::toFilePath($hanhName, $percent);
+        if ($path === '' || ! is_file($path)) {
+            return 10.0;
+        }
+
+        $info = @getimagesize($path);
+        if ($info === false || ($info[0] ?? 0) <= 0) {
+            return 12.0;
+        }
+
+        $displayW = 154.0;
+
+        return (($info[1] / $info[0]) * $displayW) + 3.0;
     }
 
     /**

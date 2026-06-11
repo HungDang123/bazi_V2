@@ -30,6 +30,7 @@
             position: absolute;
             top: 0; left: 0;
             width: 210mm; height: 297mm;
+            z-index: 0;
         }
 
         @include('pdfs.partials.content-zone-styles')
@@ -70,7 +71,7 @@
             letter-spacing: 0;
             text-align: justify;
             color: #1A1A1A;
-            margin-bottom: 3px;
+            margin-bottom: 0;
         }
 
         .para-text.emphasis {
@@ -78,7 +79,19 @@
         }
 
         .para-text p {
-            margin-bottom: 5px;
+            margin: 0;
+            padding-bottom: 0.8mm;
+            font-size: 14px;
+            line-height: 140%;
+            text-align: justify;
+        }
+
+        .para-text.emphasis p {
+            color: #6E0101;
+        }
+
+        .para-text p:last-child {
+            padding-bottom: 0;
         }
 
         .content-img {
@@ -97,7 +110,7 @@
 
     <img class="bg-img" src="{{ $page['bgPath'] }}">
 
-    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 18 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 187.1 }}mm; left: {{ $page['contentLeftMm'] ?? 28 }}mm; width: {{ $page['contentWidthMm'] ?? 154 }}mm;">
+    <div class="content-zone" style="top: {{ $page['contentZoneTopMm'] ?? 18 }}mm; height: {{ $page['contentZoneHeightMm'] ?? 252.45 }}mm; left: {{ $page['contentLeftMm'] ?? 28 }}mm; width: {{ $page['contentWidthMm'] ?? 154 }}mm;">
 @if (!empty($page['chapterTitle']))
         <div class="chapter-title">{{ $page['chapterTitle'] }}</div>
         @endif
@@ -116,7 +129,11 @@
             >
             @else
             <div class="para-text{{ !empty($block['emphasis']) ? ' emphasis' : '' }}">
-                <p>{{ $block['text'] ?? '' }}</p>
+                @include('pdfs.partials.pdf-text-chunks', [
+                    'text' => $block['text'] ?? '',
+                    'maxChars' => 75,
+                    'bulletPrefix' => false,
+                ])
             </div>
             @endif
         @endforeach

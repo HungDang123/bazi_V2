@@ -148,9 +148,14 @@ class Phan7ContentService
             if ($noiDung === '[image]' || $noiDung === '') {
                 $imagePath = self::resolveTamTheImagePath($row->image);
                 if ($imagePath !== null) {
-                    $blocks[] = ['type' => 'image', 'path' => $imagePath];
+                    $blocks[] = ['type' => 'image', 'path' => $imagePath, 'widthMm' => 162.0];
                 }
 
+                continue;
+            }
+
+            // Tiêu đề PHẦN 7 đã có trên nền LBTV-583 (trang Mục I đầu)
+            if ($sheetIndex === 0 && preg_match('/^PHẦN\s+7\s*:/ui', $noiDung)) {
                 continue;
             }
 

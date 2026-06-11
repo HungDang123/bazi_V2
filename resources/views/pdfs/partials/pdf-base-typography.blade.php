@@ -49,4 +49,7 @@ b,
 
 .para-text p {
     margin-bottom: 5px;
+    text-align: justify;
 }
+
+@include('pdfs.partials.pdf-justify-styles')

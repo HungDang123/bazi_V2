@@ -4,19 +4,12 @@ namespace App\Services;
 
 use App\Models\Hanh;
 use App\Models\HanhNoiDung;
+use App\Services\Pdf\Phan3NguHanhBanMenhPaginator;
 
 class HanhNoiDungService
 {
     /** Thứ tự hiển thị: Kim → Mộc → Thủy → Hỏa → Thổ */
     public const ELEMENT_ORDER = ['kim', 'moc', 'thuy', 'hoa', 'tho'];
-
-    /** ~14 dòng text sau title + ảnh hành (88mm) trên trang đầu (budget 172.1mm, font 14px/140%) */
-    private const FIRST_PAGE_MAX_LINES = 14;
-
-    /** ~27 dòng text trên trang overflow (budget 172.1mm, font 14px/140%) */
-    private const CONT_PAGE_MAX_LINES = 27;
-
-    private const CHARS_PER_LINE = 75;
 
     public static function phanTramToSlug(int $percent): string
     {
@@ -79,7 +72,7 @@ class HanhNoiDungService
     }
 
     /**
-     * Chia nội dung 5 hành thành các trang PDF (ảnh đầu, overflow sang page-22-bg).
+     * Chia nội dung 5 hành thành các trang PDF (paginator riêng PHẦN 3, ~80% chiều cao A4).
      *
      * @return array<int, array<string, mixed>>
      */
@@ -95,7 +88,7 @@ class HanhNoiDungService
 
         foreach ($elements as $element) {
             $blocks = self::flattenElementBlocks($element);
-            if (empty($blocks)) {
+            if ($blocks === []) {
                 continue;
             }
 
@@ -103,27 +96,22 @@ class HanhNoiDungService
             $imagePath = $hanhModel instanceof Hanh
                 ? $hanhModel->resolvedImagePath($imageDir)
                 : $imageDir . '/' . ($element['hanh_slug'] ?? '') . '.png';
-            $pageIndex = 0;
 
-            while (!empty($blocks)) {
-                $maxLines = $pageIndex === 0 ? self::FIRST_PAGE_MAX_LINES : self::CONT_PAGE_MAX_LINES;
-                [$chunk, $blocks] = self::takeBlocksByLines($blocks, $maxLines);
+            $elementPages = Phan3NguHanhBanMenhPaginator::paginate(
+                $blocks,
+                [
+                    'hanh_name'       => (string) ($element['hanh_name'] ?? ''),
+                    'percent'         => (int) ($element['percent'] ?? 0),
+                    'imagePath'       => $imagePath,
+                    'titleImagePath'  => NguHanhTitleRenderer::toFilePath(
+                        (string) ($element['hanh_name'] ?? ''),
+                        (int) ($element['percent'] ?? 0)
+                    ),
+                ],
+                $firstBgPath
+            );
 
-                $pages[] = [
-                    'bgPath'     => $pageIndex === 0 ? $firstBgPath : $contBgPath,
-                    'showTitle'  => $pageIndex === 0,
-                    'showImage'  => $pageIndex === 0,
-                    'hanhName'   => mb_strtoupper($element['hanh_name'], 'UTF-8'),
-                    'percent'    => $element['percent'],
-                    'imagePath'  => $imagePath,
-                    'titleImagePath' => $pageIndex === 0
-                        ? NguHanhTitleRenderer::toFilePath($element['hanh_name'], $element['percent'])
-                        : '',
-                    'blocks'     => $chunk,
-                ];
-
-                $pageIndex++;
-            }
+            $pages = array_merge($pages, $elementPages);
         }
 
         return $pages;
@@ -150,84 +138,6 @@ class HanhNoiDungService
         return $blocks;
     }
 
-    /**
-     * @param  array<int, array{type: string, text: string}>  $blocks
-     * @return array{0: array<int, array{type: string, text: string}>, 1: array<int, array{type: string, text: string}>}
-     */
-    private static function takeBlocksByLines(array $blocks, float $maxLines): array
-    {
-        $chunk = [];
-        $used  = 0.0;
-
-        while (!empty($blocks)) {
-            $block = $blocks[0];
-            $need  = self::blockLineCount($block);
-
-            if (!empty($chunk) && ($used + $need) > $maxLines) {
-                break;
-            }
-
-            if (empty($chunk) && $need > $maxLines) {
-                [$head, $tail] = self::splitBlockByLines($block, (int) floor($maxLines));
-                if ($head !== null) {
-                    $chunk[] = $head;
-                }
-                array_shift($blocks);
-                if ($tail !== null) {
-                    array_unshift($blocks, $tail);
-                }
-                break;
-            }
-
-            $chunk[] = array_shift($blocks);
-            $used   += $need;
-        }
-
-        return [$chunk, $blocks];
-    }
-
-    private static function blockLineCount(array $block): float
-    {
-        if ($block['type'] === 'item_title') {
-            return 1.3;
-        }
-
-        $lines = max(1, (int) ceil(mb_strlen($block['text']) / self::CHARS_PER_LINE));
-
-        return $lines * 1.05;
-    }
-
-    /**
-     * @return array{0: ?array{type: string, text: string}, 1: ?array{type: string, text: string}}
-     */
-    private static function splitBlockByLines(array $block, int $maxLines): array
-    {
-        $maxChars = max(100, $maxLines * self::CHARS_PER_LINE);
-        $text     = $block['text'];
-
-        if (mb_strlen($text) <= $maxChars) {
-            return [$block, null];
-        }
-
-        $head = mb_substr($text, 0, $maxChars);
-        $tail = mb_substr($text, $maxChars);
-
-        if ($block['type'] === 'para') {
-            if (preg_match('/^(.{0,' . $maxChars . '}[\.!\?\…]\s)/us', $text, $m)) {
-                $head = trim($m[1]);
-                $tail = trim(mb_substr($text, mb_strlen($m[1])));
-            } elseif (($sp = mb_strrpos($head, ' ')) !== false) {
-                $tail = trim(mb_substr($text, $sp));
-                $head = trim(mb_substr($text, 0, $sp));
-            }
-        }
-
-        $headBlock = $head !== '' ? ['type' => $block['type'], 'text' => $head] : null;
-        $tailBlock = $tail !== '' ? ['type' => $block['type'], 'text' => $tail] : null;
-
-        return [$headBlock, $tailBlock];
-    }
-
     private static function splitParagraphs(string $text): array
     {
         $text = trim($text);
@@ -236,7 +146,7 @@ class HanhNoiDungService
         }
 
         $paragraphs = array_filter(array_map('trim', preg_split('/\n{2,}/', $text)));
-        if (empty($paragraphs)) {
+        if ($paragraphs === []) {
             $paragraphs = array_filter(array_map('trim', explode("\n", $text)));
         }
 

@@ -53,9 +53,9 @@ class PdfExportController extends Controller
      *   Trang 18 : page-18.png          (LBTV-101 – Phần 3 cover)
      *   Trang 19 : blade la-so-tong-quan-ngu-hanh (page-19-bg.png + I. + mục 1–2)
      *   Trang 20 : blade la-so-tong-quan-ngu-hanh-tiep (chỉ khi còn mục 3+)
-     *   Trang 21+ : blade la-so-bocuc-ngu-hanh (page-21-bg + overflow page-22-bg, II. Bố cục Ngũ Hành)
-     *   Trang …  : blade la-so-bocuc-ngu-hanh (page-22-bg, III. Chất lượng nhật chủ — theo lá số)
-     *   Trang …+ : blade la-so-ngu-hanh-ban-menh  (Kim→Mộc→Thủy→Hỏa→Thổ, overflow page-22-bg)
+     *   Trang 21+ : blade la-so-bocuc-ngu-hanh (II. Bố cục Ngũ Hành Bản Mệnh)
+     *   Trang …+ : blade la-so-ngu-hanh-ban-menh  (Kim→Thổ — sau mục 2.2 Giải mã bức tranh năng lượng)
+     *   Trang …  : blade la-so-bocuc-ngu-hanh (III. Chất lượng nhật chủ — theo lá số)
      *   Trang …  : bia-phan-5.png                  (bìa PHẦN 5)
      *   Trang …  : blade la-so-tong-quan-khia-canh (tong-quan-bg.png + I. Tổng quan)
      *   Trang …  : blade la-so-su-nghiep (su-nghiep-bg.png + 1. Tổng quan + bảng Tứ Trụ)
@@ -253,7 +253,18 @@ class PdfExportController extends Controller
             'phan3-chapter-in-content-wrap',
             'pdf-font-v3-svn',
             'bocuc-img-v1',
-            'bocuc-paginate-v1',
+            'bocuc-paginate-v3-85pct',
+            'phan3-section-i-paginate-v2',
+            'phan3-height-estimate-v4',
+            'pdf-justify-v2',
+            'trait-pill-img-v1',
+            'traits-height-fix-v2',
+            'abc-label-bold-traits-split-v1',
+            'phan8-no-title-underline-v1',
+            'phan8-coding-flow-with-text-v1',
+            'phan8-coding-merge-bg-restore-v2',
+            'footer-bottom-1mm',
+            'phan8-tru-content-coding-atomic-v1',
         ]);
 
         $phan3SectionI = self::parsePhan3SectionI(
@@ -266,19 +277,27 @@ class PdfExportController extends Controller
         ], $phan3SectionI), $page19Path, $phan3Salt);
         $tempFiles[] = $page19Path;
 
-        $phan3FromSub3 = self::parsePhan3FromSub2(
-            $phan3Records->get('phan3_dinh_vi_goc_nhin'),
-            3
-        );
-
         $contentBg = $pdfDir . '/page-content-bg.png';
 
-        if (! empty($phan3FromSub3['subSections'])) {
-            $page20Path = $tempDir . '/q1p20-' . $uid . '.pdf';
-            $pdfsToMerge[] = PdfViewCache::saveView('pdfs.quyen-1.la-so-tong-quan-ngu-hanh-tiep', array_merge([
-                'templatePath' => $contentBg,
-            ], $phan3FromSub3), $page20Path, $phan3Salt);
-            $tempFiles[] = $page20Path;
+        $phan3FromSub2 = self::parsePhan3FromSub2(
+            $phan3Records->get('phan3_dinh_vi_goc_nhin'),
+            2
+        );
+
+        if (! empty($phan3FromSub2['subSections'])) {
+            $phan3Sub2Pages = Phan3PdfPaginator::paginateBocucSection(
+                ['chapterTitle' => '', 'subSections' => $phan3FromSub2['subSections']],
+                $contentBg,
+                $contentBg
+            );
+
+            if ($phan3Sub2Pages !== []) {
+                $page20Path = $tempDir . '/q1p20-' . $uid . '.pdf';
+                $pdfsToMerge[] = PdfViewCache::saveView('pdfs.quyen-1.la-so-bocuc-ngu-hanh', [
+                    'pages' => $phan3Sub2Pages,
+                ], $page20Path, $phan3Salt);
+                $tempFiles[] = $page20Path;
+            }
         }
 
         $phan3SectionII = self::parsePhan3SectionFull(
@@ -297,6 +316,23 @@ class PdfExportController extends Controller
         ], $page21Path, $phan3Salt);
         $tempFiles[] = $page21Path;
 
+        // ── II tiếp: Ngũ hành bản mệnh (Kim → Thổ) — sau mục 2.2 Giải mã bức tranh năng lượng ─
+        $nguHanhPages = HanhNoiDungService::buildPdfPages(
+            $nguHanhDong,
+            $pdfDir . '/ngu-hanh',
+            $contentBg,
+            $contentBg
+        );
+
+        if (! empty($nguHanhPages)) {
+            $pageNguHanhPath = $tempDir . '/q1p-ngu-hanh-' . $uid . '.pdf';
+            PdfRenderService::saveView('pdfs.quyen-1.la-so-ngu-hanh-ban-menh', [
+                'pages' => $nguHanhPages,
+            ], $pageNguHanhPath);
+            $pdfsToMerge[] = $pageNguHanhPath;
+            $tempFiles[]   = $pageNguHanhPath;
+        }
+
         // ── Phần 3 III: Chất lượng nhật chủ (động theo trụ tháng / nhật can) ───
         if (! empty($batTuData)) {
             $clncPages = ChatLuongNhatChuService::buildPdfPages(
@@ -313,24 +349,6 @@ class PdfExportController extends Controller
                 $pdfsToMerge[] = $pageClncPath;
                 $tempFiles[]   = $pageClncPath;
             }
-        }
-
-        // ── Trang …+: blade la-so-ngu-hanh-ban-menh (Kim → Mộc → Thủy → Hỏa → Thổ) ─
-        $nguHanhPages = HanhNoiDungService::buildPdfPages(
-            $nguHanhDong,
-            $pdfDir . '/ngu-hanh',
-            $contentBg,
-            $contentBg
-        );
-
-        $page22Path = null;
-        if (!empty($nguHanhPages)) {
-            $page22Path = $tempDir . '/q1p22-' . $uid . '.pdf';
-            PdfRenderService::saveView('pdfs.quyen-1.la-so-ngu-hanh-ban-menh', [
-                'pages' => $nguHanhPages,
-            ], $page22Path);
-            $pdfsToMerge[] = $page22Path;
-            $tempFiles[]     = $page22Path;
         }
 
         // ── PHẦN 5: bìa + I. Tổng quan các khía cạnh ────────────────────────
@@ -946,7 +964,7 @@ class PdfExportController extends Controller
                 if ($block === '' || ! preg_match('/^(\d+)\.\s/', $block, $numMatch)) {
                     continue;
                 }
-                if ((int) $numMatch[1] > 2) {
+                if ((int) $numMatch[1] > 1) {
                     continue;
                 }
                 if (preg_match('/^(\d+\.\s[^\n]+)\n?(.*)$/s', $block, $sm)) {
@@ -1017,7 +1035,7 @@ class PdfExportController extends Controller
             if (preg_match('/^(\d+\.\s[^\n]+)\n?(.*)$/s', $block, $sm)) {
                 $subSections[] = [
                     'sub_title' => trim($sm[1]),
-                    'content'   => self::splitParagraphs(trim($sm[2])),
+                    'content'   => self::splitPhan3Blocks(trim($sm[2])),
                 ];
             }
         }

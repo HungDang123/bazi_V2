@@ -83,6 +83,9 @@ class PdfPaginationConfig
      */
     public $pageMetaResolver;
 
+    /** Padding-bottom mỗi dòng para khi ước lượng / tách trang (mm). */
+    public float $paraLinePaddingMm;
+
     /**
      * @param  array<string, mixed>  $overrides
      */
@@ -105,6 +108,7 @@ class PdfPaginationConfig
         $this->forceNewPageBefore   = (array) ($overrides['forceNewPageBefore'] ?? []);
         $this->lineWidthThreshold   = (float) ($overrides['lineWidthThreshold'] ?? 0.95);
         $this->minImagePageMm       = (float) ($overrides['minImagePageMm'] ?? 50.0);
+        $this->paraLinePaddingMm    = (float) ($overrides['paraLinePaddingMm'] ?? 2.0);
         $this->bgResolver           = $overrides['bgResolver'] ?? null;
         $this->blockHeightResolver  = $overrides['blockHeightResolver'] ?? null;
         $this->budgetAdjustResolver = $overrides['budgetAdjustResolver'] ?? null;

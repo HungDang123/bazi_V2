@@ -12,7 +12,10 @@ class Phan5BlockBuilder
      */
     public static function fromTongQuan(array $subSections): array
     {
-        $blocks = [];
+        $blocks = [
+            ['type' => 'section_title', 'text' => 'I. TỔNG QUAN'],
+        ];
+
         foreach ($subSections as $sub) {
             $title = trim((string) ($sub['sub_title'] ?? ''));
             if ($title !== '') {
@@ -217,9 +220,17 @@ class Phan5BlockBuilder
         $blocks = [];
         foreach (preg_split('/\r\n|\r|\n/', $text) ?: [] as $line) {
             $line = PdfTextSanitizer::trimString($line);
-            if ($line !== '') {
-                $blocks[] = ['type' => 'para', 'text' => $line];
+            if ($line === '') {
+                continue;
             }
+            // Dòng nhãn "a. Từ khóa cốt lõi:" → in đậm như muc_label
+            if (preg_match('/^[a-z]\.\s/u', $line) === 1
+                && (mb_substr($line, -1) === ':' || mb_strlen($line) <= 40)) {
+                $blocks[] = ['type' => 'muc_label', 'text' => $line];
+
+                continue;
+            }
+            $blocks[] = ['type' => 'para', 'text' => $line];
         }
 
         return $blocks;

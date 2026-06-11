@@ -254,21 +254,7 @@ class Phan8ContentService
             $specs[] = ['type' => 'content', 'blocks' => $fallbackBlocks];
         }
 
-        if ($introBlocks !== [] && $specs !== []) {
-            foreach ($specs as $idx => $spec) {
-                if (($spec['type'] ?? '') === 'coding') {
-                    $specs[$idx]['data']['preambleBlocks'] = array_merge(
-                        $introBlocks,
-                        is_array($specs[$idx]['data']['preambleBlocks'] ?? null)
-                            ? $specs[$idx]['data']['preambleBlocks']
-                            : []
-                    );
-                    $introBlocks = [];
-                    break;
-                }
-            }
-        }
-
+        // Giới thiệu trụ (SỰ TƯƠNG TÁC...) luôn ở trang nền content — không gộp vào coding
         if ($introBlocks !== []) {
             $specs = array_merge([['type' => 'content', 'blocks' => $introBlocks]], $specs);
         }
@@ -491,17 +477,6 @@ class Phan8ContentService
 
         [$title, $subtitle] = self::splitTitle((string) ($p8['tieu_de'] ?? ''));
 
-        $meta = [];
-        if ($isDiaChi) {
-            $meta[] = 'Địa Chi: '.PdfTextSanitizer::trimString((string) ($block['dia_chi_1'] ?? ''))
-                .' – '.PdfTextSanitizer::trimString((string) ($block['dia_chi_2'] ?? ''));
-        } else {
-            $meta[] = 'Thiên Can: '.PdfTextSanitizer::trimString((string) ($block['thien_can_1'] ?? ''))
-                .' – '.PdfTextSanitizer::trimString((string) ($block['thien_can_2'] ?? ''));
-        }
-        $meta[] = 'Thập Thần: '.PdfTextSanitizer::trimString((string) ($block['thap_than'] ?? ''));
-        $meta[] = 'Mối quan hệ: '.PdfTextSanitizer::trimString((string) ($p8['moi_quan_he'] ?? $block['moi_quan_he'] ?? ''));
-
         $titleText = $title !== '' ? $title : mb_strtoupper(PdfTextSanitizer::trimString((string) ($block['thap_than'] ?? '')), 'UTF-8');
 
         // Render tiêu đề bằng font UTM-Davida thành PNG (giống tiêu đề HÀNH ở Phần 3),
@@ -511,14 +486,14 @@ class Phan8ContentService
 
         return [
             'bgPath' => $codingBgPath ?? Phan8AssetService::codingBgPath(),
-            'blockLabel' => $label,
+            'blockLabel' => '',
             'title' => $titleText,
             'titleImagePath' => $titleImg['path'],
             'titleImageHeightMm' => $titleImg['heightMm'],
             'contTitleImagePath' => $contImg['path'],
             'contTitleImageHeightMm' => $contImg['heightMm'],
             'subtitle' => $subtitle,
-            'meta' => implode(' – ', $meta),
+            'meta' => '',
             'sections' => $sections,
         ];
     }
@@ -619,8 +594,30 @@ class Phan8ContentService
         $blocks = [];
         foreach (preg_split('/\n\s*\n/u', $text) ?: [] as $para) {
             $para = PdfTextSanitizer::trimMultiline($para);
-            if ($para !== '') {
-                $blocks[] = ['type' => 'para', 'text' => $para];
+            if ($para === '') {
+                continue;
+            }
+
+            // Tách dòng heading "1. ..."/"a. ..." → sub_title (đỏ đậm)
+            $buf = [];
+            foreach (preg_split('/\r\n|\r|\n/', $para) ?: [] as $line) {
+                $line = trim($line);
+                if ($line === '') {
+                    continue;
+                }
+                if (self::isHeadingLine($line)) {
+                    if ($buf !== []) {
+                        $blocks[] = ['type' => 'para', 'text' => implode("\n", $buf)];
+                        $buf = [];
+                    }
+                    $blocks[] = ['type' => 'sub_title', 'text' => $line];
+
+                    continue;
+                }
+                $buf[] = $line;
+            }
+            if ($buf !== []) {
+                $blocks[] = ['type' => 'para', 'text' => implode("\n", $buf)];
             }
         }
 
@@ -629,5 +626,15 @@ class Phan8ContentService
         }
 
         return $blocks;
+    }
+
+    /** Dòng dạng "1. ...:", "2. ...", "a. ...:", "b. ..." → tiêu đề mục (đỏ đậm). */
+    protected static function isHeadingLine(string $line): bool
+    {
+        if (preg_match('/^(\d{1,2}|[a-z])\.\s/u', $line) !== 1) {
+            return false;
+        }
+
+        return str_ends_with($line, ':') || mb_strlen($line) <= 60;
     }
 }

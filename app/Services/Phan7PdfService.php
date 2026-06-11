@@ -10,8 +10,15 @@ class Phan7PdfService
     /** @var array<int, string> filename trong resources/views/pdfs/phan-7/ */
     private const PAGE_FILES = [
         'LBTV - 582.png', // bìa PHẦN 7
-        'LBTV - 583.png', // Mục I – Bài học cuộc sống và sự chuyển hóa
     ];
+
+    public static function muc1FirstBgPath(): string
+    {
+        return self::pageDir().'/LBTV - 583.png';
+    }
+
+    /** Vùng nội dung trang Mục I đầu — dưới banner cuộn trên LBTV-583. */
+    public const MUC1_FIRST_PAGE_TOP_MM = 74.0;
 
     public static function pageDir(): string
     {
@@ -34,6 +41,6 @@ class Phan7PdfService
 
     public static function bundleCacheKey(): string
     {
-        return 'phan7-bia-v4';
+        return 'phan7-bia-v5';
     }
 }

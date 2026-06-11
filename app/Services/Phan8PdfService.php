@@ -59,6 +59,7 @@ class Phan8PdfService
         $bufBlocks = [];
         $ivTableBuf = [];
         $ivIntroBlocks = [];
+        $codingBuf = [];
 
         foreach ($pageSpecs as $spec) {
             $type = $spec['type'] ?? 'content';
@@ -66,6 +67,7 @@ class Phan8PdfService
             if ($type === 'nien_van_cover') {
                 self::appendTextPages($pdfPages, $bufType, $bufBlocks);
                 self::flushIvTables($pdfPages, $ivTableBuf);
+                self::flushCodingPages($pdfPages, $codingBuf);
                 $bufType = null;
                 $bufBlocks = [];
                 $ivTableBuf = [];
@@ -83,24 +85,24 @@ class Phan8PdfService
             }
 
             if ($type === 'coding') {
+                // Văn bản đứng trước flush về trang nền content như cũ;
+                // các block coding liên tiếp được gom để chảy liền nhau.
                 self::appendTextPages($pdfPages, $bufType, $bufBlocks);
                 self::flushIvTables($pdfPages, $ivTableBuf);
                 $bufType = null;
                 $bufBlocks = [];
                 $ivTableBuf = [];
 
-                $codingPages = Phan8CodingPaginator::paginate($spec['data'] ?? []);
-                if ($codingPages === []) {
-                    continue;
+                $specData = $spec['data'] ?? null;
+                if (is_array($specData) && $specData !== []) {
+                    $codingBuf[] = $specData;
                 }
-
-                $pdfPages[] = [
-                    'view' => 'pdfs.phan-8.la-so-phan-8-coding',
-                    'data' => ['pages' => $codingPages],
-                ];
 
                 continue;
             }
+
+            // Spec không phải coding → kết thúc chuỗi coding đang gom
+            self::flushCodingPages($pdfPages, $codingBuf);
 
             if ($type === 'iv_table') {
                 if ($bufBlocks !== []) {
@@ -135,12 +137,38 @@ class Phan8PdfService
 
         self::appendTextPages($pdfPages, $bufType, $bufBlocks);
         self::flushIvTables($pdfPages, $ivTableBuf, $ivIntroBlocks);
+        self::flushCodingPages($pdfPages, $codingBuf);
 
         return $pdfPages;
     }
 
-    /** Max iv_table rows per PDF page (each table ~50–55 mm tall on A4). */
-    private const IV_TABLES_PER_PAGE = 4;
+    /**
+     * Gom các block coding liên tiếp thành chuỗi trang chảy liền nhau.
+     *
+     * @param  array<int, array{view: string, data: array<string, mixed>}>  $pdfPages
+     * @param  array<int, array<string, mixed>>  $codingBuf
+     */
+    private static function flushCodingPages(array &$pdfPages, array &$codingBuf): void
+    {
+        if ($codingBuf === []) {
+            return;
+        }
+
+        $codingPages = Phan8CodingPaginator::paginateMany($codingBuf);
+        $codingBuf = [];
+
+        if ($codingPages === []) {
+            return;
+        }
+
+        $pdfPages[] = [
+            'view' => 'pdfs.phan-8.la-so-phan-8-coding',
+            'data' => ['pages' => $codingPages],
+        ];
+    }
+
+    /** Max iv_table rows per PDF page (each table ~50–55 mm tall; zone 85% A4 ≈ 252 mm). */
+    private const IV_TABLES_PER_PAGE = 5;
 
     /**
      * Batch accumulated iv_table data into pages (multiple tables per page).
