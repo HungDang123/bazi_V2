@@ -4,13 +4,12 @@
   wrapAtChars chỉ dùng trong paginator (PdfTextWrapHelper) để ước lượng chiều cao.
   @param string $text
   @param int $maxChars  (giữ để tương thích caller; không dùng khi render)
-  @param bool $bulletPrefix  Thêm '– ' cho mỗi bullet (coding Phần 8)
+  @param bool $bulletPrefix  (giữ để tương thích caller; không thêm prefix khi render)
 --}}
 @php
     use App\Services\Pdf\PdfTextSanitizer;
 
     $raw = PdfTextSanitizer::trimMultiline((string) ($text ?? ''));
-    $bulletPrefix = (bool) ($bulletPrefix ?? false);
 @endphp
 @if ($raw !== '')
     @foreach (preg_split('/\r\n|\r|\n/', $raw) ?: [] as $line)
@@ -18,11 +17,6 @@
             $line = PdfTextSanitizer::trimString($line);
             if ($line === '') {
                 continue;
-            }
-            if ($bulletPrefix) {
-                $line = preg_match('/^-\s*/u', $line)
-                    ? '– '.PdfTextSanitizer::trimString(preg_replace('/^-\s*/u', '', $line))
-                    : '– '.$line;
             }
         @endphp
         <p class="pdf-justify" style="text-align: justify; text-align-last: justify;">{{ $line }}</p>
