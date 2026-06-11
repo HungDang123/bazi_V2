@@ -19,8 +19,7 @@
         .page {
             position: relative;
             width: 210mm;
-            height: 297mm;
-            overflow: hidden;
+            min-height: 297mm;
         }
 
         .bg-img {
@@ -31,10 +30,11 @@
 
         /* Vùng nội dung – trong khoảng trắng phía trên (0–149mm) */
         .content-wrap {
-            position: absolute;
-            left: 28mm;
+            position: relative;
+            z-index: 1;
+            margin-left: 28mm;
+            margin-top: 18mm;
             width: 154mm;
-            overflow: hidden;
         }
 
         /* Tiêu đề chapter */
@@ -118,7 +118,7 @@
 
     @if ($targetChapter)
     {{-- Nội dung vào vùng trắng trên (top ≈ 18mm, max-height ≈ 124mm trước khi gặp illustration) --}}
-    <div class="content-wrap" style="top: 18mm; height: 124mm;">
+    <div class="content-wrap" style="max-height: 124mm; overflow: hidden;">
 
         @foreach ($targetChapter['sub_sections'] as $sub)
         <div class="sub-section">
@@ -145,6 +145,18 @@
         @endforeach
 
     </div>
+    @endif
+
+    {{-- Ảnh Tuy Hỷ dưới nội dung --}}
+    @if (!empty($tuyHyPath))
+    <img src="{{ $tuyHyPath }}" style="
+        position: relative;
+        z-index: 1;
+        display: block;
+        width: 160mm;
+        margin-left: 25mm;
+        margin-top: 6mm;
+    ">
     @endif
 
 </div>

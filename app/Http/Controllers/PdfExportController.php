@@ -757,7 +757,8 @@ class PdfExportController extends Controller
         // ── Trang 18: la-so-phan-tich-nhat-chu ──────────────────────────────
         $page18Path = $tempDir . '/p18-' . $uid . '.pdf';
         PdfRenderService::saveView('pdfs.quyen-2.la-so-phan-tich-nhat-chu', [
-            'templatePath' => $pdfDir . '/page-18-bg.png',
+            'templatePath' => $pdfDir . '/page-19-bg.png',
+            'tuyHyPath'    => $pdfDir . '/tuy hy.png',
             'chapters'     => $nhatChuChapters,
         ], $page18Path);
         $pdfsToMerge[] = $page18Path;
