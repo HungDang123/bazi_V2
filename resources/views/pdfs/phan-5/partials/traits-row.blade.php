@@ -5,7 +5,7 @@
     $tichPill = NguHanhTitleRenderer::pillImagePath('Tích cực', [0x6F, 0xC2, 0x45], [0x2E, 0x7D, 0x32]);
     $tieuPill = NguHanhTitleRenderer::pillImagePath('Tiêu cực', [0xC6, 0x28, 0x28], [0x7B, 0x10, 0x10]);
     $pillSize = $tichPill !== '' ? NguHanhTitleRenderer::pillDisplaySizeMm($tichPill) : ['widthMm' => 30.0, 'heightMm' => 11.0];
-    $boxHeightMm = Phan5TraitLayout::boxHeightMm($tichCuc ?? '', $tieuCuc ?? '', $pillSize['heightMm']) + 40.0;
+    $boxHeightMm = Phan5TraitLayout::boxHeightMm($tichCuc ?? '', $tieuCuc ?? '', $pillSize['heightMm']) + 27.0;
 
     $formatTraitLine = static function (string $line): string {
         $line = trim($line);

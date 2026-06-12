@@ -79,7 +79,7 @@
     <img class="bg-img" src="{{ $templatePath }}">
 
     {{-- Vị trí giá trị — dưới nhãn in sẵn LBTV-494 (5 hàng ~32mm) --}}
-    <div class="val-block" style="top: 118mm;">
+    <div class="val-block" style="top: 137.5mm;">
         <p class="val-name">{{ $fullName }}</p>
     </div>
 
