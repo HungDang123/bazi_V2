@@ -292,13 +292,17 @@ class Phan9bService
             if ($muc !== $currentMuc) {
                 $sections[] = [
                     'muc' => $muc,
-                    'tieu_de' => $row->tieu_de,
+                    'tieu_de' => self::resolveCanBangSectionTitle(
+                        trim((string) ($row->tieu_de ?? '')),
+                        $muc,
+                        $currentIndex + 1
+                    ),
                     'doan' => [],
                 ];
                 $currentIndex++;
                 $currentMuc = $muc;
             } elseif ($row->tieu_de !== null && $row->tieu_de !== '' && ($sections[$currentIndex]['tieu_de'] ?? '') === '') {
-                $sections[$currentIndex]['tieu_de'] = $row->tieu_de;
+                $sections[$currentIndex]['tieu_de'] = trim((string) $row->tieu_de);
             }
 
             $noiDung = self::replaceBoPlaceholders(trim((string) $row->noi_dung), $boNguHanh);
@@ -317,6 +321,23 @@ class Phan9bService
             'tieu_de' => $header ?: 'I. GIẢI PHÁP CÂN BẰNG',
             'sections' => $sections,
         ];
+    }
+
+    protected static function resolveCanBangSectionTitle(string $title, ?string $muc, int $sectionIndex): string
+    {
+        if ($title !== '') {
+            return $title;
+        }
+
+        return match ($muc) {
+            Phan9bGiaiPhapCanBang::MUC_TRANG_THAI => '1. Trạng thái năng lượng gốc',
+            Phan9bGiaiPhapCanBang::MUC_CHIEN_LUOC => '2. Chiến lược hành động:',
+            default => match ($sectionIndex) {
+                0 => '1. Trạng thái năng lượng gốc',
+                1 => '2. Chiến lược hành động:',
+                default => '',
+            },
+        };
     }
 
     /**
