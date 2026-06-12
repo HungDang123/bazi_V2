@@ -93,12 +93,26 @@ class PdfRenderService
         }
 
         $normalized = str_replace('\\', '/', $value);
-        // Tiêu đề UTM-Davida (NguHanhTitleRenderer) — PNG trong suốt, dùng trên nền tối Phần 8.
+        // Tiêu đề UTM-Davida (NguHanhTitleRenderer) — nhúng base64, tránh DomPDF lỗi đường dẫn cục bộ.
         if (str_contains($normalized, '/pdf-cache/titles/') && preg_match('/\.png$/i', $normalized)) {
-            return $value;
+            return self::pngPathToDataUri($value);
         }
 
         return PdfMergeService::optimizedRasterPath($value);
+    }
+
+    private static function pngPathToDataUri(string $path): string
+    {
+        if ($path === '' || ! is_file($path)) {
+            return '';
+        }
+
+        $blob = @file_get_contents($path);
+        if ($blob === false || $blob === '') {
+            return '';
+        }
+
+        return 'data:image/png;base64,' . base64_encode($blob);
     }
 
     private static function normalizeUnicode(string $text): string

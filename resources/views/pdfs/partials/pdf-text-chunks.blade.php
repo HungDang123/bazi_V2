@@ -22,7 +22,7 @@
             $isSubLabel = $phan9SubLabels && PdfTextSanitizer::isPhan9SubLabelLine($line);
         @endphp
         @if ($isSubLabel)
-        <p class="sub-label-line pdf-justify" style="text-align: justify; text-align-last: justify;">{{ $line }}</p>
+        <p class="sub-label-line pdf-justify" style="text-align: justify; text-align-last: justify; color: #6E0101; font-weight: bold;">{{ $line }}</p>
         @else
         <p class="pdf-justify" style="text-align: justify; text-align-last: justify;">{{ $line }}</p>
         @endif

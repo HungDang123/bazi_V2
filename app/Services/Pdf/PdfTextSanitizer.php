@@ -37,17 +37,31 @@ class PdfTextSanitizer
         return implode("\n", $lines);
     }
 
-    /** Tiêu đề con Phần 9: 4. / a. / Về … */
+    /** Tiêu đề con (Phần 8/9): 1. / 5. / a. / Về … */
     public static function isPhan9SubLabelLine(string $line): bool
     {
-        $line = trim($line);
+        $line = self::normalizeSubLabelLine($line);
         if ($line === '') {
             return false;
         }
 
-        return preg_match('/^[abc]\.\s/iu', $line) === 1
-            || preg_match('/^\d+\.\s/iu', $line) === 1
+        return preg_match('/^[a-z]\.\s+/iu', $line) === 1
+            || preg_match('/^\d+\.\s+/iu', $line) === 1
             || preg_match('/^Về\s+/iu', $line) === 1;
+    }
+
+    public static function isSubLabelLine(string $line): bool
+    {
+        return self::isPhan9SubLabelLine($line);
+    }
+
+    private static function normalizeSubLabelLine(string $line): string
+    {
+        $line = str_replace(["\xC2\xA0", "\xE2\x80\x8B"], ' ', $line);
+        $line = trim($line);
+        $line = (string) preg_replace('/^[-–—•*]+\s*/u', '', $line);
+
+        return trim($line);
     }
 
     /**
@@ -60,8 +74,8 @@ class PdfTextSanitizer
             return [];
         }
 
-        $hasSub = preg_match('/(^|\n)\s*[abc]\.\s/iu', $text) === 1
-            || preg_match('/(^|\n)\s*\d+\.\s/iu', $text) === 1
+        $hasSub = preg_match('/(^|\n)\s*[a-z]\.\s+/iu', $text) === 1
+            || preg_match('/(^|\n)\s*\d+\.\s+/iu', $text) === 1
             || preg_match('/(^|\n)\s*Về\s+/iu', $text) === 1;
 
         if (! $hasSub) {
@@ -76,7 +90,8 @@ class PdfTextSanitizer
             }
 
             if (self::isPhan9SubLabelLine($line)) {
-                $type = preg_match('/^[abc]\.\s/iu', $line) === 1 ? 'sub_ab' : 'sub_title';
+                $norm = self::normalizeSubLabelLine($line);
+                $type = preg_match('/^[a-z]\.\s+/iu', $norm) === 1 ? 'sub_ab' : 'sub_title';
                 $blocks[] = ['type' => $type, 'text' => $line];
             } else {
                 $blocks[] = ['type' => 'para', 'text' => $line];

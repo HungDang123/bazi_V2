@@ -542,7 +542,7 @@ class Phan8ContentService
                 $tone = mb_stripos($huong, 'tích') !== false ? 'positive' : 'negative';
                 $blocks[] = ['type' => 'huong_label', 'text' => $huong, 'tone' => $tone];
             }
-            $blocks[] = ['type' => 'para', 'text' => $filtered];
+            PdfTextSanitizer::appendParagraphBlocks($blocks, $filtered);
         }
 
         return $blocks;
@@ -586,55 +586,6 @@ class Phan8ContentService
      */
     protected static function paragraphBlocks(string $text): array
     {
-        $text = PdfTextSanitizer::trimMultiline($text);
-        if ($text === '') {
-            return [];
-        }
-
-        $blocks = [];
-        foreach (preg_split('/\n\s*\n/u', $text) ?: [] as $para) {
-            $para = PdfTextSanitizer::trimMultiline($para);
-            if ($para === '') {
-                continue;
-            }
-
-            // Tách dòng heading "1. ..."/"a. ..." → sub_title (đỏ đậm)
-            $buf = [];
-            foreach (preg_split('/\r\n|\r|\n/', $para) ?: [] as $line) {
-                $line = trim($line);
-                if ($line === '') {
-                    continue;
-                }
-                if (self::isHeadingLine($line)) {
-                    if ($buf !== []) {
-                        $blocks[] = ['type' => 'para', 'text' => implode("\n", $buf)];
-                        $buf = [];
-                    }
-                    $blocks[] = ['type' => 'sub_title', 'text' => $line];
-
-                    continue;
-                }
-                $buf[] = $line;
-            }
-            if ($buf !== []) {
-                $blocks[] = ['type' => 'para', 'text' => implode("\n", $buf)];
-            }
-        }
-
-        if ($blocks === []) {
-            $blocks[] = ['type' => 'para', 'text' => $text];
-        }
-
-        return $blocks;
-    }
-
-    /** Dòng dạng "1. ...:", "2. ...", "a. ...:", "b. ..." → tiêu đề mục (đỏ đậm). */
-    protected static function isHeadingLine(string $line): bool
-    {
-        if (preg_match('/^(\d{1,2}|[a-z])\.\s/u', $line) !== 1) {
-            return false;
-        }
-
-        return str_ends_with($line, ':') || mb_strlen($line) <= 60;
+        return PdfTextSanitizer::blocksFromParagraphText($text);
     }
 }

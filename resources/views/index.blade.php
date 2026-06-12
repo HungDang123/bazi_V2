@@ -2792,11 +2792,19 @@
                         });
                     }
 
+                    function normalizeSubLabelLine(line) {
+                        line = String(line || '')
+                            .replace(/\u00A0|\u200B/g, ' ')
+                            .trim()
+                            .replace(/^[-–—•*]+\s*/, '');
+                        return line.trim();
+                    }
+
                     function isPhan9SubLabelLine(line) {
-                        line = String(line || '').trim();
+                        line = normalizeSubLabelLine(line);
                         if (!line) return false;
-                        return /^[abc]\.\s/i.test(line)
-                            || /^\d+\.\s/.test(line)
+                        return /^[a-z]\.\s+/i.test(line)
+                            || /^\d+\.\s+/.test(line)
                             || /^Về\s+/u.test(line);
                     }
 
@@ -4396,8 +4404,8 @@
                             }
                             p8.sections.forEach(function(sec) {
                                 const label = escapeHtml(sec.label || '');
-                                const content = escapeHtml(sec.content || '');
-                                if (!content) return;
+                                const rawContent = (sec.content || '').trim();
+                                if (!rawContent) return;
                                 let cls = 'text-gray-700';
                                 const labelLower = (sec.label || '').toLowerCase();
                                 if (labelLower.indexOf('cơ hội') >= 0) {
@@ -4411,7 +4419,8 @@
                                 if (label) {
                                     html += '<div class="font-semibold ' + cls + ' mb-1">' + label + '</div>';
                                 }
-                                html += '<div class="whitespace-pre-line ' + cls + '">' + content + '</div></div>';
+                                html += '<div class="whitespace-pre-line ' + cls + '">' +
+                                    formatPhan9TextBlock(rawContent) + '</div></div>';
                             });
                             html += '</div>';
                         });

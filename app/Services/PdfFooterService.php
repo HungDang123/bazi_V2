@@ -139,7 +139,7 @@ class PdfFooterService
 
         foreach ($segments as $segment) {
             $path = (string) ($segment['path'] ?? '');
-            if ($path === '' || ! is_file($path)) {
+            if ($path === '' || ! file_exists($path)) {
                 continue;
             }
 
@@ -178,7 +178,7 @@ class PdfFooterService
 
         foreach ($segments as $segment) {
             $path = (string) ($segment['path'] ?? '');
-            if ($path === '' || ! is_file($path)) {
+            if ($path === '' || ! file_exists($path)) {
                 continue;
             }
 
@@ -226,7 +226,7 @@ class PdfFooterService
         $firstFooter = self::FIRST_FOOTER_PAGE;
 
         foreach ($mergeOrder as $path) {
-            if ($path === '' || ! is_file($path)) {
+            if ($path === '' || ! file_exists($path)) {
                 continue;
             }
 
@@ -272,7 +272,7 @@ class PdfFooterService
         $firstFooter = self::FIRST_FOOTER_PAGE;
 
         foreach ($mergeOrder as $path) {
-            if ($path === '' || ! is_file($path)) {
+            if ($path === '' || ! file_exists($path)) {
                 continue;
             }
 
@@ -311,6 +311,55 @@ class PdfFooterService
     }
 
     /**
+     * Tổng số trang vật lý của các file PDF theo thứ tự merge (0 nếu file thiếu).
+     *
+     * @param  array<int, string>  $mergeOrder
+     */
+    public static function totalPhysicalPages(array $mergeOrder): int
+    {
+        $total = 0;
+        foreach ($mergeOrder as $path) {
+            if (! is_string($path) || $path === '' || ! file_exists($path)) {
+                continue;
+            }
+            $total += self::countPdfPages($path);
+        }
+
+        return $total;
+    }
+
+    /**
+     * Trang footer chữ trắng cho một dải segment liên tiếp (vd. bìa + nội dung Phần 6).
+     *
+     * @param  array<int, string>  $segmentPaths
+     * @return array<int, int>
+     */
+    public static function whitePagesFromOffset(
+        int $physicalBefore,
+        array $segmentPaths,
+        int $firstFooterPage = self::FIRST_FOOTER_PAGE
+    ): array {
+        $white    = [];
+        $physical = max(0, $physicalBefore);
+
+        foreach ($segmentPaths as $path) {
+            if (! is_string($path) || $path === '' || ! file_exists($path)) {
+                continue;
+            }
+
+            $pageCount = self::countPdfPages($path);
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $physical++;
+                if ($physical >= $firstFooterPage) {
+                    $white[] = $physical;
+                }
+            }
+        }
+
+        return $white;
+    }
+
+    /**
      * Trang footer chữ trắng cho các segment PDF cụ thể (theo thứ tự merge).
      *
      * @param  array<int, string>  $mergeOrder
@@ -338,7 +387,7 @@ class PdfFooterService
         $physical = 0;
 
         foreach ($mergeOrder as $path) {
-            if ($path === '' || ! is_file($path)) {
+            if ($path === '' || ! file_exists($path)) {
                 continue;
             }
 

@@ -162,6 +162,20 @@
             background: transparent;
         }
         .section-box p:last-child { padding-bottom: 0; }
+
+        .section-box .sub-label-line,
+        .preamble-para .sub-label-line {
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 10.5pt;
+            font-weight: bold;
+            line-height: 15pt;
+            color: #6E0101;
+            text-align: justify;
+            display: block;
+            margin: 0;
+            padding-bottom: 2mm;
+            background: transparent;
+        }
     </style>
 </head>
 <body>
@@ -181,9 +195,12 @@
                 <div class="preamble-subtitle">{{ $block['text'] ?? '' }}</div>
                 @else
                 <div class="preamble-para">
-                    @foreach (preg_split('/\r\n|\r|\n/', $block['text'] ?? '') ?: [] as $line)
-                        @if (trim($line) !== '')<p>{{ trim($line) }}</p>@endif
-                    @endforeach
+                    @include('pdfs.partials.pdf-text-chunks', [
+                        'text' => $block['text'] ?? '',
+                        'maxChars' => 72,
+                        'bulletPrefix' => false,
+                        'phan9SubLabels' => true,
+                    ])
                 </div>
                 @endif
 
@@ -232,6 +249,7 @@
                             'text' => $sec['content'] ?? '',
                             'maxChars' => 72,
                             'bulletPrefix' => true,
+                            'phan9SubLabels' => true,
                         ])
                     </div>
                 </div>

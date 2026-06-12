@@ -50,6 +50,13 @@
             text-align: justify;
         }
         .para-text p { margin-bottom: 3mm; }
+
+        .para-text .sub-label-line {
+            color: #6E0101;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 15pt;
+        }
     </style>
 </head>
 <body>
@@ -70,9 +77,12 @@
             <div class="red-title">{{ $block['text'] ?? '' }}</div>
             @else
             <div class="para-text">
-                @foreach (preg_split('/\r\n|\r|\n/', $block['text'] ?? '') ?: [] as $line)
-                    @if (trim($line) !== '')<p>{{ trim($line) }}</p>@endif
-                @endforeach
+                @include('pdfs.partials.pdf-text-chunks', [
+                    'text' => $block['text'] ?? '',
+                    'maxChars' => 72,
+                    'bulletPrefix' => false,
+                    'phan9SubLabels' => true,
+                ])
             </div>
             @endif
         @endforeach

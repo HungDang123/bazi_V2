@@ -62,6 +62,13 @@
         }
         .para-text p:last-child { padding-bottom: 0; }
 
+        .para-text .sub-label-line {
+            color: #6E0101;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 15pt;
+        }
+
         .huong-label { font-weight: bold; margin-top: 4px; margin-bottom: 3px; font-size: 14px; line-height: 130%; }
         .huong-label.positive { color: #2E7D32; }
         .huong-label.negative { color: #C62828; }
@@ -91,6 +98,7 @@
                     'text' => $block['text'] ?? '',
                     'maxChars' => 72,
                     'bulletPrefix' => false,
+                    'phan9SubLabels' => true,
                 ])
             </div>
             @endif

@@ -367,9 +367,9 @@ class PdfExportController extends Controller
         }
 
         // ── PHẦN 6: bìa + nội dung dòng chảy năng lượng ───────────────────────
-        $phan6BiaPath    = null;
-        $pagePhan6Path   = null;
-        $phan6BiaPath    = PdfStaticPageCache::resolve(Phan6PdfService::coverImagePath());
+        $phan6MergeStartIndex = count($pdfsToMerge);
+        $phan6MergePaths      = [];
+        $phan6BiaPath         = PdfStaticPageCache::resolve(Phan6PdfService::coverImagePath());
         if ($phan6BiaPath !== null) {
             $pdfsToMerge[] = $phan6BiaPath;
             $taggedFooterSegments[] = [
@@ -380,7 +380,8 @@ class PdfExportController extends Controller
             Log::warning('PdfExport Q1: không tìm thấy bìa Phần 6');
         }
 
-        $phan6Content = Phan6PdfService::buildContentPageSpec($req);
+        $pagePhan6Path = null;
+        $phan6Content  = Phan6PdfService::buildContentPageSpec($req);
         if ($phan6Content !== null) {
             $pagePhan6Path = $tempDir . '/q1p-phan6-content-' . $uid . '.pdf';
             PdfRenderService::saveView($phan6Content['view'], $phan6Content['data'], $pagePhan6Path);
@@ -391,6 +392,7 @@ class PdfExportController extends Controller
                 'coverPages' => 'all',
             ];
         }
+        $phan6MergePaths = array_slice($pdfsToMerge, $phan6MergeStartIndex);
 
         // ── PHẦN 8 (8A): bìa + Đại Vận + IV. Những năm cần chú ý ─────────────
         self::appendStaticPage(
@@ -427,14 +429,6 @@ class PdfExportController extends Controller
         self::appendPhan9KetBaiSegments($pdfsToMerge, $footerSegments, $phan9Dir, $q1AppendixDir);
 
         $fullName = trim((string) $req->input('full_name', ''));
-        $allTaggedSegments = array_merge($taggedFooterSegments, $footerSegments);
-        $phan6WhitePaths = array_values(array_filter([$phan6BiaPath, $pagePhan6Path]));
-        $whiteNamePages = PdfFooterService::resolveCoverNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
-        $whiteNamePages = array_values(array_unique(array_merge(
-            $whiteNamePages,
-            PdfFooterService::whiteNamePagesForPathsInMergeOrder($pdfsToMerge, $phan6WhitePaths)
-        )));
-        $darkNamePages  = PdfFooterService::resolveDarkNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
 
         // ── Merge + footer (banner 08.png, số trang, tên người nhập) ─────────
         $mergedTemp = $tempDir.'/merged-q1-'.$uid.'.pdf';
@@ -442,12 +436,26 @@ class PdfExportController extends Controller
         $merged     = PdfMergeService::mergeMultiple($pdfsToMerge, $mergedTemp);
         $mergeMs    = (microtime(true) - $tMerge) * 1000;
 
-        foreach ($tempFiles as $tmp) {
-            @unlink($tmp);
+        if (! $merged || ! file_exists($mergedTemp)) {
+            foreach ($tempFiles as $tmp) {
+                @unlink($tmp);
+            }
+            throw new \RuntimeException('Merge PDF Quyển 1 thất bại');
         }
 
-        if (! $merged || ! file_exists($mergedTemp)) {
-            throw new \RuntimeException('Merge PDF Quyển 1 thất bại');
+        $allTaggedSegments = array_merge($taggedFooterSegments, $footerSegments);
+        $whiteNamePages    = PdfFooterService::resolveCoverNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
+        if ($phan6MergePaths !== []) {
+            $offsetBeforePhan6 = PdfFooterService::totalPhysicalPages(
+                array_slice($pdfsToMerge, 0, $phan6MergeStartIndex)
+            );
+            $phan6WhitePages = PdfFooterService::whitePagesFromOffset($offsetBeforePhan6, $phan6MergePaths);
+            $whiteNamePages  = array_values(array_unique(array_merge($whiteNamePages, $phan6WhitePages)));
+        }
+        $darkNamePages = PdfFooterService::resolveDarkNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
+
+        foreach ($tempFiles as $tmp) {
+            @unlink($tmp);
         }
 
         $tFooter  = microtime(true);

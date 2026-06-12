@@ -520,11 +520,26 @@ class NguHanhTitleRenderer
         }
 
         $file = $cacheDir . DIRECTORY_SEPARATOR . hash('xxh128', $cacheKey . '|v3') . '.png';
-        if (!file_exists($file)) {
+        if (! is_file($file) || filesize($file) < 64) {
+            if (is_file($file)) {
+                @unlink($file);
+            }
             self::renderToFile($hanhName, $percent, $file);
         }
 
-        return self::$pathCache[$cacheKey] = $file;
+        if (! is_file($file) || filesize($file) < 64 || @getimagesize($file) === false) {
+            if (is_file($file)) {
+                @unlink($file);
+            }
+
+            return self::$pathCache[$cacheKey] = '';
+        }
+
+        $real = realpath($file);
+
+        return self::$pathCache[$cacheKey] = $real !== false
+            ? str_replace('\\', '/', $real)
+            : str_replace('\\', '/', $file);
     }
 
     /** Chiều cao hiển thị tiêu đề HÀNH X XX% (mm) — khớp blade + paginator. */
