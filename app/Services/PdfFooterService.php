@@ -217,7 +217,7 @@ class PdfFooterService
         foreach ($taggedSegments as $segment) {
             $path = (string) ($segment['path'] ?? '');
             if ($path !== '') {
-                $tagByPath[$path] = $segment;
+                $tagByPath[self::normalizeMergePath($path)] = $segment;
             }
         }
 
@@ -231,7 +231,7 @@ class PdfFooterService
             }
 
             $pageCount  = self::countPdfPages($path);
-            $coverPages = $tagByPath[$path]['coverPages'] ?? null;
+            $coverPages = $tagByPath[self::normalizeMergePath($path)]['coverPages'] ?? null;
 
             for ($i = 1; $i <= $pageCount; $i++) {
                 $physical++;
@@ -263,7 +263,7 @@ class PdfFooterService
         foreach ($taggedSegments as $segment) {
             $path = (string) ($segment['path'] ?? '');
             if ($path !== '') {
-                $tagByPath[$path] = $segment;
+                $tagByPath[self::normalizeMergePath($path)] = $segment;
             }
         }
 
@@ -277,7 +277,7 @@ class PdfFooterService
             }
 
             $pageCount     = self::countPdfPages($path);
-            $darkNamePages = $tagByPath[$path]['darkNamePages'] ?? null;
+            $darkNamePages = $tagByPath[self::normalizeMergePath($path)]['darkNamePages'] ?? null;
 
             for ($i = 1; $i <= $pageCount; $i++) {
                 $physical++;
@@ -296,6 +296,65 @@ class PdfFooterService
         }
 
         return $dark;
+    }
+
+    private static function normalizeMergePath(string $path): string
+    {
+        $path = str_replace('\\', '/', trim($path));
+        if ($path === '') {
+            return '';
+        }
+
+        $real = realpath($path);
+
+        return $real !== false ? str_replace('\\', '/', $real) : $path;
+    }
+
+    /**
+     * Trang footer chữ trắng cho các segment PDF cụ thể (theo thứ tự merge).
+     *
+     * @param  array<int, string>  $mergeOrder
+     * @param  array<int, string|null>  $targetPaths
+     * @return array<int, int>
+     */
+    public static function whiteNamePagesForPathsInMergeOrder(
+        array $mergeOrder,
+        array $targetPaths,
+        int $firstFooterPage = self::FIRST_FOOTER_PAGE
+    ): array {
+        $targets = [];
+        foreach ($targetPaths as $path) {
+            if (! is_string($path) || trim($path) === '') {
+                continue;
+            }
+            $targets[self::normalizeMergePath($path)] = true;
+        }
+
+        if ($targets === []) {
+            return [];
+        }
+
+        $white    = [];
+        $physical = 0;
+
+        foreach ($mergeOrder as $path) {
+            if ($path === '' || ! is_file($path)) {
+                continue;
+            }
+
+            $norm      = self::normalizeMergePath($path);
+            $pageCount = self::countPdfPages($path);
+
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $physical++;
+
+                if ($physical >= $firstFooterPage && isset($targets[$norm])) {
+                    $white[] = $physical;
+                }
+            }
+        }
+
+        return $white;
     }
 
     public static function countPdfPages(string $path): int

@@ -367,11 +367,13 @@ class PdfExportController extends Controller
         }
 
         // ── PHẦN 6: bìa + nội dung dòng chảy năng lượng ───────────────────────
-        $phan6Bia = PdfStaticPageCache::resolve(Phan6PdfService::coverImagePath());
-        if ($phan6Bia !== null) {
-            $pdfsToMerge[] = $phan6Bia;
+        $phan6BiaPath    = null;
+        $pagePhan6Path   = null;
+        $phan6BiaPath    = PdfStaticPageCache::resolve(Phan6PdfService::coverImagePath());
+        if ($phan6BiaPath !== null) {
+            $pdfsToMerge[] = $phan6BiaPath;
             $taggedFooterSegments[] = [
-                'path'       => $phan6Bia,
+                'path'       => $phan6BiaPath,
                 'coverPages' => 'all',
             ];
         } else {
@@ -385,8 +387,8 @@ class PdfExportController extends Controller
             $pdfsToMerge[] = $pagePhan6Path;
             $tempFiles[]   = $pagePhan6Path;
             $taggedFooterSegments[] = [
-                'path'        => $pagePhan6Path,
-                'coverPages'  => 'all',
+                'path'       => $pagePhan6Path,
+                'coverPages' => 'all',
             ];
         }
 
@@ -424,16 +426,21 @@ class PdfExportController extends Controller
         $q1AppendixDir = resource_path('views/pdfs/q2-appendix');
         self::appendPhan9KetBaiSegments($pdfsToMerge, $footerSegments, $phan9Dir, $q1AppendixDir);
 
+        $fullName = trim((string) $req->input('full_name', ''));
+        $allTaggedSegments = array_merge($taggedFooterSegments, $footerSegments);
+        $phan6WhitePaths = array_values(array_filter([$phan6BiaPath, $pagePhan6Path]));
+        $whiteNamePages = PdfFooterService::resolveCoverNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
+        $whiteNamePages = array_values(array_unique(array_merge(
+            $whiteNamePages,
+            PdfFooterService::whiteNamePagesForPathsInMergeOrder($pdfsToMerge, $phan6WhitePaths)
+        )));
+        $darkNamePages  = PdfFooterService::resolveDarkNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
+
         // ── Merge + footer (banner 08.png, số trang, tên người nhập) ─────────
         $mergedTemp = $tempDir.'/merged-q1-'.$uid.'.pdf';
         $tMerge     = microtime(true);
         $merged     = PdfMergeService::mergeMultiple($pdfsToMerge, $mergedTemp);
         $mergeMs    = (microtime(true) - $tMerge) * 1000;
-
-        $fullName = trim((string) $req->input('full_name', ''));
-        $allTaggedSegments = array_merge($taggedFooterSegments, $footerSegments);
-        $whiteNamePages = PdfFooterService::resolveCoverNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
-        $darkNamePages  = PdfFooterService::resolveDarkNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
 
         foreach ($tempFiles as $tmp) {
             @unlink($tmp);
