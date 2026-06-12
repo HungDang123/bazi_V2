@@ -80,7 +80,7 @@
         }
         .bar-cell {
             height: 8mm;
-            padding: 0 2mm 0.6mm;
+            padding: 1.6mm 2mm 0;
             vertical-align: middle;
             text-align: center;
         }
@@ -92,40 +92,39 @@
             border-radius: 2.4mm;
             height: 4.8mm;
             overflow: hidden;
-            line-height: 0;
-            margin: 0 0 0.5mm;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+        .bar-fill-bm,
+        .bar-fill-nv {
+            border-radius: 2.4mm;
+            height: 4.8mm;
+            min-width: 8mm;
+            font-size: 7pt;
+            color: #ffffff;
+            font-weight: bold;
+            padding: 0.4mm 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
         .bar-fill-bm {
             background: #4169E1;
-            border-radius: 2.4mm;
-            height: 4.8mm;
-            min-width: 8mm;
-            font-size: 7pt;
-            color: #ffffff;
-            text-align: center;
-            line-height: 4.8mm;
-            font-weight: bold;
-            padding: 0;
         }
         .bar-fill-nv {
             background: #8B4513;
-            border-radius: 2.4mm;
-            height: 4.8mm;
-            min-width: 8mm;
-            font-size: 7pt;
-            color: #ffffff;
-            text-align: center;
-            line-height: 4.8mm;
-            font-weight: bold;
-            padding: 0;
         }
         .bar-zero {
             height: 4.8mm;
             font-size: 7pt;
             color: #666666;
-            line-height: 4.8mm;
+            line-height: 1;
             text-align: left;
-            padding: 0 0 0 1.5mm;
+            padding: 0.4mm 0 0 1.5mm;
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>

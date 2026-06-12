@@ -329,8 +329,8 @@ class TongQuanKhiaCanhController extends Controller
         $nguHanhBanMenh = $this->resolveNguHanhBanMenhForPhan9($req, $result);
         $nguHanhYeuNhat = Phan9bService::resolveYeuNhatBanMenh($nguHanhBanMenh);
 
-        $hyKyThan = HyKyThan::findByThienCanDiaChi($dayStem, $monthBranch);
-        $thanTrangThai = Phan9bService::resolveThanTrangThai($hyKyThan);
+        $hyKyThan = Phan9bService::findHyKyThan($dayStem, $monthBranch);
+        $thanTrangThai = Phan9bService::resolveThanTrangThaiForChart($dayStem, $monthBranch, $batTu);
         $boNguHanh = Phan9bService::resolveBoHyThanNguHanh($dayStem, $hyKyThan);
 
         $display = $thanTrangThai !== null

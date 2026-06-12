@@ -14,10 +14,12 @@ class Phan5TraitLayout
     public const P_MARGIN_MM = 2.5;
 
     /** padding-bottom 4mm + buffer nhỏ dưới body. */
-    public const BODY_PADDING_MM = 10.0;
+    public const BODY_PADDING_MM = 12.0;
 
-    /** Đệm chống clip dòng cuối khi box ép height. */
-    public const BOX_SAFETY_MM = 1.5;
+    /** Đệm chống clip + slack render DomPDF (justify wrap thực tế cao hơn ước lượng). */
+    public const BOX_SAFETY_MM = 8.0;
+
+    public const DOM_RENDER_SLACK_MM = 6.0;
 
     public const ROW_MARGIN_MM = 6.0;
 
@@ -69,13 +71,13 @@ class Phan5TraitLayout
         }
 
         $height = 0.0;
-        $lastIdx = count($lines) - 1;
-        foreach ($lines as $i => $line) {
-            $lineCount = PdfTextWrapHelper::lineCountByWidth($line, $colWidth);
-            $height += $lineCount * self::LINE_MM;
-            if ($i < $lastIdx) {
-                $height += self::P_MARGIN_MM;
-            }
+        foreach ($lines as $line) {
+            $height += PdfTextWrapHelper::renderedHeightMmByWidth(
+                $line,
+                $colWidth,
+                self::LINE_MM,
+                self::P_MARGIN_MM
+            );
         }
 
         return $height;
@@ -99,7 +101,7 @@ class Phan5TraitLayout
         );
 
         return round(
-            self::pillSectionHeightMm($pillHeightMm) + $maxBody + self::BODY_PADDING_MM + self::BOX_SAFETY_MM,
+            self::pillSectionHeightMm($pillHeightMm) + $maxBody + self::BODY_PADDING_MM + self::BOX_SAFETY_MM + self::DOM_RENDER_SLACK_MM,
             2
         );
     }
@@ -129,6 +131,7 @@ class Phan5TraitLayout
             - self::pillSectionHeightMm()
             - self::BODY_PADDING_MM
             - self::BOX_SAFETY_MM
+            - self::DOM_RENDER_SLACK_MM
             - self::ROW_MARGIN_MM;
 
         // Dưới ~2 dòng thì không tách — paginator sẽ thử đặt cả khối hoặc sang trang sau
@@ -182,8 +185,12 @@ class Phan5TraitLayout
             $formatted = preg_match('/^[-–•]\s*/u', $line)
                 ? preg_replace('/^[-–•]\s*/u', '– ', $line)
                 : '– '.$line;
-            $lineCount = PdfTextWrapHelper::lineCountByWidth($formatted, $colWidth);
-            $h         = ($lineCount * self::LINE_MM) + self::P_MARGIN_MM;
+            $h = PdfTextWrapHelper::renderedHeightMmByWidth(
+                $formatted,
+                $colWidth,
+                self::LINE_MM,
+                self::P_MARGIN_MM
+            );
 
             if ($height + $h > $budgetMm + 0.01) {
                 $tail[] = $line;

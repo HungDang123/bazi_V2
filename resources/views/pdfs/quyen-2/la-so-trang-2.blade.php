@@ -5,16 +5,7 @@
     <style>
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        @include('pdfs.partials.pdf-justify-styles')
-        body {
-            width: 210mm; height: 297mm;
-            font-family: 'svn-poppins', sans-serif;
-            font-size: 14px;
-            font-weight: normal;
-            line-height: 140%;
-            text-align: justify;
-            letter-spacing: 0;
-        }
+        body { width: 210mm; height: 297mm; }
 
         .page {
             position: relative;
@@ -29,79 +20,124 @@
             width: 210mm; height: 297mm;
         }
 
-        /* Vùng kem cuộn lịch — canh giữa vùng parchment LBTV-494 */
-        .val-block {
+        /* Vùng parchment cuộn lịch LBTV-143 */
+        .scroll-content {
             position: absolute;
             left: 28mm;
+            top: 114mm;
             width: 154mm;
-            text-align: center;
+            height: 148mm;
         }
 
-        .val-block p {
-            margin: 0;
+        .scroll-table {
+            width: 100%;
+            height: 148mm;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .scroll-table td {
+            vertical-align: middle;
+            text-align: center;
             padding: 0;
         }
 
-        .val-name,
-        .val-text {
-            color: #6E0101;
-            font-family: 'svn-poppins', sans-serif;
-            font-weight: bold;
-            text-align: center !important;
+        .field-label-img,
+        .val-kw-img {
+            display: block;
+            margin: 0 auto;
         }
 
-        .val-name {
-            font-size: 17px;
-            line-height: 115%;
-            text-transform: uppercase;
-            letter-spacing: 0.2px;
-        }
-
-        .val-text {
-            font-size: 14px;
-            line-height: 115%;
-        }
-
-        .val-text strong {
-            font-weight: bold;
-            color: #6E0101;
-        }
-
-        .val-bat-tu {
-            font-size: 12px;
-            line-height: 120%;
+        .field-label-img {
+            margin-bottom: 1.2mm;
         }
     </style>
 </head>
 <body>
+@php
+    use App\Services\NguHanhTitleRenderer;
+
+    $kwPlain = static function (string $text): string {
+        return trim(strip_tags($text));
+    };
+
+    $batTuPlain = trim(strip_tags(str_replace(['<strong>', '</strong>'], '', $batTu ?? '')));
+
+    /** Chiều ngang tối đa trong vùng kem cuộn lịch. */
+    $valueW = 128.0;
+
+    $rows = [
+        [
+            'label' => 'Họ & Tên',
+            'value' => $fullName ?? '',
+            'valPx' => 20,
+            'minH'  => 14.0,
+        ],
+        [
+            'label' => 'Giới tính',
+            'value' => $gender ?? '',
+            'valPx' => 20,
+            'minH'  => 12.0,
+        ],
+        [
+            'label' => 'Ngày sinh dương lịch',
+            'value' => $birthDate ?? '',
+            'valPx' => 18,
+            'minH'  => 14.0,
+        ],
+    ];
+
+    if ($batTuPlain !== '') {
+        $rows[] = [
+            'label' => 'Bát tự sinh thần',
+            'value' => $batTuPlain,
+            'valPx' => 14,
+            'minH'  => 14.0,
+        ];
+    }
+
+    if (trim((string) ($address ?? '')) !== '') {
+        $rows[] = [
+            'label' => 'Địa chỉ',
+            'value' => $address,
+            'valPx' => 18,
+            'minH'  => 14.0,
+        ];
+    }
+
+    $rowCount  = max(1, count($rows));
+    $rowHeight = round(148 / $rowCount, 2);
+    $labelW    = 145.0;
+    $labelH    = 6.0;
+    $labelPx   = 14;
+@endphp
 <div class="page">
 
     <img class="bg-img" src="{{ $templatePath }}">
 
-    {{-- Vị trí giá trị — dưới nhãn in sẵn LBTV-494 (5 hàng ~32mm) --}}
-    <div class="val-block" style="top: 137.5mm;">
-        <p class="val-name">{{ $fullName }}</p>
+    <div class="scroll-content">
+        <table class="scroll-table">
+            @foreach ($rows as $row)
+            @php
+                $labelImg = NguHanhTitleRenderer::scrollLabelImagePath($row['label'], $labelW, $labelH, $labelPx);
+                $valueText = $kwPlain($row['value']);
+                $valueMeta = $valueText !== ''
+                    ? NguHanhTitleRenderer::scrollValueImageMetrics($valueText, $valueW, $row['valPx'], $row['minH'])
+                    : ['path' => '', 'widthMm' => $valueW, 'heightMm' => $row['minH']];
+            @endphp
+            <tr style="height: {{ $rowHeight }}mm;">
+                <td>
+                    @if ($labelImg !== '')
+                    <img class="field-label-img" style="width: {{ $labelW }}mm; height: {{ $labelH }}mm;" src="{{ $labelImg }}" alt="">
+                    @endif
+                    @if ($valueMeta['path'] !== '')
+                    <img class="val-kw-img" style="width: {{ $valueMeta['widthMm'] }}mm; height: {{ $valueMeta['heightMm'] }}mm;" src="{{ $valueMeta['path'] }}" alt="">
+                    @endif
+                </td>
+            </tr>
+            @endforeach
+        </table>
     </div>
-
-    <div class="val-block" style="top: 150mm;">
-        <p class="val-text">{{ $gender }}</p>
-    </div>
-
-    <div class="val-block" style="top: 182mm;">
-        <p class="val-text">{{ $birthDate }}</p>
-    </div>
-
-    @if (!empty($batTu))
-    <div class="val-block" style="top: 214mm;">
-        <p class="val-text val-bat-tu">{!! $batTu !!}</p>
-    </div>
-    @endif
-
-    @if (!empty($address))
-    <div class="val-block" style="top: 246mm;">
-        <p class="val-text">{{ $address }}</p>
-    </div>
-    @endif
 
 </div>
 </body>

@@ -107,17 +107,64 @@ class Phan9bService
             return null;
         }
 
-        $label = trim((string) $hyKyThan->than_nhuoc_than_vuong);
+        return self::resolveThanTrangThaiFromLabel((string) $hyKyThan->than_nhuoc_than_vuong);
+    }
 
-        if (preg_match('/VƯỢNG/u', mb_strtoupper($label, 'UTF-8'))) {
+    /**
+     * Phân loại Thân Vượng / Thân Nhược từ nhãn (Hỷ Kỵ Thần hoặc Chất lượng Nhật Chủ).
+     */
+    public static function resolveThanTrangThaiFromLabel(string $label): ?string
+    {
+        $label = trim($label);
+        if ($label === '') {
+            return null;
+        }
+
+        $upper = mb_strtoupper($label, 'UTF-8');
+
+        if (preg_match('/VƯỢNG/u', $upper)) {
             return Phan9bGiaiPhapCanBang::THAN_VUONG;
         }
 
-        if (preg_match('/NHƯỢC/u', mb_strtoupper($label, 'UTF-8'))) {
+        if (preg_match('/NHƯỢC|SUY/u', $upper)) {
             return Phan9bGiaiPhapCanBang::THAN_NHUOC;
         }
 
         return null;
+    }
+
+    /**
+     * Xác định Thân Vượng / Thân Nhược: ưu tiên Hỷ Kỵ Thần, fallback Chất lượng Nhật Chủ.
+     *
+     * @param  array<string, mixed>  $batTu
+     */
+    public static function resolveThanTrangThaiForChart(string $dayStem, string $monthBranch, array $batTu = []): ?string
+    {
+        $hyKyThan = HyKyThan::findByThienCanDiaChi($dayStem, $monthBranch);
+        $than = self::resolveThanTrangThai($hyKyThan);
+        if ($than !== null) {
+            return $than;
+        }
+
+        if ($batTu !== []) {
+            $clnc = ChatLuongNhatChuService::buildFromBatTu($batTu);
+            foreach ($clnc['items'] ?? [] as $item) {
+                $than = self::resolveThanTrangThaiFromLabel((string) ($item['trang_thai'] ?? ''));
+                if ($than !== null) {
+                    return $than;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Tra Hỷ Kỵ Thần theo Can ngày + Chi tháng (Địa Chi đã chuẩn hóa trong model).
+     */
+    public static function findHyKyThan(string $dayStem, string $monthBranch): ?HyKyThan
+    {
+        return HyKyThan::findByThienCanDiaChi($dayStem, $monthBranch);
     }
 
     /**

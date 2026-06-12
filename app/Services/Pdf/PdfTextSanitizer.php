@@ -37,6 +37,65 @@ class PdfTextSanitizer
         return implode("\n", $lines);
     }
 
+    /** Tiêu đề con Phần 9: 4. / a. / Về … */
+    public static function isPhan9SubLabelLine(string $line): bool
+    {
+        $line = trim($line);
+        if ($line === '') {
+            return false;
+        }
+
+        return preg_match('/^[abc]\.\s/iu', $line) === 1
+            || preg_match('/^\d+\.\s/iu', $line) === 1
+            || preg_match('/^Về\s+/iu', $line) === 1;
+    }
+
+    /**
+     * @return array<int, array{type: string, text: string}>
+     */
+    public static function blocksFromParagraphText(string $text): array
+    {
+        $text = self::trimMultiline($text);
+        if ($text === '') {
+            return [];
+        }
+
+        $hasSub = preg_match('/(^|\n)\s*[abc]\.\s/iu', $text) === 1
+            || preg_match('/(^|\n)\s*\d+\.\s/iu', $text) === 1
+            || preg_match('/(^|\n)\s*Về\s+/iu', $text) === 1;
+
+        if (! $hasSub) {
+            return [['type' => 'para', 'text' => $text]];
+        }
+
+        $blocks = [];
+        foreach (preg_split('/\r\n|\r|\n/u', $text) ?: [] as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+
+            if (self::isPhan9SubLabelLine($line)) {
+                $type = preg_match('/^[abc]\.\s/iu', $line) === 1 ? 'sub_ab' : 'sub_title';
+                $blocks[] = ['type' => $type, 'text' => $line];
+            } else {
+                $blocks[] = ['type' => 'para', 'text' => $line];
+            }
+        }
+
+        return $blocks;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $blocks
+     */
+    public static function appendParagraphBlocks(array &$blocks, string $text): void
+    {
+        foreach (self::blocksFromParagraphText($text) as $block) {
+            $blocks[] = $block;
+        }
+    }
+
     public static function trimByKey(string $key, string $value): string
     {
         if (in_array($key, self::MULTILINE_KEYS, true)) {

@@ -167,9 +167,6 @@ class Phan9bNoiLucPdfBuilder
             }
             if (! empty($item['thap_than']['ten'])) {
                 $name = (string) $item['thap_than']['ten'];
-                if (! empty($item['is_top'])) {
-                    $name .= ' (Bản mệnh cao)';
-                }
                 $blocks[] = ['type' => 'sub_title', 'text' => $name];
             }
             if (! empty($item['tagline'])) {
@@ -194,16 +191,6 @@ class Phan9bNoiLucPdfBuilder
      */
     private static function appendParagraphs(array &$blocks, string $text): void
     {
-        $text = trim($text);
-        if ($text === '') {
-            return;
-        }
-
-        foreach (preg_split('/\r\n|\r|\n/u', $text) ?: [] as $part) {
-            $part = trim($part);
-            if ($part !== '') {
-                $blocks[] = ['type' => 'para', 'text' => $part];
-            }
-        }
+        PdfTextSanitizer::appendParagraphBlocks($blocks, $text);
     }
 }

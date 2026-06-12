@@ -7,8 +7,11 @@ namespace App\Services\Pdf;
  */
 class PdfContentPaginator
 {
-    /** Slack mm khi đặt cả khối traits sau khi split thất bại. */
-    private const TRAITS_WHOLE_BLOCK_SLACK_MM = 4.0;
+    /** Không cho phép traits tràn quá budget — tránh clip footer / tiêu đề Chiến lược. */
+    private const TRAITS_WHOLE_BLOCK_SLACK_MM = 0.0;
+
+    /** Buffer sau khối traits trước tiêu đề Chiến lược phát triển. */
+    private const TRAITS_CHIEN_LUOC_BUFFER_MM = 8.0;
 
     /**
      * @param  array<int, array<string, mixed>>  $blocks
@@ -137,6 +140,13 @@ class PdfContentPaginator
 
             if ($chunk !== [] && self::mustKeepWithNext($type, $blocks, $idx)) {
                 $nextNeed = self::keepWithNextHeightMm($type, $blocks, $idx, $config);
+                if ($nextNeed > 0 && ($used + $need + $nextNeed) > $maxMm) {
+                    break;
+                }
+            }
+
+            if ($chunk !== [] && $type === 'traits') {
+                $nextNeed = self::traitsTrailingHeightMm($blocks, $idx, $config);
                 if ($nextNeed > 0 && ($used + $need + $nextNeed) > $maxMm) {
                     break;
                 }
@@ -287,6 +297,19 @@ class PdfContentPaginator
         return [$head, $tail];
     }
 
+    /**
+     * Chiều cao cần giữ sau traits (tiêu đề Chiến lược + buffer footer).
+     */
+    private static function traitsTrailingHeightMm(array $blocks, int $idx, PdfPaginationConfig $config): float
+    {
+        $next = $blocks[$idx + 1] ?? null;
+        if (! is_array($next) || ($next['type'] ?? '') !== 'chien_luoc_title') {
+            return 0.0;
+        }
+
+        return self::blockHeightMm($next, $config) + self::TRAITS_CHIEN_LUOC_BUFFER_MM;
+    }
+
     private static function mustKeepWithNext(string $type, array $blocks, int $idx): bool
     {
         if (in_array($type, [
@@ -299,6 +322,12 @@ class PdfContentPaginator
             'chapter_title',
         ], true)) {
             return true;
+        }
+
+        if ($type === 'traits') {
+            $next = $blocks[$idx + 1] ?? null;
+
+            return is_array($next) && ($next['type'] ?? '') === 'chien_luoc_title';
         }
 
         $next = $blocks[$idx + 1] ?? null;
@@ -336,6 +365,13 @@ class PdfContentPaginator
             }
 
             return $need;
+        }
+
+        if ($type === 'traits') {
+            $next = $blocks[$idx + 1] ?? null;
+            if (is_array($next) && ($next['type'] ?? '') === 'chien_luoc_title') {
+                return self::blockHeightMm($next, $config) + self::TRAITS_CHIEN_LUOC_BUFFER_MM;
+            }
         }
 
         // Label-like blocks: tránh orphan heading — sub_title phải kèm toàn bộ đoạn kế tiếp

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Services\Pdf\PdfContentPaginator;
 use App\Services\Pdf\PdfPaginationProfiles;
+use App\Services\Pdf\PdfTextSanitizer;
 use App\Models\DongChayGioiThieu;
 use App\Models\Phan9aNgoaiLuc;
 use App\Models\Phan9aNoiLuc;
@@ -11,7 +12,7 @@ use App\Models\Phan9aNoiLuc;
 /**
  * Xây dựng trang PDF Phần 9 – Giải Pháp Tối Ưu Để Kiến Tạo Vận Mệnh.
  *
- * Bìa   : LBTV-236 (bia-phan-9.png) – xử lý ở PdfExportController.
+ * Bìa   : bia-phan-9a.png (Cuốn 1) – xử lý ở PdfExportController.
  * Trang 2: giai-phap-bg.png + mục I (nội dung render lên nền cuộn thư).
  * Tiếp  : page-content-bg.png + la-so-phan-8-content.
  */
@@ -22,7 +23,7 @@ class Phan9PdfService
 
     public static function coverImagePath(): string
     {
-        return resource_path('views/pdfs/phan-9/bia-phan-9.png');
+        return resource_path('views/pdfs/phan-9/bia-phan-9a.png');
     }
 
     public static function contentBgPath(): string
@@ -99,7 +100,7 @@ class Phan9PdfService
                     $yeuNhat['phan_tram']
                 );
             }
-            $blocks[] = ['type' => 'para', 'text' => $text];
+            PdfTextSanitizer::appendParagraphBlocks($blocks, $text);
         }
 
         if ($yeuNhat !== null) {
@@ -122,7 +123,7 @@ class Phan9PdfService
                 foreach ($section['doan'] as $para) {
                     $para = trim($para);
                     if ($para !== '') {
-                        $blocks[] = ['type' => 'para', 'text' => $para];
+                        PdfTextSanitizer::appendParagraphBlocks($blocks, $para);
                     }
                 }
             }
@@ -154,7 +155,7 @@ class Phan9PdfService
             foreach ($paragraphs as $para) {
                 $para = trim($para);
                 if ($para !== '') {
-                    $blocks[] = ['type' => 'para', 'text' => $para];
+                    PdfTextSanitizer::appendParagraphBlocks($blocks, $para);
                 }
             }
         }

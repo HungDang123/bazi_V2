@@ -327,21 +327,18 @@
         }
 
         .phan9-muc1-sheet {
-            position: relative;
             max-width: 42rem;
             margin: 0 auto 1.5rem;
-            background: #fff url('{{ asset('images/phan-9/giai-phap-bg.png') }}') no-repeat top center;
-            background-size: 100% auto;
+            background: #fff;
             border-radius: 0.5rem;
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            padding: 11.5rem 1.5rem 1.5rem;
+            padding: 1.5rem;
+            border-left: 4px solid rgb(129 140 248);
         }
 
         @media (max-width: 640px) {
             .phan9-muc1-sheet {
-                padding-top: 9rem;
-                padding-left: 1rem;
-                padding-right: 1rem;
+                padding: 1rem;
             }
         }
 
@@ -1163,6 +1160,11 @@
         .phan5-bat-tu-wrap .result-table td.phan5-hl {
             background-color: #F8D7DC;
         }
+
+        .phan9-sub-label {
+            color: #6E0101;
+            font-weight: 700;
+        }
     </style>
 </head>
 
@@ -1342,12 +1344,12 @@
 
             <div id="pdfDownloadBar" class="mb-6 flex flex-col items-center gap-3">
                 <div class="flex flex-wrap justify-center gap-3">
-                    <button type="button" id="btnDownloadPdfQ1"
+                    <button type="button" id="btnDownloadPdfQ1" disabled
                         class="inline-flex items-center gap-2 rounded-lg bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60">
                         <i class="fas fa-file-pdf"></i>
                         <span class="btn-label">Tải PDF Quyển 1</span>
                     </button>
-                    <button type="button" id="btnDownloadPdfQ2"
+                    <button type="button" id="btnDownloadPdfQ2" disabled
                         class="inline-flex items-center gap-2 rounded-lg bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-60">
                         <i class="fas fa-file-pdf"></i>
                         <span class="btn-label">Tải PDF Quyển 2</span>
@@ -1736,7 +1738,7 @@
             <div id="phan9Section" class="quyen-section mt-6 mb-6" style="display: none;">
                 {{-- Bìa + cuộn thư (giống PDF Phần 9 / 9B) --}}
                 <div id="phan9SharedCovers" class="mb-6 max-w-2xl mx-auto" style="display: none;">
-                    <img src="{{ asset('images/phan-9/bia-phan-9.png') }}" alt="PHẦN 9 — Giải pháp tối ưu" class="w-full rounded-lg shadow-lg">
+                    <img id="phan9CoverImg" src="{{ asset('images/phan-9/bia-phan-9a.png') }}" alt="PHẦN 9 — Giải pháp tối ưu" class="w-full rounded-lg shadow-lg">
                 </div>
                 <div id="phan9aBlock" data-phan9-quyen="1">
                     <h3 class="text-xl font-bold mb-4 form-title">
@@ -2170,6 +2172,15 @@
                     $('#phan9SharedCovers').toggle(
                         (isCuon1 && has9a) || (isCuon2 && has9b)
                     );
+
+                    if ((isCuon1 && has9a) || (isCuon2 && has9b)) {
+                        $('#phan9CoverImg').attr(
+                            'src',
+                            isCuon1
+                                ? @json(asset('images/phan-9/bia-phan-9a.png'))
+                                : @json(asset('images/phan-9/bia-phan-9b.png'))
+                        );
+                    }
                 }
 
                 function refreshPhan8QuyenVisibility() {
@@ -2556,6 +2567,10 @@
                             });
                     }
 
+                    function enablePdfActionsAfterPhan2(phan2Data, params, result) {
+                        queuePdfExport(buildPdfQueuePayload(params, result, phan2Data));
+                    }
+
                     function queuePdfExport(payload) {
                         lastPdfQueuePayload = payload;
                         $('#pdfStatusHint').removeClass('hidden').text('Đang xếp hàng tạo PDF Quyển 1 và Quyển 2...');
@@ -2574,6 +2589,7 @@
                             };
                             updatePdfStatusHint();
                             startPdfStatusPolling();
+                            $('#btnDownloadPdfQ1, #btnDownloadPdfQ2').prop('disabled', false);
                         }).fail(function(xhr) {
                             showNotification(resolveApiErrorMessage(xhr, 'error'), 'error');
                             $('#pdfStatusHint').text('Không thể xếp hàng tạo PDF.');
@@ -2613,7 +2629,7 @@
 
                                 // Hiển thị kết quả (xếp hàng PDF sau khi PHẦN 2 load xong)
                                 displayResults(params, response, function(phan2Data) {
-                                    queuePdfExport(buildPdfQueuePayload(params, response, phan2Data));
+                                    enablePdfActionsAfterPhan2(phan2Data, params, response);
                                 });
 
                                 // Khôi phục trạng thái nút
@@ -2776,10 +2792,39 @@
                         });
                     }
 
+                    function isPhan9SubLabelLine(line) {
+                        line = String(line || '').trim();
+                        if (!line) return false;
+                        return /^[abc]\.\s/i.test(line)
+                            || /^\d+\.\s/.test(line)
+                            || /^Về\s+/u.test(line);
+                    }
+
+                    function formatPhan9TextBlock(text) {
+                        if (!text) return '';
+                        const lines = String(text).split(/\r?\n/);
+                        let html = '';
+                        lines.forEach(function(line) {
+                            line = line.trim();
+                            if (!line) return;
+                            if (isPhan9SubLabelLine(line)) {
+                                html += '<p class="mb-2 phan9-sub-label leading-relaxed">' +
+                                    escapeHtml(line) + '</p>';
+                            } else {
+                                html += '<p class="mb-3 leading-relaxed text-gray-700">' +
+                                    escapeHtml(line) + '</p>';
+                            }
+                        });
+                        return html;
+                    }
+
                     function renderPhan9Paragraphs(paragraphs) {
                         if (!paragraphs || !paragraphs.length) return '';
                         return paragraphs.map(function(p) {
-                            return '<p class="mb-3 leading-relaxed">' + escapeHtml(p) + '</p>';
+                            if (/\r?\n/.test(String(p)) || isPhan9SubLabelLine(p)) {
+                                return formatPhan9TextBlock(p);
+                            }
+                            return '<p class="mb-3 leading-relaxed text-gray-700">' + escapeHtml(p) + '</p>';
                         }).join('');
                     }
 
@@ -2997,12 +3042,7 @@
 
                     function renderPhan9bNoiLucParagraphs(text) {
                         if (!text) return '';
-                        return String(text).split('\n').map(function(line) {
-                            line = line.trim();
-                            if (!line) return '';
-                            return '<p class="mb-2 text-gray-700 leading-relaxed pl-3 border-l-2 border-gray-200">' +
-                                escapeHtml(line) + '</p>';
-                        }).join('');
+                        return formatPhan9TextBlock(text);
                     }
 
                     function renderPhan9bContent(data) {
@@ -3025,6 +3065,13 @@
                                 escapeHtml(String(data.ngu_hanh_yeu_nhat.phan_tram)) + '%</div>';
                         }
 
+                        if (!data.noi_dung && (data.noi_luc || data.thap_than || data.ngoai_luc || data.hieu_qua)) {
+                            html += '<div class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900">' +
+                                'Chưa xác định được <strong>Thân Vượng / Thân Nhược</strong> — không thể chọn nội dung Mục I. ' +
+                                'Kiểm tra bảng Hỷ Kỵ Thần (Can ngày + Chi tháng) hoặc Chất lượng Nhật Chủ (Phần 3).' +
+                                '</div>';
+                        }
+
                         const block = data.noi_dung;
                         if (block) {
                             html += '<div class="phan9-muc1-sheet mb-4">';
@@ -3033,7 +3080,7 @@
 
                             (block.sections || []).forEach(function(sec) {
                                 if (sec.tieu_de) {
-                                    html += '<h5 class="text-base font-bold text-gray-800 mt-5 mb-3">' +
+                                    html += '<h5 class="text-base phan9-sub-label mt-5 mb-3">' +
                                         escapeHtml(sec.tieu_de) + '</h5>';
                                 }
                                 (sec.doan || []).forEach(function(item) {
@@ -3065,7 +3112,7 @@
                             }
 
                             if (nl && nl.muc) {
-                                html += '<h5 class="text-base font-bold text-gray-800 mb-4">' +
+                                html += '<h5 class="text-base phan9-sub-label mb-4">' +
                                     escapeHtml(nl.muc) + '</h5>';
                             }
 
@@ -3082,7 +3129,7 @@
                                     }
                                     (hanh.sections || []).forEach(function(sec) {
                                         if (sec.tieu_de) {
-                                            html += '<h6 class="font-semibold text-gray-700 mt-4 mb-2">' +
+                                            html += '<h6 class="phan9-sub-label mt-4 mb-2">' +
                                                 escapeHtml(sec.tieu_de) + '</h6>';
                                         }
                                         (sec.doan || []).forEach(function(para) {
@@ -3107,7 +3154,7 @@
                                 }
 
                                 if (tt.muc) {
-                                    html += '<h5 class="text-base font-bold text-gray-800 mb-4 mt-6 pt-4 border-t border-gray-200">' +
+                                    html += '<h5 class="text-base phan9-sub-label mb-4 mt-6 pt-4 border-t border-gray-200">' +
                                         escapeHtml(tt.muc) + '</h5>';
                                 }
 
@@ -3138,7 +3185,7 @@
                                     }
                                     (item.sections || []).forEach(function(sec) {
                                         if (sec.tieu_de) {
-                                            html += '<h6 class="font-semibold text-gray-700 mt-4 mb-2">' +
+                                            html += '<h6 class="phan9-sub-label mt-4 mb-2">' +
                                                 escapeHtml(sec.tieu_de) + '</h6>';
                                         }
                                         (sec.doan || []).forEach(function(para) {
@@ -3169,15 +3216,17 @@
                             (nluc.sections || []).forEach(function(sec) {
                                 html += '<div class="mb-6 pb-5 border-b border-gray-100 last:border-0">';
                                 if (sec.tieu_de) {
-                                    html += '<h5 class="text-base font-bold text-teal-800 mb-3">' +
+                                    html += '<h5 class="text-base phan9-sub-label mb-3">' +
                                         escapeHtml(sec.tieu_de) + '</h5>';
                                 }
                                 (sec.items || []).forEach(function(item) {
                                     if (!item) return;
-                                    const isLabel = /^[^:]{1,80}:/u.test(item) &&
-                                        !/^Nếu bạn cần nạp/u.test(item);
+                                    const isLabel = isPhan9SubLabelLine(item) || (
+                                        /^[^:]{1,80}:/u.test(item) &&
+                                        !/^Nếu bạn cần nạp/u.test(item)
+                                    );
                                     if (isLabel) {
-                                        html += '<p class="font-semibold text-gray-800 mt-3 mb-1 leading-relaxed">' +
+                                        html += '<p class="phan9-sub-label mt-3 mb-1 leading-relaxed">' +
                                             escapeHtml(item) + '</p>';
                                     } else if (/^Nếu bạn cần nạp/u.test(item) || /^Cần nạp/u.test(item)) {
                                         html += '<p class="text-gray-700 mb-2 leading-relaxed pl-3 border-l-2 border-teal-200">' +
@@ -3205,7 +3254,7 @@
                             (hq.sections || []).forEach(function(sec) {
                                 html += '<div class="mb-6 pb-5 border-b border-gray-100 last:border-0">';
                                 if (sec.tieu_de) {
-                                    html += '<h5 class="text-base font-bold text-rose-800 mb-3">' +
+                                    html += '<h5 class="text-base phan9-sub-label mb-3">' +
                                         escapeHtml(sec.tieu_de) + '</h5>';
                                 }
                                 if (sec.intro) {
@@ -3220,9 +3269,9 @@
                                     }
                                     const text = item.noi_dung || '';
                                     if (!text.trim()) return;
-                                    const isLabel = /^Về\s+/u.test(text);
+                                    const isLabel = isPhan9SubLabelLine(text);
                                     if (isLabel) {
-                                        html += '<p class="font-semibold text-gray-800 mt-3 mb-1 leading-relaxed">' +
+                                        html += '<p class="phan9-sub-label mt-3 mb-1 leading-relaxed">' +
                                             escapeHtml(text) + '</p>';
                                     } else {
                                         html += '<p class="text-gray-700 mb-2 leading-relaxed">' +
@@ -3330,7 +3379,7 @@
                             }
                             (hanh.sections || []).forEach(function(sec) {
                                 if (sec.tieu_de) {
-                                    html += '<h6 class="font-semibold text-gray-700 mt-4 mb-2">' +
+                                    html += '<h6 class="phan9-sub-label mt-4 mb-2">' +
                                         escapeHtml(sec.tieu_de) + '</h6>';
                                 }
                                 if (sec.doan && sec.doan.length) {
@@ -5812,14 +5861,14 @@
                                         <div class="bar-container" style="position: relative;">
                                             ${natalPercent > 0 ? `<div class="bar natal" style="width: ${natalPercent}%;"></div>` : ''}
                                             <div class="bar-bg" style="flex: 1;"></div>
-                                            <span style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: ${natalPercent > 0 ? 'white' : '#4169E1'}; font-weight: bold; font-size: 12px; z-index: 10;">${natalPercent}%</span>
+                                            <span style="position: absolute; left: 8px; top: 54%; transform: translateY(-50%); color: ${natalPercent > 0 ? 'white' : '#4169E1'}; font-weight: bold; font-size: 12px; z-index: 10;">${natalPercent}%</span>
                                         </div>
                                     </td>
                                     <td style="padding: 4px 8px;">
                                         <div class="bar-container" style="position: relative;">
                                             ${annualPercent > 0 ? `<div class="bar annual" style="width: ${annualPercent}%;"></div>` : ''}
                                             <div class="bar-bg" style="flex: 1;"></div>
-                                            <span style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: ${annualPercent > 0 ? 'white' : '#8B4513'}; font-weight: bold; font-size: 12px; z-index: 10;">${annualPercent}%</span>
+                                            <span style="position: absolute; left: 8px; top: 54%; transform: translateY(-50%); color: ${annualPercent > 0 ? 'white' : '#8B4513'}; font-weight: bold; font-size: 12px; z-index: 10;">${annualPercent}%</span>
                                         </div>
                                     </td>
                                 </tr>

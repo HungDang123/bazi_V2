@@ -18,6 +18,17 @@ class PdfDownloadService
         return self::download($filePath, $filename, false);
     }
 
+    /** Xem inline trong iframe (preview). */
+    public static function inline(string $filePath, string $filename): StreamedResponse
+    {
+        return response()->streamDownload(function () use ($filePath) {
+            readfile($filePath);
+        }, $filename, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$filename.'"',
+        ]);
+    }
+
     public static function download(string $filePath, string $filename, bool $deleteAfter = true): StreamedResponse
     {
         $headers = [

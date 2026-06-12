@@ -204,6 +204,100 @@ class PdfFooterService
         return $dark;
     }
 
+    /**
+     * Ánh xạ segment metadata → số trang vật lý theo thứ tự merge thực tế.
+     *
+     * @param  array<int, string>  $mergeOrder
+     * @param  array<int, array{path: string, coverPages?: 'all'|array<int, int>, darkNamePages?: 'all'|array<int, int>}>  $taggedSegments
+     * @return array<int, int>
+     */
+    public static function resolveCoverNamePagesFromFullMerge(array $mergeOrder, array $taggedSegments): array
+    {
+        $tagByPath = [];
+        foreach ($taggedSegments as $segment) {
+            $path = (string) ($segment['path'] ?? '');
+            if ($path !== '') {
+                $tagByPath[$path] = $segment;
+            }
+        }
+
+        $white     = [];
+        $physical  = 0;
+        $firstFooter = self::FIRST_FOOTER_PAGE;
+
+        foreach ($mergeOrder as $path) {
+            if ($path === '' || ! is_file($path)) {
+                continue;
+            }
+
+            $pageCount  = self::countPdfPages($path);
+            $coverPages = $tagByPath[$path]['coverPages'] ?? null;
+
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $physical++;
+
+                if ($physical < $firstFooter) {
+                    continue;
+                }
+
+                $isCover = $coverPages === 'all'
+                    || (is_array($coverPages) && in_array($i, $coverPages, true));
+
+                if ($isCover) {
+                    $white[] = $physical;
+                }
+            }
+        }
+
+        return $white;
+    }
+
+    /**
+     * @param  array<int, string>  $mergeOrder
+     * @param  array<int, array{path: string, coverPages?: 'all'|array<int, int>, darkNamePages?: 'all'|array<int, int>}>  $taggedSegments
+     * @return array<int, int>
+     */
+    public static function resolveDarkNamePagesFromFullMerge(array $mergeOrder, array $taggedSegments): array
+    {
+        $tagByPath = [];
+        foreach ($taggedSegments as $segment) {
+            $path = (string) ($segment['path'] ?? '');
+            if ($path !== '') {
+                $tagByPath[$path] = $segment;
+            }
+        }
+
+        $dark      = [];
+        $physical  = 0;
+        $firstFooter = self::FIRST_FOOTER_PAGE;
+
+        foreach ($mergeOrder as $path) {
+            if ($path === '' || ! is_file($path)) {
+                continue;
+            }
+
+            $pageCount     = self::countPdfPages($path);
+            $darkNamePages = $tagByPath[$path]['darkNamePages'] ?? null;
+
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $physical++;
+
+                if ($physical < $firstFooter) {
+                    continue;
+                }
+
+                $forceDark = $darkNamePages === 'all'
+                    || (is_array($darkNamePages) && in_array($i, $darkNamePages, true));
+
+                if ($forceDark) {
+                    $dark[] = $physical;
+                }
+            }
+        }
+
+        return $dark;
+    }
+
     public static function countPdfPages(string $path): int
     {
         if (! is_file($path)) {

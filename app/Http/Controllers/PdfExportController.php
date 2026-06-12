@@ -25,6 +25,7 @@ use App\Services\PdfRenderService;
 use App\Services\PdfStaticPageCache;
 use App\Services\PdfViewCache;
 use App\Services\Pdf\PdfExportMetrics;
+use App\Services\PdfBaziCache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -99,59 +100,13 @@ class PdfExportController extends Controller
         $q2Dir = resource_path('views/pdfs/quyen-2');
 
         // ── BaZi data (trang 14–17) ───────────────────────────────────────────
-        $baziData            = null;
-        $batTuData           = [];
-        $quyNhanVanXuong     = [];
-        $bangDaiVan          = [];
-        $nienVan             = [];
-        $bieuDoNguHanh       = [];
-        $chatLuongThapThan   = [];
-        $chiSoBieuDoCot      = [];
-        $nguHanhDong         = [];
-
-        $birthY = $req->input('y');
-        $birthM = $req->input('m');
-        $birthD = $req->input('d');
-
-        if ($birthY && $birthM && $birthD) {
-            $baziT0 = microtime(true);
-            try {
-                $baziData = BaZiServiceV2::calc(
-                    $req->input('full_name', ''),
-                    (int) $birthY,
-                    (int) $birthM,
-                    (int) $birthD,
-                    $req->filled('h')      ? (int) $req->input('h')      : null,
-                    $req->filled('minute') ? (int) $req->input('minute') : null,
-                    $req->input('g', 'male')
-                );
-                $batTuData         = $baziData['bat_tu']              ?? [];
-                $quyNhanVanXuong   = $baziData['quy_nhan_van_xuong']  ?? [];
-                $bangDaiVan        = $baziData['bang_dai_van']         ?? [];
-                $nienVan           = $baziData['nien_van']             ?? [];
-                $bieuDoNguHanh     = $baziData['bieu_do_ngu_hanh']     ?? [];
-                $chatLuongThapThan = $baziData['chat_luong_thap_than'] ?? [];
-                $chiSoBieuDoCot    = $baziData['chi_so_bieu_do_cot']   ?? [];
-                $nguHanhDong       = $baziData['ngu_hanh_dong']         ?? [];
-            } catch (\Throwable $e) {
-                Log::error('PdfExport Q1: BaZiServiceV2::calc lỗi – ' . $e->getMessage());
-            }
-
-            $this->applyPrecomputedStrengthData(
-                $req,
-                $batTuData,
-                $bieuDoNguHanh,
-                $chatLuongThapThan,
-                $chiSoBieuDoCot,
-                $nguHanhDong
-            );
-
-            PdfExportMetrics::addBaziMs((microtime(true) - $baziT0) * 1000);
-        }
+        $baziCore = $this->resolveBaziCore($req, 'PdfExport Q1');
+        extract($baziCore, EXTR_OVERWRITE);
 
         $pdfsToMerge = [];
         $tempFiles   = [];
         $footerSegments = [];
+        $taggedFooterSegments = [];
 
         // ── Trang 1: PDF tĩnh ───────────────────────────────────────────────
         self::appendStaticPage($pdfsToMerge, $pdfDir . '/page-01.pdf', 'Q1 page-01.pdf');
@@ -175,7 +130,7 @@ class PdfExportController extends Controller
         $tempFiles[]     = $page2Path;
 
         // ── Trang 3–13: bundle PDF tĩnh (cache) ─────────────────────────────
-        $staticMid = PdfStaticPageCache::resolveBundle('q1-pages-3-13', [
+        $q1StaticSources = [
             $pdfDir . '/page-03.pdf',
             $pdfDir . '/page-04.pdf',
             $pdfDir . '/page-05.png',
@@ -187,7 +142,8 @@ class PdfExportController extends Controller
             $pdfDir . '/page-11.png',
             $pdfDir . '/page-12.png',
             $pdfDir . '/page-13.png',
-        ]);
+        ];
+        $staticMid = PdfStaticPageCache::resolveBundle('q1-pages-3-13', $q1StaticSources);
         if ($staticMid !== null) {
             $pdfsToMerge[] = $staticMid;
         } else {
@@ -411,11 +367,16 @@ class PdfExportController extends Controller
         }
 
         // ── PHẦN 6: bìa + nội dung dòng chảy năng lượng ───────────────────────
-        self::appendStaticPage(
-            $pdfsToMerge,
-            Phan6PdfService::coverImagePath(),
-            'Q1 phan6-bia'
-        );
+        $phan6Bia = PdfStaticPageCache::resolve(Phan6PdfService::coverImagePath());
+        if ($phan6Bia !== null) {
+            $pdfsToMerge[] = $phan6Bia;
+            $taggedFooterSegments[] = [
+                'path'       => $phan6Bia,
+                'coverPages' => 'all',
+            ];
+        } else {
+            Log::warning('PdfExport Q1: không tìm thấy bìa Phần 6');
+        }
 
         $phan6Content = Phan6PdfService::buildContentPageSpec($req);
         if ($phan6Content !== null) {
@@ -423,6 +384,10 @@ class PdfExportController extends Controller
             PdfRenderService::saveView($phan6Content['view'], $phan6Content['data'], $pagePhan6Path);
             $pdfsToMerge[] = $pagePhan6Path;
             $tempFiles[]   = $pagePhan6Path;
+            $taggedFooterSegments[] = [
+                'path'        => $pagePhan6Path,
+                'coverPages'  => 'all',
+            ];
         }
 
         // ── PHẦN 8 (8A): bìa + Đại Vận + IV. Những năm cần chú ý ─────────────
@@ -465,6 +430,11 @@ class PdfExportController extends Controller
         $merged     = PdfMergeService::mergeMultiple($pdfsToMerge, $mergedTemp);
         $mergeMs    = (microtime(true) - $tMerge) * 1000;
 
+        $fullName = trim((string) $req->input('full_name', ''));
+        $allTaggedSegments = array_merge($taggedFooterSegments, $footerSegments);
+        $whiteNamePages = PdfFooterService::resolveCoverNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
+        $darkNamePages  = PdfFooterService::resolveDarkNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
+
         foreach ($tempFiles as $tmp) {
             @unlink($tmp);
         }
@@ -473,8 +443,6 @@ class PdfExportController extends Controller
             throw new \RuntimeException('Merge PDF Quyển 1 thất bại');
         }
 
-        $fullName = trim((string) $req->input('full_name', ''));
-        $darkNamePages = PdfFooterService::resolveDarkNamePages($footerSegments);
         $tFooter  = microtime(true);
         if (! PdfFooterService::applyToMergedPdf(
             $mergedTemp,
@@ -482,7 +450,7 @@ class PdfExportController extends Controller
             $fullName,
             PdfFooterService::FIRST_FOOTER_PAGE,
             PdfFooterService::FIRST_DISPLAY_PAGE_NUMBER,
-            [],
+            $whiteNamePages,
             $darkNamePages
         )) {
             Log::warning('Gắn footer PDF Quyển 1 thất bại — xuất PDF không footer', [
@@ -605,7 +573,7 @@ class PdfExportController extends Controller
         $tempFiles[]     = $page2Path;
 
         // ── Trang 3–11: bundle PDF tĩnh (cache) ─────────────────────────────
-        $staticMid = PdfStaticPageCache::resolveBundle('q2-pages-3-11', [
+        $q2StaticSources = [
             $pdfDir . '/page-03.pdf',
             $pdfDir . '/page-04.png',
             $pdfDir . '/page-05.png',
@@ -615,7 +583,8 @@ class PdfExportController extends Controller
             $pdfDir . '/page-09.png',
             $pdfDir . '/page-10.png',
             $pdfDir . '/page-11.png',
-        ]);
+        ];
+        $staticMid = PdfStaticPageCache::resolveBundle('q2-pages-3-11', $q2StaticSources);
         if ($staticMid !== null) {
             // Trang 11 trong cuốn = trang bìa section (trang thứ 9 trong bundle 3–11)
             self::pushMergeSegment($mergeSegments, $staticMid, [9]);
@@ -624,77 +593,34 @@ class PdfExportController extends Controller
         }
 
         // ── Tính Bát Tự nếu có đủ tham số y/m/d ─────────────────────────────
-        $baziData            = null;
-        $batTuData           = [];
-        $quyNhanVanXuong     = [];
-        $bangDaiVan          = [];
-        $nienVan             = [];
-        $bieuDoNguHanh       = [];
-        $chatLuongThapThan   = [];
-        $chiSoBieuDoCot      = [];
-        $nguHanhDong         = [];
-        $nhatChuTitle        = '';
-        $nhatChuChapters     = [];
+        $baziCore = $this->resolveBaziCore($req, 'PdfExport');
+        extract($baziCore, EXTR_OVERWRITE);
 
-        $birthY = $req->input('y');
-        $birthM = $req->input('m');
-        $birthD = $req->input('d');
+        $nhatChuTitle    = '';
+        $nhatChuChapters = [];
 
-        if ($birthY && $birthM && $birthD) {
-            $baziT0 = microtime(true);
-            try {
-                $baziData = BaZiServiceV2::calc(
-                    $req->input('full_name', ''),
-                    (int) $birthY,
-                    (int) $birthM,
-                    (int) $birthD,
-                    $req->filled('h')      ? (int) $req->input('h')      : null,
-                    $req->filled('minute') ? (int) $req->input('minute') : null,
-                    $req->input('g', 'male')
-                );
-                $batTuData        = $baziData['bat_tu']              ?? [];
-                $quyNhanVanXuong  = $baziData['quy_nhan_van_xuong']  ?? [];
-                $bangDaiVan       = $baziData['bang_dai_van']         ?? [];
-                $nienVan          = $baziData['nien_van']             ?? [];
-                $bieuDoNguHanh    = $baziData['bieu_do_ngu_hanh']     ?? [];
-                $chatLuongThapThan= $baziData['chat_luong_thap_than'] ?? [];
-                $chiSoBieuDoCot   = $baziData['chi_so_bieu_do_cot']   ?? [];
-                $nguHanhDong      = $baziData['ngu_hanh_dong']        ?? [];
-
-                // Dữ liệu trang 17: NHẬT CHỦ TRỤ NGÀY – Lý tổng quan + 1. Ý nghĩa trụ ngày
-                $thienCanNgay   = trim((string)($batTuData['day']['can']['thien_can'] ?? ''));
-                $diaChiNgay     = trim((string)($batTuData['day']['chi']['dia_chi']   ?? ''));
-                if ($diaChiNgay === 'Tí') $diaChiNgay = 'Tý';
-
-                $truNgayRecords = NhatChuTruNgay::findByThienCanDiaChi($thienCanNgay, $diaChiNgay);
-                $nhatChuTitle   = $truNgayRecords->first()?->title ?? '';
-
-                $chaptersMap = [];
-                foreach ($truNgayRecords as $r) {
-                    $key = $r->chapter ?? '';
-                    if (!isset($chaptersMap[$key])) {
-                        $chaptersMap[$key] = ['chapter' => $key, 'sub_sections' => []];
-                    }
-                    $chaptersMap[$key]['sub_sections'][] = [
-                        'sub_title' => $r->sub_title,
-                        'content'   => $r->content,
-                    ];
-                }
-                $nhatChuChapters = array_values($chaptersMap);
-            } catch (\Throwable $e) {
-                Log::error('PdfExport: BaZiServiceV2::calc lỗi – ' . $e->getMessage());
+        if ($batTuData !== []) {
+            $thienCanNgay = trim((string) ($batTuData['day']['can']['thien_can'] ?? ''));
+            $diaChiNgay   = trim((string) ($batTuData['day']['chi']['dia_chi'] ?? ''));
+            if ($diaChiNgay === 'Tí') {
+                $diaChiNgay = 'Tý';
             }
 
-            $this->applyPrecomputedStrengthData(
-                $req,
-                $batTuData,
-                $bieuDoNguHanh,
-                $chatLuongThapThan,
-                $chiSoBieuDoCot,
-                $nguHanhDong
-            );
+            $truNgayRecords = NhatChuTruNgay::findByThienCanDiaChi($thienCanNgay, $diaChiNgay);
+            $nhatChuTitle   = $truNgayRecords->first()?->title ?? '';
 
-            PdfExportMetrics::addBaziMs((microtime(true) - $baziT0) * 1000);
+            $chaptersMap = [];
+            foreach ($truNgayRecords as $r) {
+                $key = $r->chapter ?? '';
+                if (! isset($chaptersMap[$key])) {
+                    $chaptersMap[$key] = ['chapter' => $key, 'sub_sections' => []];
+                }
+                $chaptersMap[$key]['sub_sections'][] = [
+                    'sub_title' => $r->sub_title,
+                    'content'   => $r->content,
+                ];
+            }
+            $nhatChuChapters = array_values($chaptersMap);
         }
 
         // ── Trang 12: blade la-so-bat-tu ─────────────────────────────────────
@@ -880,7 +806,21 @@ class PdfExportController extends Controller
             Log::warning('PdfExport Q2: không tìm thấy bìa Phần 9B');
         }
 
-        foreach (Phan9bPdfService::buildPdfPages($req, $nguHanhDong, $chatLuongThapThan) as $idx => $phan9Page) {
+        $phan9bSpecs = Phan9bPdfService::buildPdfPages(
+            $req,
+            $nguHanhDong,
+            $chatLuongThapThan,
+            $batTuData,
+            is_array($baziData['luc_than'] ?? null) ? $baziData['luc_than'] : null
+        );
+        if ($phan9bSpecs === []) {
+            Log::warning('PdfExport Q2: Phần 9B không có trang nội dung (chỉ bìa)', [
+                'has_bat_tu' => $batTuData !== [],
+                'ngu_hanh_dong_empty' => $nguHanhDong === [],
+            ]);
+        }
+
+        foreach ($phan9bSpecs as $idx => $phan9Page) {
             $pagePhan9Path = $tempDir . '/q2p-phan9b-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan9Page['view'], $phan9Page['data'], $pagePhan9Path);
             self::pushMergeSegment($mergeSegments, $pagePhan9Path);
@@ -1313,6 +1253,84 @@ class PdfExportController extends Controller
         }
 
         return array_values($paragraphs);
+    }
+
+    /**
+     * @return array{
+     *   baziData: ?array<string, mixed>,
+     *   batTuData: array<string, mixed>,
+     *   quyNhanVanXuong: array<int, mixed>,
+     *   bangDaiVan: array<int, mixed>,
+     *   nienVan: array<int, mixed>,
+     *   bieuDoNguHanh: array<int|string, mixed>,
+     *   chatLuongThapThan: array<int, mixed>,
+     *   chiSoBieuDoCot: array<string, mixed>,
+     *   nguHanhDong: array<string, mixed>
+     * }
+     */
+    private function resolveBaziCore(Request $req, string $logPrefix): array
+    {
+        $empty = [
+            'baziData'            => null,
+            'batTuData'           => [],
+            'quyNhanVanXuong'     => [],
+            'bangDaiVan'          => [],
+            'nienVan'             => [],
+            'bieuDoNguHanh'       => [],
+            'chatLuongThapThan'   => [],
+            'chiSoBieuDoCot'      => [],
+            'nguHanhDong'         => [],
+        ];
+
+        $birthY = $req->input('y');
+        $birthM = $req->input('m');
+        $birthD = $req->input('d');
+
+        if (! $birthY || ! $birthM || ! $birthD) {
+            return $empty;
+        }
+
+        return PdfBaziCache::remember($req, function () use ($req, $logPrefix, $empty): array {
+            $result = $empty;
+            $baziT0 = microtime(true);
+
+            try {
+                $baziData = BaZiServiceV2::calc(
+                    $req->input('full_name', ''),
+                    (int) $req->input('y'),
+                    (int) $req->input('m'),
+                    (int) $req->input('d'),
+                    $req->filled('h') ? (int) $req->input('h') : null,
+                    $req->filled('minute') ? (int) $req->input('minute') : null,
+                    $req->input('g', 'male')
+                );
+
+                $result['baziData']          = $baziData;
+                $result['batTuData']           = $baziData['bat_tu'] ?? [];
+                $result['quyNhanVanXuong']     = $baziData['quy_nhan_van_xuong'] ?? [];
+                $result['bangDaiVan']          = $baziData['bang_dai_van'] ?? [];
+                $result['nienVan']             = $baziData['nien_van'] ?? [];
+                $result['bieuDoNguHanh']       = $baziData['bieu_do_ngu_hanh'] ?? [];
+                $result['chatLuongThapThan']   = $baziData['chat_luong_thap_than'] ?? [];
+                $result['chiSoBieuDoCot']      = $baziData['chi_so_bieu_do_cot'] ?? [];
+                $result['nguHanhDong']         = $baziData['ngu_hanh_dong'] ?? [];
+            } catch (\Throwable $e) {
+                Log::error($logPrefix.': BaZiServiceV2::calc lỗi – '.$e->getMessage());
+            }
+
+            $this->applyPrecomputedStrengthData(
+                $req,
+                $result['batTuData'],
+                $result['bieuDoNguHanh'],
+                $result['chatLuongThapThan'],
+                $result['chiSoBieuDoCot'],
+                $result['nguHanhDong']
+            );
+
+            PdfExportMetrics::addBaziMs((microtime(true) - $baziT0) * 1000);
+
+            return $result;
+        });
     }
 
     /**

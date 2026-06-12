@@ -3,20 +3,27 @@
 namespace App\Services\Pdf;
 
 /**
- * Cấu hình phân trang PDF — vùng nội dung 70% A4, nội dung xếp từ trên xuống.
+ * Cấu hình phân trang PDF — vùng nội dung tính từ top đến trước footer (~39mm).
  */
 class PdfPaginationConfig
 {
     public const PAGE_HEIGHT_MM = 297.0;
 
-    public const CONTENT_RATIO = 0.63;
+    /** Khoảng trống phía trên footer overlay (badge + tên) — khớp Phần 8. */
+    public const FOOTER_SAFE_MM = 39.0;
 
-    public const CONTENT_ZONE_HEIGHT_MM = 187.1; // 297 × 0.63 — chiều cao container CSS
+    public const CONTENT_ZONE_TOP_MM = 18.0;
 
-    public const CONTENT_ZONE_TOP_MM = 18.0; // nội dung bắt đầu từ 18mm, xếp từ trên xuống
+    /** top=18mm → 297 − 18 − 39 = 240mm */
+    public const CONTENT_ZONE_HEIGHT_MM = 240.0;
 
-    /** Budget thực tế cho paginator = 92% container — giữ buffer ~15mm để không bao giờ tràn */
-    public const CONTENT_BUDGET_MM = 172.1; // 187.1 × 0.92
+    /** Budget mặc định = 92% container */
+    public const CONTENT_BUDGET_MM = 220.8;
+
+    public static function contentZoneHeightForTop(float $topMm): float
+    {
+        return max(120.0, round(self::PAGE_HEIGHT_MM - $topMm - self::FOOTER_SAFE_MM, 1));
+    }
 
     public float $contentHeightMm;
 

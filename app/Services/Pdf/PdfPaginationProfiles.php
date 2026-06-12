@@ -88,14 +88,22 @@ class PdfPaginationProfiles
 
         $config->pageMetaResolver = static function (int $pageIndex, array $page): array {
             if ($pageIndex === 0) {
-                return ['layoutVariant' => 'tong_quan'];
+                $top = self::contentZoneTopForLayout('tong_quan');
+
+                return [
+                    'layoutVariant'         => 'tong_quan',
+                    'contentZoneHeightMm'   => PdfPaginationConfig::contentZoneHeightForTop($top),
+                ];
             }
 
+            $top = PdfPaginationConfig::CONTENT_ZONE_TOP_MM;
+
             return [
-                'layoutVariant'    => 'page_content',
-                'contentZoneTopMm' => PdfPaginationConfig::CONTENT_ZONE_TOP_MM,
-                'contentLeftMm'    => 28.0,
-                'contentWidthMm'   => 154.0,
+                'layoutVariant'       => 'page_content',
+                'contentZoneTopMm'    => $top,
+                'contentZoneHeightMm' => PdfPaginationConfig::contentZoneHeightForTop($top),
+                'contentLeftMm'       => 28.0,
+                'contentWidthMm'      => 154.0,
             ];
         };
 
@@ -109,15 +117,18 @@ class PdfPaginationProfiles
     ): PdfPaginationConfig {
         $zoneTop = self::contentZoneTopForLayout($layoutVariant);
         [$contentLeft, $contentWidth] = self::contentBoxForLayout($layoutVariant);
+        $zoneHeight = PdfPaginationConfig::contentZoneHeightForTop($zoneTop);
         $isItemLayout = in_array($layoutVariant, ['su_nghiep_item', 'lbtv119', 'traits_su_nghiep', 'traits_lbtv119'], true);
 
         // 14px × 140% line-height = 19.6px × 0.75pt × 0.3528mm = 5.19mm — giá trị vật lý thật
         $lineMm = 5.3;
 
+        $budgetRatio = $isItemLayout ? 0.90 : 0.94;
+
         return new PdfPaginationConfig([
             'contentZoneTopMm'    => $zoneTop,
-            'contentHeightMm'     => round(PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM * 0.96, 1),
-            'contentZoneHeightMm' => PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM,
+            'contentHeightMm'     => round($zoneHeight * $budgetRatio, 1),
+            'contentZoneHeightMm' => $zoneHeight,
             'contentLeftMm'       => $contentLeft,
             'charsPerLine'        => 72,
             'lineMm'              => $lineMm,
@@ -134,7 +145,7 @@ class PdfPaginationProfiles
                 'section_title'      => 10.0,
                 'sub_title'          => 11.0,
                 'muc_label'          => 8.0,
-                'chien_luoc_title'   => 8.0,
+                'chien_luoc_title'   => 12.0,
                 'keywords'           => 70.0,
                 'table'              => 92.0,
             ],
@@ -177,7 +188,8 @@ class PdfPaginationProfiles
                 return $chunk;
             },
             'pageMetaResolver'    => static fn (int $pageIndex, array $page): array => [
-                'layoutVariant' => $layoutVariant,
+                'layoutVariant'         => $layoutVariant,
+                'contentZoneHeightMm'   => $zoneHeight,
             ],
         ]);
     }
@@ -185,6 +197,12 @@ class PdfPaginationProfiles
     public static function phan6(string $bgPath): PdfPaginationConfig
     {
         $base = self::phan68Base($bgPath);
+
+        $zoneTop    = PdfPaginationConfig::CONTENT_ZONE_TOP_MM;
+        $zoneHeight = PdfPaginationConfig::contentZoneHeightForTop($zoneTop);
+        $base->contentZoneTopMm    = $zoneTop;
+        $base->contentZoneHeightMm = $zoneHeight;
+        $base->contentHeightMm     = round($zoneHeight * 0.96, 1);
 
         $base->fixedBlockHeights['table'] = 48.0;
         $base->clampImages                = true;
@@ -205,11 +223,12 @@ class PdfPaginationProfiles
 
     public static function phan7Muc1(string $bgPath, ?string $firstPageBgPath = null): PdfPaginationConfig
     {
-        $zoneHeight = PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM;
         $zoneTop    = PdfPaginationConfig::CONTENT_ZONE_TOP_MM;
+        $zoneHeight = PdfPaginationConfig::contentZoneHeightForTop($zoneTop);
         $firstBg    = $firstPageBgPath ?? $bgPath;
         $hasIntroBg = $firstPageBgPath !== null && $firstPageBgPath !== $bgPath;
         $introTop   = Phan7PdfService::MUC1_FIRST_PAGE_TOP_MM;
+        $introHeight = PdfPaginationConfig::contentZoneHeightForTop($introTop);
         $baseBudget = round($zoneHeight * 0.96, 1);
 
         return new PdfPaginationConfig([
@@ -233,13 +252,14 @@ class PdfPaginationProfiles
             'pageMetaResolver' => static function (int $pageIndex, array $page) use (
                 $hasIntroBg,
                 $introTop,
+                $introHeight,
                 $zoneTop,
                 $zoneHeight
             ): array {
                 if ($hasIntroBg && $pageIndex === 0) {
                     return [
                         'contentZoneTopMm'    => $introTop,
-                        'contentZoneHeightMm' => $zoneHeight,
+                        'contentZoneHeightMm' => $introHeight,
                     ];
                 }
 
@@ -397,7 +417,7 @@ class PdfPaginationProfiles
 
         $zoneTop = self::contentZoneTopForLayout('lbtv119');
         [$contentLeft, $contentWidth] = self::contentBoxForLayout('lbtv119');
-        $zoneHeight = PdfPaginationConfig::CONTENT_ZONE_HEIGHT_MM;
+        $zoneHeight = PdfPaginationConfig::contentZoneHeightForTop($zoneTop);
 
         $base->contentHeightMm     = round($zoneHeight * 0.96, 1);
         $base->contentZoneHeightMm = $zoneHeight;
@@ -421,8 +441,7 @@ class PdfPaginationProfiles
         $zoneTop = $base->contentZoneTopMm;
         $zoneHeight = $base->contentZoneHeightMm;
         $hasIntroBg = $introBgPath !== '' && $introBgPath !== $contentBgPath;
-        $bottomSafe = 18.0;
-        $introZoneHeight = min($zoneHeight, PdfPaginationConfig::PAGE_HEIGHT_MM - $introTop - $bottomSafe);
+        $introZoneHeight = PdfPaginationConfig::contentZoneHeightForTop($introTop);
         $originalBudget = $base->contentHeightMm;
 
         $base->bgResolver = static fn (int $pageIndex): string => ($hasIntroBg && $pageIndex === 0)

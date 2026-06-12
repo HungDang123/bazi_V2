@@ -4,10 +4,13 @@ namespace App\Services;
 
 use App\Models\DongChayGioiThieu;
 use App\Models\HyKyThan;
+use App\Models\Phan9bGiaiPhapCanBang;
 use App\Services\Pdf\PdfContentPaginator;
 use App\Services\Pdf\PdfPaginationConfig;
 use App\Services\Pdf\PdfPaginationProfiles;
+use App\Services\Pdf\PdfTextSanitizer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * PDF Phần 9B — Giải pháp cân bằng (Cuốn 2).
@@ -16,7 +19,7 @@ class Phan9bPdfService
 {
     public static function coverImagePath(): string
     {
-        return Phan9PdfService::coverImagePath();
+        return resource_path('views/pdfs/phan-9/bia-phan-9b.png');
     }
 
     public static function introScrollPath(): string
@@ -32,12 +35,21 @@ class Phan9bPdfService
     /**
      * @param  array<string, int|float>  $nguHanhDong
      * @param  array<int, array<string, mixed>>|null  $chatLuongThapThan
+     * @param  array<string, mixed>  $batTuData  Bát Tự đã tính ở PdfExportController (tránh calc lại)
+     * @param  array<string, string>|null  $lucThan
      * @return array<int, array{view: string, data: array<string, mixed>}>
      */
-    public static function buildPdfPages(Request $req, array $nguHanhDong, ?array $chatLuongThapThan = null): array
-    {
-        $context = self::resolveContext($req, $nguHanhDong, $chatLuongThapThan);
+    public static function buildPdfPages(
+        Request $req,
+        array $nguHanhDong,
+        ?array $chatLuongThapThan = null,
+        array $batTuData = [],
+        ?array $lucThan = null
+    ): array {
+        $context = self::resolveContext($req, $nguHanhDong, $chatLuongThapThan, $batTuData, $lucThan);
         if ($context === null) {
+            Log::warning('Phan9bPdfService: resolveContext trả null — không render nội dung Phần 9B');
+
             return [];
         }
 
@@ -46,7 +58,11 @@ class Phan9bPdfService
 
         $sectionIBlocks = [];
         if ($context['display'] !== null) {
-            self::appendSectionI($sectionIBlocks, $context['display']);
+            $display = $context['display'];
+            if (! empty($context['than_label'])) {
+                $display['than_label'] = $context['than_label'];
+            }
+            self::appendSectionI($sectionIBlocks, $display);
         }
         if ($context['transition'] !== null && $context['transition'] !== '') {
             $sectionIBlocks[] = ['type' => 'sub_title', 'text' => $context['transition']];
@@ -123,55 +139,78 @@ class Phan9bPdfService
     /**
      * @param  array<string, int|float>  $nguHanhDong
      * @param  array<int, array<string, mixed>>|null  $chatLuongThapThan
+     * @param  array<string, mixed>  $batTuData
+     * @param  array<string, string>|null  $lucThan
      * @return array<string, mixed>|null
      */
-    private static function resolveContext(Request $req, array $nguHanhDong, ?array $chatLuongThapThan): ?array
-    {
+    private static function resolveContext(
+        Request $req,
+        array $nguHanhDong,
+        ?array $chatLuongThapThan,
+        array $batTuData = [],
+        ?array $lucThan = null
+    ): ?array {
         try {
-            $y = (int) $req->input('y');
-            $m = (int) $req->input('m');
-            $d = (int) $req->input('d');
             $g = (string) $req->input('g', 'male');
-            $h = $req->filled('h') ? (int) $req->input('h') : null;
-            $minute = $req->filled('minute') ? (int) $req->input('minute') : null;
 
-            $result = BaZiServiceV2::calc(
-                (string) $req->input('full_name', ''),
-                $y,
-                $m,
-                $d,
-                $h,
-                $minute,
-                $g,
-                needStrength: true
-            );
+            if ($batTuData === []) {
+                $y = (int) $req->input('y');
+                $m = (int) $req->input('m');
+                $d = (int) $req->input('d');
+                $h = $req->filled('h') ? (int) $req->input('h') : null;
+                $minute = $req->filled('minute') ? (int) $req->input('minute') : null;
 
-            $batTu = $result['bat_tu'] ?? [];
-            $dayStem = trim((string) ($batTu['day']['can']['thien_can'] ?? ''));
-            $monthBranch = trim((string) ($batTu['month']['chi']['dia_chi'] ?? ''));
+                $result = BaZiServiceV2::calc(
+                    (string) $req->input('full_name', ''),
+                    $y,
+                    $m,
+                    $d,
+                    $h,
+                    $minute,
+                    $g,
+                    needStrength: false
+                );
 
-            if ($chatLuongThapThan === null && is_array($result['chat_luong_thap_than'] ?? null)) {
-                $chatLuongThapThan = $result['chat_luong_thap_than'];
+                $batTuData = is_array($result['bat_tu'] ?? null) ? $result['bat_tu'] : [];
+                if ($chatLuongThapThan === null && is_array($result['chat_luong_thap_than'] ?? null)) {
+                    $chatLuongThapThan = $result['chat_luong_thap_than'];
+                }
+                if ($lucThan === null && is_array($result['luc_than'] ?? null)) {
+                    $lucThan = $result['luc_than'];
+                }
+            }
+
+            $dayStem = trim((string) ($batTuData['day']['can']['thien_can'] ?? ''));
+            $monthBranch = trim((string) ($batTuData['month']['chi']['dia_chi'] ?? ''));
+
+            if ($dayStem === '' || $monthBranch === '') {
+                Log::warning('Phan9bPdfService: thiếu Can ngày / Chi tháng', [
+                    'day_stem' => $dayStem,
+                    'month_branch' => $monthBranch,
+                ]);
+
+                return null;
             }
 
             $nguHanhBanMenh = self::normalizeNguHanhFromRequest($req, $nguHanhDong);
             $thapThanCaoNhat = Phan9bService::resolveTop2ThapThanBanMenh($chatLuongThapThan);
 
-            $hyKyThan = HyKyThan::findByThienCanDiaChi($dayStem, $monthBranch);
-            $thanTrangThai = Phan9bService::resolveThanTrangThai($hyKyThan);
-            if ($thanTrangThai === null) {
-                return null;
-            }
+            $hyKyThan = Phan9bService::findHyKyThan($dayStem, $monthBranch);
+            $thanTrangThai = Phan9bService::resolveThanTrangThaiForChart($dayStem, $monthBranch, $batTuData);
 
             $boNguHanh = Phan9bService::resolveBoHyThanNguHanh($dayStem, $hyKyThan);
-            $lucThan = is_array($result['luc_than'] ?? null) ? $result['luc_than'] : null;
 
             $transition = DongChayGioiThieu::query()
                 ->where('tru_loai', 'transition_phan9b')
                 ->value('noi_dung');
 
             return [
-                'display' => Phan9bService::buildDisplay($thanTrangThai, $boNguHanh),
+                'display' => $thanTrangThai !== null
+                    ? Phan9bService::buildDisplay($thanTrangThai, $boNguHanh)
+                    : null,
+                'than_label' => $thanTrangThai !== null
+                    ? (Phan9bGiaiPhapCanBang::THAN_LABELS[$thanTrangThai] ?? $thanTrangThai)
+                    : null,
                 'transition' => $transition !== null ? trim((string) $transition) : null,
                 'noi_luc' => Phan9bService::buildNoiLucDisplay(),
                 'thap_than' => Phan9bService::buildThapThanDisplay($thapThanCaoNhat),
@@ -180,7 +219,11 @@ class Phan9bPdfService
                 'hieu_qua' => Phan9bService::buildHieuQuaDisplay($lucThan, $g),
                 'chart' => Phan9bService::computeNguHanhChuyenHoaChart($nguHanhBanMenh),
             ];
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::error('Phan9bPdfService: resolveContext lỗi — '.$e->getMessage(), [
+                'exception' => $e,
+            ]);
+
             return null;
         }
     }
@@ -216,6 +259,13 @@ class Phan9bPdfService
             'type' => 'chapter_title',
             'text' => $display['tieu_de'] ?? 'I. GIẢI PHÁP CÂN BẰNG',
         ];
+
+        if (! empty($display['than_label'])) {
+            $blocks[] = [
+                'type' => 'sub_title',
+                'text' => 'Trạng thái Nhật Chủ: '.$display['than_label'],
+            ];
+        }
 
         foreach ($display['sections'] ?? [] as $sec) {
             if (! empty($sec['tieu_de'])) {
@@ -337,17 +387,7 @@ class Phan9bPdfService
      */
     private static function appendParagraphs(array &$blocks, string $text): void
     {
-        $text = trim($text);
-        if ($text === '') {
-            return;
-        }
-
-        foreach (preg_split('/\r\n|\r|\n/u', $text) ?: [] as $part) {
-            $part = trim($part);
-            if ($part !== '') {
-                $blocks[] = ['type' => 'para', 'text' => $part];
-            }
-        }
+        PdfTextSanitizer::appendParagraphBlocks($blocks, $text);
     }
 
     /**

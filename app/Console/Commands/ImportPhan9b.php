@@ -229,6 +229,8 @@ class ImportPhan9b extends Command
 
     protected function importSheetCanBang(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet): int
     {
+        Phan9bGiaiPhapCanBang::query()->delete();
+
         $highestRow = $sheet->getHighestRow();
         $currentThan = null;
         $currentMuc = null;

@@ -16,29 +16,9 @@ class LaSoPdfController extends Controller
 {
     public function queue(Request $request, LaSoPdfGeneratorService $generator): JsonResponse
     {
-        $validated = $request->validate([
-            'full_name'        => 'required|string|max:255',
-            'y'                => 'required|integer|min:1900|max:2100',
-            'm'                => 'required|integer|min:1|max:12',
-            'd'                => 'required|integer|min:1|max:31',
-            'g'                => 'nullable|string|in:male,female',
-            'h'                => 'nullable|integer|min:0|max:23',
-            'minute'           => 'nullable|integer|min:0|max:59',
-            'address'          => 'nullable|string|max:500',
-            'gender'           => 'nullable|string|max:50',
-            'birth_date'       => 'nullable|string|max:100',
-            'bat_tu'           => 'nullable|string|max:500',
-            'uknow_birthdate'  => 'nullable|in:0,1',
-            'chat_luong_thap_than' => 'nullable|array',
-            'bieu_do_ngu_hanh'     => 'nullable|array',
-            'ngu_hanh_dong'        => 'nullable|array',
-            'chi_so_bieu_do_cot'   => 'nullable|array',
-            'phan_tram_nien_van'   => 'nullable|array',
-            'hanh_noi_dung_nien_van' => 'nullable|array',
-        ]);
-
-        $params = $generator->normalizeParams($validated);
-        $userId = (int) $request->user()->id;
+        $validated = $this->validatePdfParams($request);
+        $params    = $generator->normalizeParams($validated);
+        $userId    = (int) $request->user()->id;
 
         $export = LaSoPdfExport::query()->create([
             'id'          => (string) Str::uuid(),
@@ -95,6 +75,33 @@ class LaSoPdfController extends Controller
             : PdfDownloadService::FILENAME_QUYEN_2;
 
         return PdfDownloadService::serveStored($path, $filename);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function validatePdfParams(Request $request): array
+    {
+        return $request->validate([
+            'full_name'              => 'required|string|max:255',
+            'y'                      => 'required|integer|min:1900|max:2100',
+            'm'                      => 'required|integer|min:1|max:12',
+            'd'                      => 'required|integer|min:1|max:31',
+            'g'                      => 'nullable|string|in:male,female',
+            'h'                      => 'nullable|integer|min:0|max:23',
+            'minute'                 => 'nullable|integer|min:0|max:59',
+            'address'                => 'nullable|string|max:500',
+            'gender'                 => 'nullable|string|max:50',
+            'birth_date'             => 'nullable|string|max:100',
+            'bat_tu'                 => 'nullable|string|max:500',
+            'uknow_birthdate'        => 'nullable|in:0,1',
+            'chat_luong_thap_than'   => 'nullable|array',
+            'bieu_do_ngu_hanh'       => 'nullable|array',
+            'ngu_hanh_dong'          => 'nullable|array',
+            'chi_so_bieu_do_cot'     => 'nullable|array',
+            'phan_tram_nien_van'     => 'nullable|array',
+            'hanh_noi_dung_nien_van' => 'nullable|array',
+        ]);
     }
 
     private function findOwnedExport(string $exportId, Request $request): LaSoPdfExport

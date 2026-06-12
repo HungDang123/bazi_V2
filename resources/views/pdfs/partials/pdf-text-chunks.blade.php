@@ -10,6 +10,7 @@
     use App\Services\Pdf\PdfTextSanitizer;
 
     $raw = PdfTextSanitizer::trimMultiline((string) ($text ?? ''));
+    $phan9SubLabels = ! empty($phan9SubLabels);
 @endphp
 @if ($raw !== '')
     @foreach (preg_split('/\r\n|\r|\n/', $raw) ?: [] as $line)
@@ -18,7 +19,12 @@
             if ($line === '') {
                 continue;
             }
+            $isSubLabel = $phan9SubLabels && PdfTextSanitizer::isPhan9SubLabelLine($line);
         @endphp
+        @if ($isSubLabel)
+        <p class="sub-label-line pdf-justify" style="text-align: justify; text-align-last: justify;">{{ $line }}</p>
+        @else
         <p class="pdf-justify" style="text-align: justify; text-align-last: justify;">{{ $line }}</p>
+        @endif
     @endforeach
 @endif

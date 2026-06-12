@@ -254,7 +254,8 @@ class NguHanhTitleRenderer
         string $text,
         float $widthMm = 27.0,
         float $heightMm = 34.0,
-        int $fontPx = 20
+        int $fontPx = 20,
+        ?array $rgb = null
     ): string {
         $text = mb_strtoupper(trim($text), 'UTF-8');
         $text = (string) preg_replace('/[\x{2012}\x{2013}\x{2014}\x{2015}\x{2212}]/u', '-', $text);
@@ -268,7 +269,9 @@ class NguHanhTitleRenderer
             return '';
         }
 
-        $cacheKey = 'kw|'.$text.'|'.$widthMm.'|'.$heightMm.'|'.$fontPx;
+        $rgb = $rgb ?? [0xD4, 0xAF, 0x37];
+
+        $cacheKey = 'kw|'.$text.'|'.$widthMm.'|'.$heightMm.'|'.$fontPx.'|'.implode(',', $rgb);
         $cacheDir = storage_path('app/pdf-cache/titles');
         if (! is_dir($cacheDir)) {
             mkdir($cacheDir, 0755, true);
@@ -284,7 +287,7 @@ class NguHanhTitleRenderer
         $w        = (int) round($widthMm / 25.4 * 96 * $scale);
         $h        = (int) round($heightMm / 25.4 * 96 * $scale);
 
-        $lines = self::wrapLines($text, $fontSize, $font, $w);
+        $lines = self::wrapLinesMultiline($text, $fontSize, $font, $w);
 
         $sample     = imagettfbbox($fontSize, 0, $font, 'ÂĐQGẶàjgyÀ');
         $ascDesc    = max(1, abs($sample[7] - $sample[1]));
@@ -297,7 +300,7 @@ class NguHanhTitleRenderer
         imagefill($im, 0, 0, imagecolorallocatealpha($im, 0, 0, 0, 127));
         imagealphablending($im, true);
 
-        $gold = imagecolorallocate($im, 0xD4, 0xAF, 0x37);
+        $gold = imagecolorallocate($im, $rgb[0], $rgb[1], $rgb[2]);
 
         $y = (int) round(($h - $blockH) / 2 + $ascDesc * 0.85);
         foreach ($lines as $line) {
@@ -312,6 +315,122 @@ class NguHanhTitleRenderer
         imagedestroy($im);
 
         return $file;
+    }
+
+    /**
+     * Nhãn cuộn lịch trang 2 — UTM-Davida, vàng (#D4AF37) như từ khóa Phần 5.
+     */
+    public static function scrollLabelImagePath(
+        string $text,
+        float $widthMm = 145.0,
+        float $heightMm = 6.0,
+        int $fontPx = 14
+    ): string {
+        return self::keywordImagePath($text, $widthMm, $heightMm, $fontPx, self::SCROLL_LABEL_RGB);
+    }
+
+    /** Tiêu đề trường (Họ & Tên, Giới tính…). */
+    public const SCROLL_LABEL_RGB = [0xD4, 0xAF, 0x37];
+
+    /** Giá trị nhập liệu — đỏ #6E0101. */
+    public const SCROLL_VALUE_RGB = [0x6E, 0x01, 0x01];
+
+    /**
+     * Giá trị cuộn lịch trang 2 — UTM-Davida đỏ, tự tính chiều cao theo số dòng wrap.
+     *
+     * @return array{path: string, widthMm: float, heightMm: float}
+     */
+    public static function scrollValueImageMetrics(
+        string $text,
+        float $widthMm = 128.0,
+        int $fontPx = 16,
+        float $minHeightMm = 12.0
+    ): array {
+        $text = mb_strtoupper(trim($text), 'UTF-8');
+        $text = (string) preg_replace('/[\x{2012}\x{2013}\x{2014}\x{2015}\x{2212}]/u', '-', $text);
+
+        $empty = ['path' => '', 'widthMm' => $widthMm, 'heightMm' => $minHeightMm];
+        if ($text === '' || ! function_exists('imagettfbbox')) {
+            return $empty;
+        }
+
+        $font = self::resolveFontPath();
+        if ($font === null) {
+            return $empty;
+        }
+
+        $rgb   = self::SCROLL_VALUE_RGB;
+        $scale = self::RENDER_SCALE;
+        $fontSize = $fontPx * $scale;
+        $wPx      = (int) round($widthMm / 25.4 * 96 * $scale);
+
+        $lines = self::wrapLinesMultiline($text, $fontSize, $font, $wPx);
+
+        $sample     = imagettfbbox($fontSize, 0, $font, 'ÂĐQGẶàjgyÀ');
+        $ascDesc    = max(1, abs($sample[7] - $sample[1]));
+        $lineHeight = (int) round($ascDesc * 1.15);
+        $blockH     = $lineHeight * count($lines);
+        $padPx      = (int) round(1.2 / 25.4 * 96 * $scale);
+        $hPx        = max((int) round($minHeightMm / 25.4 * 96 * $scale), $blockH + $padPx * 2);
+        $heightMm   = round($hPx / $scale / 96 * 25.4, 1);
+
+        $cacheKey = 'scroll-val|'.$text.'|'.$widthMm.'|'.$heightMm.'|'.$fontPx.'|'.implode(',', $rgb);
+        $cacheDir = storage_path('app/pdf-cache/titles');
+        if (! is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+
+        $file = $cacheDir.DIRECTORY_SEPARATOR.hash('xxh128', $cacheKey).'.png';
+        if (! is_file($file)) {
+            $im = imagecreatetruecolor($wPx, $hPx);
+            imagesavealpha($im, true);
+            imagealphablending($im, false);
+            imagefill($im, 0, 0, imagecolorallocatealpha($im, 0, 0, 0, 127));
+            imagealphablending($im, true);
+
+            $color = imagecolorallocate($im, $rgb[0], $rgb[1], $rgb[2]);
+            $y     = (int) round(($hPx - $blockH) / 2 + $ascDesc * 0.85);
+            foreach ($lines as $line) {
+                $bbox  = imagettfbbox($fontSize, 0, $font, $line);
+                $lineW = abs($bbox[2] - $bbox[0]);
+                $x     = (int) round(($wPx - $lineW) / 2) - $bbox[0];
+                imagettftext($im, $fontSize, 0, $x, $y, $color, $font, $line);
+                $y += $lineHeight;
+            }
+
+            imagepng($im, $file);
+            imagedestroy($im);
+        }
+
+        return [
+            'path'      => is_file($file) ? $file : '',
+            'widthMm'   => $widthMm,
+            'heightMm'  => $heightMm,
+        ];
+    }
+
+    /**
+     * Ngắt dòng — ưu tiên xuống hàng sau dấu phẩy, rồi wrap theo chiều ngang.
+     *
+     * @return array<int, string>
+     */
+    private static function wrapLinesMultiline(string $text, int $fontSize, string $font, int $maxWidthPx): array
+    {
+        $text = (string) preg_replace('/\s*,\s*/u', ",\n", trim($text));
+        $segments = preg_split('/\r\n|\r|\n/u', $text) ?: [];
+        $lines    = [];
+
+        foreach ($segments as $segment) {
+            $segment = trim($segment);
+            if ($segment === '') {
+                continue;
+            }
+            foreach (self::wrapLines($segment, $fontSize, $font, $maxWidthPx) as $line) {
+                $lines[] = $line;
+            }
+        }
+
+        return $lines === [] ? [trim($text)] : $lines;
     }
 
     /**
@@ -333,6 +452,18 @@ class NguHanhTitleRenderer
             if ($cur !== '' && $wpx > $maxWidthPx) {
                 $lines[] = $cur;
                 $cur = $word;
+                $bboxWord = imagettfbbox($fontSize, 0, $font, $cur);
+                if (is_array($bboxWord) && abs($bboxWord[2] - $bboxWord[0]) > $maxWidthPx) {
+                    foreach (self::wrapLongToken($cur, $fontSize, $font, $maxWidthPx) as $chunk) {
+                        $lines[] = $chunk;
+                    }
+                    $cur = '';
+                }
+            } elseif ($cur === '' && $wpx > $maxWidthPx) {
+                foreach (self::wrapLongToken($word, $fontSize, $font, $maxWidthPx) as $chunk) {
+                    $lines[] = $chunk;
+                }
+                $cur = '';
             } else {
                 $cur = $try;
             }
@@ -346,6 +477,34 @@ class NguHanhTitleRenderer
     }
 
     /**
+     * @return array<int, string>
+     */
+    private static function wrapLongToken(string $word, int $fontSize, string $font, int $maxWidthPx): array
+    {
+        $chunks = [];
+        $cur    = '';
+
+        foreach (preg_split('//u', $word, -1, PREG_SPLIT_NO_EMPTY) ?: [] as $ch) {
+            $try  = $cur.$ch;
+            $bbox = imagettfbbox($fontSize, 0, $font, $try);
+            $wpx  = abs($bbox[2] - $bbox[0]);
+
+            if ($cur !== '' && $wpx > $maxWidthPx) {
+                $chunks[] = $cur;
+                $cur = $ch;
+            } else {
+                $cur = $try;
+            }
+        }
+
+        if ($cur !== '') {
+            $chunks[] = $cur;
+        }
+
+        return $chunks === [] ? [$word] : $chunks;
+    }
+
+    /**
      * Đường dẫn PNG tiêu đề (cache disk) — DomPDF nhanh hơn base64.
      */
     public static function toFilePath(string $hanhName, int $percent): string
@@ -356,7 +515,7 @@ class NguHanhTitleRenderer
         }
 
         $cacheDir = storage_path('app/pdf-cache/titles');
-        if (!is_dir($cacheDir)) {
+        if (! is_dir($cacheDir)) {
             mkdir($cacheDir, 0755, true);
         }
 

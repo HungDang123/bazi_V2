@@ -89,9 +89,22 @@
             text-align: center;
             font-size: 16px;
             line-height: 130%;
-            color: #1A1A1A;
+            color: #6E0101;
             margin-top: 1mm;
             margin-bottom: 3mm;
+            background: transparent;
+        }
+
+        .section-box .sub-label-line {
+            font-family: 'svn-poppins', sans-serif;
+            font-size: 10.5pt;
+            font-weight: bold;
+            line-height: 15pt;
+            color: #6E0101;
+            text-align: justify;
+            display: block;
+            margin: 0;
+            padding-bottom: 2mm;
             background: transparent;
         }
 
@@ -124,7 +137,7 @@
 @foreach ($pages ?? [] as $page)
 <div class="page">
     <img class="bg-img" src="{{ $page['bgPath'] }}">
-    <div class="content-zone" style="left:24mm;width:162mm;top:{{ $page['contentZoneTopMm'] ?? 18 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 252.45 }}mm;">
+    <div class="content-zone" style="left:24mm;width:162mm;top:{{ $page['contentZoneTopMm'] ?? 18 }}mm;height:{{ $page['contentZoneHeightMm'] ?? 240 }}mm;">
         @foreach ($page['items'] ?? [] as $it)
             @php $kind = $it['kind'] ?? ''; @endphp
 
@@ -178,6 +191,7 @@
                             'text' => $sec['content'] ?? '',
                             'maxChars' => 72,
                             'bulletPrefix' => true,
+                            'phan9SubLabels' => true,
                         ])
                     </div>
                 </div>

@@ -10,7 +10,7 @@ class ApiTimeout
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->is('api/la-so/export-pdf-*')) {
+        if ($request->is('api/la-so/export-pdf-*') || $request->is('api/la-so/pdf/preview/*')) {
             $seconds = 300;
         } else {
             $seconds = max(30, (int) config('api.max_execution_seconds', 120));
