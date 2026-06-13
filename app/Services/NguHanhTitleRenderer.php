@@ -519,7 +519,7 @@ class NguHanhTitleRenderer
             mkdir($cacheDir, 0755, true);
         }
 
-        $file = $cacheDir . DIRECTORY_SEPARATOR . hash('xxh128', $cacheKey . '|v3') . '.png';
+        $file = $cacheDir . DIRECTORY_SEPARATOR . hash('xxh128', $cacheKey . '|v4') . '.png';
         if (! is_file($file) || filesize($file) < 64) {
             if (is_file($file)) {
                 @unlink($file);
@@ -561,16 +561,69 @@ class NguHanhTitleRenderer
     }
 
     /**
+     * Nhúng PNG raster (tiêu đề UTM-Davida, pill, keyword…) thành data URI cho DomPDF.
+     * DomPDF không tải được đường dẫn file cục bộ (đặc biệt path có khoảng trắng).
+     */
+    public static function embedPath(string $path): string
+    {
+        $path = trim($path);
+        if ($path === '') {
+            return '';
+        }
+
+        if (str_starts_with($path, 'data:image/')) {
+            return $path;
+        }
+
+        if (! is_file($path)) {
+            return '';
+        }
+
+        $blob = @file_get_contents($path);
+        if ($blob === false || $blob === '') {
+            return '';
+        }
+
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $mime = match ($ext) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'webp' => 'image/webp',
+            default => 'image/png',
+        };
+
+        return 'data:' . $mime . ';base64,' . base64_encode($blob);
+    }
+
+    /**
+     * Tiêu đề vàng nhiều dòng — PNG nhúng sẵn cho DomPDF.
+     *
+     * @return array{src: string, widthMm: float, heightMm: float}
+     */
+    public static function goldTitleEmbedded(string $text, int $fontPx = 16, float $maxWidthMm = 162.0): array
+    {
+        $img = self::goldTitleToFilePath($text, $fontPx, $maxWidthMm);
+
+        return [
+            'src' => self::embedPath($img['path']),
+            'widthMm' => $img['widthMm'],
+            'heightMm' => $img['heightMm'],
+        ];
+    }
+
+    /**
+     * PNG tiêu đề HÀNH X XX% nhúng base64 an toàn cho DomPDF.
+     */
+    public static function toEmbeddedSrc(string $hanhName, int $percent): string
+    {
+        return self::embedPath(self::toFilePath($hanhName, $percent));
+    }
+
+    /**
      * @deprecated Dùng toFilePath() — giữ cho tương thích.
      */
     public static function toDataUri(string $hanhName, int $percent): string
     {
-        $path = self::toFilePath($hanhName, $percent);
-        if ($path === '' || !file_exists($path)) {
-            return '';
-        }
-
-        return 'data:image/png;base64,' . base64_encode((string) file_get_contents($path));
+        return self::toEmbeddedSrc($hanhName, $percent);
     }
 
     private static function renderToFile(string $hanhName, int $percent, string $outputPath): void
@@ -883,6 +936,7 @@ class NguHanhTitleRenderer
         $root = dirname(__DIR__, 2);
 
         $candidates = [
+            $root . '/public/fonts/UTM-Davida.ttf',
             $root . '/resources/fonts/UTM-Davida.ttf',
             $root . '/resources/fonts/UTMDavida.ttf',
             $root . '/resources/fonts/UTM Davida.ttf',

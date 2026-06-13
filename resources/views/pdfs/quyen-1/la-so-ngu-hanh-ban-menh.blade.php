@@ -116,10 +116,10 @@
 
         @if (!empty($page['showTitle']) && !empty($page['titleImagePath']))
         <div class="hanh-title-wrap">
-            <img class="hanh-title-img" src="{{ $page['titleImagePath'] }}">
+            <img class="hanh-title-img" src="{{ $page['titleImagePath'] }}" alt="">
         </div>
         @elseif (!empty($page['showTitle']))
-        <div class="hanh-title-fallback">HÀNH {{ $page['hanhName'] }} {{ $page['percent'] }}%</div>
+        <div class="hanh-title-fallback">HÀNH {{ $page['hanhName'] ?? $page['hanh_name'] ?? '' }} {{ (int) ($page['percent'] ?? 0) }}%</div>
         @endif
 
         @if (!empty($page['showImage']) && !empty($page['imagePath']))

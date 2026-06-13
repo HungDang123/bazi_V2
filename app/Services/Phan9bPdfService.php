@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\DongChayGioiThieu;
+
 use App\Models\HyKyThan;
 use App\Models\Phan9bGiaiPhapCanBang;
 use App\Services\Pdf\PdfContentPaginator;
@@ -63,9 +63,6 @@ class Phan9bPdfService
                 $display['than_label'] = $context['than_label'];
             }
             self::appendSectionI($sectionIBlocks, $display);
-        }
-        if ($context['transition'] !== null && $context['transition'] !== '') {
-            $sectionIBlocks[] = ['type' => 'sub_title', 'text' => $context['transition']];
         }
         self::appendSpecsFromBlocks($specs, $sectionIBlocks, $bgPath, self::introScrollPath());
 
@@ -200,10 +197,6 @@ class Phan9bPdfService
 
             $boNguHanh = Phan9bService::resolveBoHyThanNguHanh($dayStem, $hyKyThan);
 
-            $transition = DongChayGioiThieu::query()
-                ->where('tru_loai', 'transition_phan9b')
-                ->value('noi_dung');
-
             return [
                 'display' => $thanTrangThai !== null
                     ? Phan9bService::buildDisplay($thanTrangThai, $boNguHanh)
@@ -211,7 +204,6 @@ class Phan9bPdfService
                 'than_label' => $thanTrangThai !== null
                     ? (Phan9bGiaiPhapCanBang::THAN_LABELS[$thanTrangThai] ?? $thanTrangThai)
                     : null,
-                'transition' => $transition !== null ? trim((string) $transition) : null,
                 'noi_luc' => Phan9bService::buildNoiLucDisplay(),
                 'thap_than' => Phan9bService::buildThapThanDisplay($thapThanCaoNhat),
                 'thap_than_label' => Phan9bService::formatThapThanCaoNhat($thapThanCaoNhat),
@@ -244,6 +236,19 @@ class Phan9bPdfService
 
         if (count($fromRequest) === 5) {
             return Phan9aService::normalizeNguHanhDong($fromRequest);
+        }
+
+        $fromPayload = $req->input('ngu_hanh_dong');
+        if (is_array($fromPayload)) {
+            $fromArray = [];
+            foreach ($keys as $key) {
+                if (isset($fromPayload[$key])) {
+                    $fromArray[$key] = (int) $fromPayload[$key];
+                }
+            }
+            if (count($fromArray) === 5) {
+                return Phan9aService::normalizeNguHanhDong($fromArray);
+            }
         }
 
         return Phan9aService::normalizeNguHanhDong($fallback);
@@ -351,35 +356,17 @@ class Phan9bPdfService
             return;
         }
 
-        $blocks[] = ['type' => 'sub_title', 'text' => 'Mô phỏng biểu đồ Ngũ Hành cần cải thiện'];
-        if (! empty($chart['weakest']['ten'])) {
-            $blocks[] = [
-                'type' => 'para',
-                'text' => 'Hành yếu nhất: '.$chart['weakest']['ten']
-                    .' ('.($chart['weakest']['phan_tram'] ?? 0).'%)',
-            ];
+        $path = Phan9bBeamChartService::toCachedPngPath($chart);
+        if ($path === '') {
+            return;
         }
-        foreach ($chart['rows'] as $row) {
-            $delta = (int) ($row['after'] ?? 0) - (int) ($row['before'] ?? 0);
-            $sign = $delta > 0 ? '+' : ($delta < 0 ? '' : '');
-            $dir = match ($row['direction'] ?? 'stable') {
-                'tang' => 'Tăng',
-                'giam' => 'Giảm',
-                default => 'Không đổi',
-            };
-            $blocks[] = [
-                'type' => 'para',
-                'text' => sprintf(
-                    '%s: %d%% → %d%% (%s%s%d%%)',
-                    $row['ten'] ?? '',
-                    (int) ($row['before'] ?? 0),
-                    (int) ($row['after'] ?? 0),
-                    $dir,
-                    $sign,
-                    $delta
-                ),
-            ];
-        }
+
+        $blocks[] = [
+            'type' => 'image',
+            'path' => $path,
+            'widthMm' => 162.0,
+            'renderHeightMm' => Phan9bBeamChartService::chartHeightMm(162.0),
+        ];
     }
 
     /**

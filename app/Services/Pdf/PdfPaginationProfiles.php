@@ -123,7 +123,7 @@ class PdfPaginationProfiles
         // 14px × 140% line-height = 19.6px × 0.75pt × 0.3528mm = 5.19mm — giá trị vật lý thật
         $lineMm = 5.3;
 
-        $budgetRatio = $isItemLayout ? 0.90 : 0.94;
+        $budgetRatio = $isItemLayout ? 0.93 : 0.96;
 
         return new PdfPaginationConfig([
             'contentZoneTopMm'    => $zoneTop,
@@ -154,6 +154,15 @@ class PdfPaginationProfiles
 
                 if ($type === 'traits') {
                     return Phan5TraitLayout::blockHeightMm(
+                        (string) ($block['tichCuc'] ?? ''),
+                        (string) ($block['tieuCuc'] ?? ''),
+                        $contentWidth
+                    );
+                }
+
+                if ($type === 'energy_traits') {
+                    return Phan5TraitLayout::energyTraitsBlockHeightMm(
+                        (string) ($block['giaiNghia'] ?? ''),
                         (string) ($block['tichCuc'] ?? ''),
                         (string) ($block['tieuCuc'] ?? ''),
                         $contentWidth
@@ -202,11 +211,19 @@ class PdfPaginationProfiles
         $zoneHeight = PdfPaginationConfig::contentZoneHeightForTop($zoneTop);
         $base->contentZoneTopMm    = $zoneTop;
         $base->contentZoneHeightMm = $zoneHeight;
-        $base->contentHeightMm     = round($zoneHeight * 0.96, 1);
+        $base->contentHeightMm     = round($zoneHeight * 0.97, 1);
+        $base->contentLeftMm       = 24.0;
+        $base->contentWidthMm      = 162.0;
 
-        $base->fixedBlockHeights['table'] = 48.0;
-        $base->clampImages                = true;
-        $base->blockHeightResolver        = self::phan68BlockHeight(...);
+        $base->clampImages = true;
+        $base->blockHeightResolver = static function (array $block): float {
+            $contentWidth = 162.0;
+            if (($block['type'] ?? '') === 'table') {
+                return self::phan6LaSoTableHeightMm($block, $contentWidth);
+            }
+
+            return self::phan68BlockHeight($block, $contentWidth);
+        };
 
         return $base;
     }
@@ -274,7 +291,10 @@ class PdfPaginationProfiles
     /** Vùng nội dung Phần 8 trên page-content-bg — chừa ~39mm cho footer overlay. */
     public const PHAN8_CONTENT_ZONE_HEIGHT_MM = 240.0;
 
-    public const PHAN8_CONTENT_BUDGET_RATIO = 0.92;
+    /** Cuốn 2 — chapter paginated (tách hằng để sửa Phần 8 không đụng Quyển 2). */
+    public const QUYEN2_CHAPTER_ZONE_HEIGHT_MM = 240.0;
+
+    public const PHAN8_CONTENT_BUDGET_RATIO = 0.95;
 
     /** Cuốn 2 — NHẬT CHỦ chapter (trang 19–21): cùng vùng an toàn footer như Phần 8. */
     public static function quyen2NhatChuChapter(
@@ -282,7 +302,7 @@ class PdfPaginationProfiles
         string $contBgPath,
         string $chapterTitle
     ): PdfPaginationConfig {
-        $zoneHeight   = self::PHAN8_CONTENT_ZONE_HEIGHT_MM;
+        $zoneHeight   = self::QUYEN2_CHAPTER_ZONE_HEIGHT_MM;
         $zoneTop      = Phan3NguHanhBanMenhPaginator::CONTENT_ZONE_TOP_MM;
         $baseBudget   = round($zoneHeight * 0.96, 1);
         $chapterTitle = trim($chapterTitle);
@@ -336,7 +356,7 @@ class PdfPaginationProfiles
     public static function quyen2TongQuan(string $firstBgPath, string $contBgPath): PdfPaginationConfig
     {
         $firstZoneHeight = self::QUYEN2_TONGQUAN_ZONE_HEIGHT_MM;
-        $contZoneHeight  = self::PHAN8_CONTENT_ZONE_HEIGHT_MM;
+        $contZoneHeight  = self::QUYEN2_CHAPTER_ZONE_HEIGHT_MM;
         $firstZoneTop    = self::QUYEN2_TONGQUAN_ZONE_TOP_MM;
         $contZoneTop     = Phan3NguHanhBanMenhPaginator::CONTENT_ZONE_TOP_MM;
         $contBudget      = round($contZoneHeight * 0.96, 1);
@@ -419,13 +439,13 @@ class PdfPaginationProfiles
         [$contentLeft, $contentWidth] = self::contentBoxForLayout('lbtv119');
         $zoneHeight = PdfPaginationConfig::contentZoneHeightForTop($zoneTop);
 
-        $base->contentHeightMm     = round($zoneHeight * 0.96, 1);
+        $base->contentHeightMm     = round($zoneHeight * 0.93, 1);
         $base->contentZoneHeightMm = $zoneHeight;
         $base->contentZoneTopMm    = $zoneTop;
         $base->contentLeftMm       = $contentLeft;
         $base->contentWidthMm      = $contentWidth;
-        $base->blockHeightResolver = static function (array $block): float {
-            return self::phan68BlockHeight($block);
+        $base->blockHeightResolver = static function (array $block) use ($contentWidth): float {
+            return self::phan68BlockHeight($block, $contentWidth);
         };
 
         return $base;
@@ -455,7 +475,7 @@ class PdfPaginationProfiles
             $originalBudget
         ) {
             if ($hasIntroBg && $pageIndex === 0) {
-                $firstBudget = round($introZoneHeight * 0.96, 1);
+                $firstBudget = round($introZoneHeight * 0.90, 1);
 
                 return self::chapterBudgetAdjust($pageIndex, $remaining, $firstBudget);
             }
@@ -570,15 +590,80 @@ class PdfPaginationProfiles
     }
 
     /** @param array<string, mixed> $block */
-    private static function phan68BlockHeight(array $block): float
+    private static function phan6LaSoTableHeightMm(array $block, float $contentWidthMm): float
     {
-        if (($block['type'] ?? '') !== 'coding_box') {
+        $table = is_array($block['table'] ?? null) ? $block['table'] : [];
+        $cols  = is_array($table['columns'] ?? null) ? $table['columns'] : [];
+        $rows  = is_array($table['rows'] ?? null) ? $table['rows'] : [];
+        $colCount = max(1, count($cols));
+
+        $labelW = $contentWidthMm * 0.14;
+        $cellW  = max(28.0, ($contentWidthMm - $labelW) / $colCount);
+        $lineMm = 4.6;
+        $cellPadV = 4.4;
+
+        $height = 7.5 + 2.0 + 9.0; // title + gap + header
+
+        foreach ($rows as $row) {
+            $rowH = 10.0;
+            foreach ($cols as $col) {
+                $key  = (string) ($col['key'] ?? '');
+                $text = trim((string) ($row['cells'][$key] ?? ''));
+                if ($text === '') {
+                    continue;
+                }
+                $textH = PdfTextWrapHelper::renderedHeightMmByWidth(
+                    $text,
+                    max(20.0, $cellW - 5.0),
+                    $lineMm,
+                    1.2
+                );
+                $rowH = max($rowH, $textH + $cellPadV);
+            }
+            $height += $rowH;
+        }
+
+        return round($height + 2.0, 1);
+    }
+
+    /** @param array<string, mixed> $block */
+    private static function phan68BlockHeight(array $block, float $contentWidthMm = 0.0): float
+    {
+        if (($block['type'] ?? '') === 'coding_box') {
+            $cfg = new PdfPaginationConfig(['contentWidthMm' => 156.0, 'lineMm' => 5.3, 'paraLinePaddingMm' => 2.0, 'blockGapMm' => 2.0]);
+
+            return PdfContentPaginator::paraHeightMm((string) ($block['text'] ?? ''), $cfg) + 3.0 + 2.0;
+        }
+
+        if ($contentWidthMm > 0) {
+            $heading = self::phan68HeadingBlockHeight($block, $contentWidthMm);
+            if ($heading > 0) {
+                return $heading;
+            }
+        }
+
+        return 0.0;
+    }
+
+    /** @param array<string, mixed> $block */
+    private static function phan68HeadingBlockHeight(array $block, float $contentWidthMm): float
+    {
+        $type = (string) ($block['type'] ?? '');
+        if (! in_array($type, ['chapter_title', 'sub_title', 'sub_ab', 'huong_label'], true)) {
             return 0.0;
         }
 
-        $cfg = new PdfPaginationConfig(['contentWidthMm' => 156.0, 'lineMm' => 5.3, 'paraLinePaddingMm' => 2.0, 'blockGapMm' => 2.0]);
+        $text = trim((string) ($block['text'] ?? ''));
+        if ($text === '') {
+            return 9.0;
+        }
 
-        return PdfContentPaginator::paraHeightMm((string) ($block['text'] ?? ''), $cfg) + 3.0 + 2.0;
+        // la-so-phan-8-content: chapter-title / red-title — 16px, line-height 130%
+        $lineMm = 5.5;
+        $extraMm = $type === 'chapter_title' ? 3.5 : 3.0;
+        $lines = max(1, count(PdfTextWrapHelper::wrapByWidthMm($text, $contentWidthMm, 16.0)));
+
+        return ($lines * $lineMm) + $extraMm;
     }
 
     /** @param array<string, mixed> $block */

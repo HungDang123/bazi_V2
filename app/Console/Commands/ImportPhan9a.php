@@ -15,7 +15,7 @@ class ImportPhan9a extends Command
     protected $signature = 'import:phan9a
         {--fresh : Xóa dữ liệu PHẦN 9A trước khi import}';
 
-    protected $description = 'Import PHẦN 9A: Excel I. Nội lực + DOCX intro & II. Ngoại lực';
+    protected $description = 'Import PHẦN 9A: Excel I. Nội lực (intro + 5 hành) + DOCX II. Ngoại lực';
 
     public function handle(): int
     {
@@ -36,7 +36,6 @@ class ImportPhan9a extends Command
 
         $count = 0;
         $count += $this->importNoiLucFromExcel($xlsx);
-        $count += $this->importIntroFromDocx(ImportPath::resolve(null, 'PHẦN 9A - I. NỘI LỰC TỰ THÂN.docx'));
         $count += $this->importNgoaiLucFromDocx(ImportPath::resolve(null, 'PHẦN 9A - II. NGOẠI LỰC - VKB tự chủ.docx'));
 
         $this->info("Hoàn thành PHẦN 9A! Tổng {$count} bản ghi.");
@@ -46,24 +45,27 @@ class ImportPhan9a extends Command
 
     protected function importNoiLucFromExcel(string $filePath): int
     {
+        Phan9aNoiLuc::query()
+            ->whereIn('loai', ['intro', 'hanh'])
+            ->delete();
+
         $reader = IOFactory::createReader('Xlsx');
         $reader->setReadDataOnly(true);
         $sheet = $reader->load($filePath)->getSheet(0);
 
         $currentSlug = null;
-        $sort = 0;
-        $count = 0;
+        $hanhSort = 0;
+        $introSort = 0;
+        $introCount = 0;
+        $hanhCount = 0;
         $highestRow = $sheet->getHighestRow();
 
         for ($row = 1; $row <= $highestRow; $row++) {
             $colA = mb_strtoupper(trim((string) $sheet->getCell('A' . $row)->getValue()), 'UTF-8');
-            $colB = trim((string) $sheet->getCell('B' . $row)->getValue());
+            $colBRaw = (string) $sheet->getCell('B' . $row)->getValue();
+            $colB = trim($colBRaw);
 
             if ($colB === '') {
-                continue;
-            }
-
-            if (Phan9aService::isSkippableImportLine($colB)) {
                 continue;
             }
 
@@ -73,33 +75,60 @@ class ImportPhan9a extends Command
 
             if (preg_match('/^(MỘC|THỦY|HỎA|THỔ|KIM)$/u', $colA)) {
                 $currentSlug = Phan9aNoiLuc::labelToSlug($colA);
-                $sort = 0;
-                $this->storeHanhRow($currentSlug, $colB, null, $sort++);
-                $count++;
+                $hanhSort = 0;
+                $this->storeHanhRow($currentSlug, $colB, null, $hanhSort++);
+                $hanhCount++;
 
                 continue;
             }
 
-            if ($currentSlug === null) {
-                continue;
-            }
+            foreach ($this->splitCellLines($colBRaw) as $line) {
+                $line = trim($line);
+                if ($line === '' || Phan9aService::isSkippableImportLine($line)) {
+                    continue;
+                }
 
-            $tieuDe = null;
-            $noiDung = $colB;
-            if (preg_match('/^Về\s+/u', $colB)) {
-                $tieuDe = $colB;
-                $noiDung = '';
-            } elseif (str_starts_with($colB, '- ')) {
+                if ($currentSlug === null) {
+                    Phan9aNoiLuc::create([
+                        'loai' => 'intro',
+                        'ngu_hanh' => null,
+                        'tieu_de' => null,
+                        'noi_dung' => $line,
+                        'sort_order' => $introSort++,
+                    ]);
+                    $introCount++;
+
+                    continue;
+                }
+
                 $tieuDe = null;
-            }
+                $noiDung = $line;
+                if (preg_match('/^Về\s+/u', $line)) {
+                    $tieuDe = $line;
+                    $noiDung = '';
+                }
 
-            $this->storeHanhRow($currentSlug, $noiDung, $tieuDe, $sort++);
-            $count++;
+                $this->storeHanhRow($currentSlug, $noiDung, $tieuDe, $hanhSort++);
+                $hanhCount++;
+            }
         }
 
-        $this->info("Excel Nội lực (5 hành): {$count} dòng.");
+        $this->info("Excel Nội lực: {$introCount} đoạn intro, {$hanhCount} dòng hành.");
 
-        return $count;
+        return $introCount + $hanhCount;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function splitCellLines(string $raw): array
+    {
+        $parts = preg_split('/\r\n|\r|\n/', $raw) ?: [];
+
+        return array_values(array_filter(
+            $parts,
+            static fn (string $part): bool => trim($part) !== ''
+        ));
     }
 
     protected function storeHanhRow(?string $slug, string $noiDung, ?string $tieuDe, int $sort): void
@@ -117,64 +146,6 @@ class ImportPhan9a extends Command
             ],
             ['sort_order' => $sort]
         );
-    }
-
-    protected function importIntroFromDocx(string $filePath): int
-    {
-        if (! file_exists($filePath)) {
-            $this->warn('Không tìm thấy DOCX I: ' . basename($filePath));
-
-            return 0;
-        }
-
-        $lines = DocxTextService::extractParagraphs($filePath) ?? [];
-        $introLines = [];
-        $started = false;
-
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '') {
-                continue;
-            }
-
-            if (preg_match('/^I\.\s*NỘI LỰC/i', $line)) {
-                $started = true;
-
-                continue;
-            }
-
-            if (! $started) {
-                continue;
-            }
-
-            if (Phan9aService::isSkippableImportLine($line)) {
-                break;
-            }
-
-            if (preg_match('/^(MỘC|THỦY|HỎA|THỔ|KIM)$/iu', $line)) {
-                break;
-            }
-
-            $introLines[] = $line;
-        }
-
-        Phan9aNoiLuc::where('loai', 'intro')->delete();
-
-        $count = 0;
-        foreach ($introLines as $i => $paragraph) {
-            Phan9aNoiLuc::create([
-                'loai' => 'intro',
-                'ngu_hanh' => null,
-                'tieu_de' => null,
-                'noi_dung' => $paragraph,
-                'sort_order' => $i,
-            ]);
-            $count++;
-        }
-
-        $this->info("DOCX intro I: {$count} đoạn.");
-
-        return $count;
     }
 
     protected function importNgoaiLucFromDocx(string $filePath): int

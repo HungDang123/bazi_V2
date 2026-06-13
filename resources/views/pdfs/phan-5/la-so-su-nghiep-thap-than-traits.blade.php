@@ -29,15 +29,6 @@
 
         @include('pdfs.phan-5.partials.traits-row-styles')
 
-        .muc-label {
-            color: #6E0101;
-            font-weight: bold;
-            font-style: italic;
-            font-size: 14px;
-            line-height: 130%;
-            margin-bottom: 3mm;
-        }
-
         .para-text {
             color: #1A1A1A;
             font-size: 14px;

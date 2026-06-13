@@ -135,11 +135,19 @@ class Phan9aService
             return true;
         }
 
-        if (preg_match('/^\[CHÈN NỘI DUNG/i', $line)) {
+        if (preg_match('/CHÈN\s+NỘI\s+DUNG\s+CỦA\s+NGŨ\s+HÀNH/iu', $line)) {
+            return true;
+        }
+
+        if (preg_match('/^\[CHÈN\s+NỘI\s+DUNG/iu', $line)) {
             return true;
         }
 
         if (preg_match('/^PHẦN\s*9A\b/iu', $line)) {
+            return true;
+        }
+
+        if (preg_match('/^I\.\s*NỘI\s+LỰC/iu', $line)) {
             return true;
         }
 

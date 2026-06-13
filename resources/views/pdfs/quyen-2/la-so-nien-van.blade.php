@@ -5,7 +5,6 @@
     <style>
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        @include('pdfs.partials.pdf-justify-styles')
         body {
             width: 210mm;
             height: 297mm;
@@ -13,7 +12,6 @@
             font-size: 14px;
             font-weight: normal;
             line-height: 140%;
-            text-align: justify;
             letter-spacing: 0;
         }
         .page {
@@ -29,86 +27,92 @@
         }
         .content {
             position: absolute;
-            top: 16mm;
-            left: 17mm;
-            width: 176mm;
+            top: 92mm;
+            left: 16mm;
+            width: 178mm;
         }
 
-        /* ── Bảng Niên Vận ───────────────────────────────────── */
         .nv-table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            border: 1.5pt solid #6E0101;
+            border: 1.2pt solid #6E0101;
         }
         .nv-table th,
         .nv-table td {
             border: 0.5pt solid #FFFFFF;
             text-align: center;
             vertical-align: middle;
-            padding: 1mm;
+            padding: 1.5mm 1mm;
         }
         .nv-hdr th {
             background-color: #6E0101;
-            color: #ffffff;
-            font-size: 8.5pt;
+            color: #FFFFFF;
+            font-size: 9pt;
             font-weight: bold;
-            height: 9mm;
+            height: 11mm;
             border: 0.5pt solid #6E0101;
         }
         th.lbl {
             background-color: #6E0101 !important;
-            color: #ffffff !important;
-            font-size: 7.5pt;
+            color: #E5CA8E !important;
+            font-size: 8pt;
             font-weight: bold;
-            width: 9%;
+            width: 12%;
+            line-height: 1.25;
         }
         td.lbl {
-            background-color: #F3F3F3 !important;
+            background-color: #EBE7E0 !important;
             color: #333333 !important;
-            font-size: 7.5pt;
+            font-size: 8pt;
             font-weight: bold;
-            width: 9%;
+            width: 12%;
+            line-height: 1.25;
         }
-        .nv-tc-row td  { height: 22mm; background-color: #F3F3F3; }
-        .nv-dc-row td  { height: 16mm; background-color: #F3F3F3; }
-        .nv-tang-row td{ height: 10mm; background-color: #F3F3F3; padding: 0.5mm; }
-        .nv-tang-row .tc-sub td { font-size: 5pt; padding: 0; line-height: 1.0; }
-        .nv-name { font-size: 10pt; font-weight: bold; color: #6E0101; }
-        .nv-meta { font-size: 7.5pt; color: #555555; }
-        .nv-tt   { font-size: 7.5pt; font-weight: bold; color: #6E0101; }
-        .kv-sm   { font-size: 6pt; font-style: italic; color: #888; }
 
-        /* Sub-table Tàng Can */
-        .tc-sub { width: 100%; border-collapse: collapse; }
-        .tc-sub td { border: none !important; padding: 0.1mm; text-align: center; font-size: 5.5pt; line-height: 1.1; }
-        .t-can  { color: #6E0101; font-weight: bold; }
-        .t-meta { color: #555555; }
-        .t-pho  { color: #6E0101; font-weight: bold; }
+        .nv-tc-row td  { height: 26mm; background-color: #F8F6F2; }
+        .nv-dc-row td  { height: 18mm; background-color: #F3F3F3; }
+        .nv-tang-row td { height: auto; min-height: 22mm; background-color: #F8F6F2; padding: 1.5mm 0.8mm; }
+
+        .nv-name { font-size: 13pt; font-weight: bold; color: #6E0101; line-height: 1.2; }
+        .nv-meta { font-size: 8.5pt; color: #444444; line-height: 1.2; margin-top: 0.8mm; }
+        .nv-tt   { font-size: 8.5pt; font-weight: bold; color: #6E0101; line-height: 1.2; margin-top: 0.8mm; }
+        .kv-sm   { font-size: 7pt; font-style: italic; color: #888888; margin-top: 0.5mm; }
+
+        .tang-stack {
+            width: 100%;
+            text-align: center;
+            font-size: 0;
+        }
+        .tang-item {
+            display: inline-block;
+            vertical-align: top;
+            width: 31%;
+            padding: 0 0.5mm;
+            text-align: center;
+        }
+        .tang-item .t-can  { display: block; font-size: 8pt; font-weight: bold; color: #6E0101; line-height: 1.3; }
+        .tang-item .t-meta { display: block; font-size: 7pt; color: #555555; line-height: 1.3; margin-top: 0.4mm; }
+        .tang-item .t-pho  { display: block; font-size: 7pt; font-weight: bold; color: #6E0101; line-height: 1.3; margin-top: 0.4mm; }
     </style>
 </head>
 <body>
 <div class="page">
 
-    {{-- Nền trang trí --}}
     <img class="bg-img" src="{{ $templatePath }}">
 
     <div class="content">
-
-        {{-- ══════════════════════════════════════════════
-             BẢNG NIÊN VẬN  (3 năm: trước / hiện / sau)
-             ══════════════════════════════════════════════ --}}
         <table class="nv-table">
             <thead>
                 <tr class="nv-hdr">
-                    <th class="lbl" style="width:9%;">NIÊN<br>VẬN</th>
+                    <th class="lbl">NIÊN<br>VẬN</th>
                     @foreach($nienVan as $nv)
-                    <th style="width:30.33%;">{{ $nv['nam'] }}</th>
+                    <th>{{ $nv['nam'] }}</th>
                     @endforeach
                 </tr>
             </thead>
             <tbody>
 
-                {{-- Thiên Can --}}
                 <tr class="nv-tc-row">
                     <td class="lbl">Thiên<br>Can</td>
                     @foreach($nienVan as $nv)
@@ -120,7 +124,6 @@
                     @endforeach
                 </tr>
 
-                {{-- Địa Chi --}}
                 <tr class="nv-dc-row">
                     <td class="lbl">Địa<br>Chi</td>
                     @foreach($nienVan as $nv)
@@ -132,36 +135,26 @@
                     @endforeach
                 </tr>
 
-                {{-- Tàng Can --}}
                 <tr class="nv-tang-row">
                     <td class="lbl">Tàng<br>Can</td>
                     @foreach($nienVan as $nv)
                     <td>
-                        <table class="tc-sub">
-                            <tr>
-                                @foreach($nv['cantang'] as $tc)
-                                <td><span class="t-can">{{ $tc['can_tang'] }}</span></td>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($nv['cantang'] as $tc)
-                                <td><span class="t-meta">{{ $tc['menh'] }}</span></td>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($nv['cantang'] as $tc)
-                                <td><span class="t-pho">{{ $tc['pho_tinh'] }}</span></td>
-                                @endforeach
-                            </tr>
-                        </table>
+                        <div class="tang-stack">
+                            @foreach($nv['cantang'] as $tc)
+                            <div class="tang-item">
+                                <span class="t-can">{{ $tc['can_tang'] }}</span>
+                                <span class="t-meta">{{ $tc['menh'] }}</span>
+                                <span class="t-pho">{{ $tc['pho_tinh'] }}</span>
+                            </div>
+                            @endforeach
+                        </div>
                     </td>
                     @endforeach
                 </tr>
 
             </tbody>
         </table>
-
-    </div>{{-- .content --}}
-</div>{{-- .page --}}
+    </div>
+</div>
 </body>
 </html>

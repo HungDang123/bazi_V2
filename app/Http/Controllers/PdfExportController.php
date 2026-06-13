@@ -25,6 +25,8 @@ use App\Services\PdfRenderService;
 use App\Services\PdfStaticPageCache;
 use App\Services\PdfViewCache;
 use App\Services\Pdf\PdfExportMetrics;
+use App\Services\Pdf\PdfTocRenderer;
+use App\Services\Pdf\PdfTocTracker;
 use App\Services\PdfBaziCache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -40,7 +42,7 @@ class PdfExportController extends Controller
      *   Trang  2 : blade la-so-trang-2  (page-02-bg.png + thông tin cá nhân)
      *   Trang  3 : page-03.pdf          (LBTV-148)
      *   Trang  4 : page-04.pdf          (LBTV-145)
-     *   Trang  5 : page-05.png          (LBTV-146 – mục lục)
+     *   Trang  5 : la-so-muc-luc (LBTV-586 – mục lục động)
      *   Trang  6 : page-06.png          (LBTV-147)
      *   Trang  7 : page-07.png          (LBTV-144)
      *   Trang  8 : page-08.png          (LBTV-149)
@@ -107,9 +109,14 @@ class PdfExportController extends Controller
         $tempFiles   = [];
         $footerSegments = [];
         $taggedFooterSegments = [];
+        $tocTracker = new PdfTocTracker();
+        $headPaths  = [];
+        $bodyPaths  = [];
+        $hasClnc    = false;
+        $phan5Slugs = [];
 
         // ── Trang 1: PDF tĩnh ───────────────────────────────────────────────
-        self::appendStaticPage($pdfsToMerge, $pdfDir . '/page-01.pdf', 'Q1 page-01.pdf');
+        self::tocAppendStatic($tocTracker, $headPaths, $pdfDir . '/page-01.pdf', 'Q1 page-01.pdf');
 
         // ── Trang 2: blade la-so-trang-2 (thông tin cá nhân) ─────────────────
         $batTuRaw  = $req->input('bat_tu', '');
@@ -126,14 +133,15 @@ class PdfExportController extends Controller
             'batTu'        => $batTuHtml,
             'address'      => $req->input('address', ''),
         ], $page2Path);
-        $pdfsToMerge[] = $page2Path;
+        self::tocPush($tocTracker, $headPaths, $page2Path);
         $tempFiles[]     = $page2Path;
 
-        // ── Trang 3–13: bundle PDF tĩnh (cache) ─────────────────────────────
-        $q1StaticSources = [
+        // ── Trang 3–4 (trước mục lục) + 6–13 (sau mục lục): bundle tĩnh ─────
+        $q1BeforeTocSources = [
             $pdfDir . '/page-03.pdf',
             $pdfDir . '/page-04.pdf',
-            $pdfDir . '/page-05.png',
+        ];
+        $q1AfterTocSources = [
             $pdfDir . '/page-06.png',
             $pdfDir . '/page-07.png',
             $pdfDir . '/page-08.png',
@@ -143,11 +151,18 @@ class PdfExportController extends Controller
             $pdfDir . '/page-12.png',
             $pdfDir . '/page-13.png',
         ];
-        $staticMid = PdfStaticPageCache::resolveBundle('q1-pages-3-13', $q1StaticSources);
-        if ($staticMid !== null) {
-            $pdfsToMerge[] = $staticMid;
+        $beforeTocBundle = PdfStaticPageCache::resolveBundle('q1-pages-3-4-v1', $q1BeforeTocSources);
+        if ($beforeTocBundle !== null) {
+            self::tocPush($tocTracker, $headPaths, $beforeTocBundle);
         } else {
-            Log::warning('PdfExport Q1: không tạo được bundle trang 3–13');
+            Log::warning('PdfExport Q1: không tạo được bundle trang 3–4');
+        }
+
+        $afterTocBundle = PdfStaticPageCache::resolveBundle('q1-pages-6-13-v1', $q1AfterTocSources);
+        if ($afterTocBundle !== null) {
+            self::tocPush($tocTracker, $bodyPaths, $afterTocBundle);
+        } else {
+            Log::warning('PdfExport Q1: không tạo được bundle trang 6–13');
         }
 
         // ── Trang 14: blade la-so-bat-tu (KẾT QUẢ LÁ SỐ TỨ TRỤ) ────────────
@@ -157,7 +172,7 @@ class PdfExportController extends Controller
             'batTu'           => $batTuData,
             'quyNhanVanXuong' => $quyNhanVanXuong,
         ], $page14Path);
-        $pdfsToMerge[] = $page14Path;
+        self::tocPush($tocTracker, $bodyPaths, $page14Path);
         $tempFiles[]     = $page14Path;
 
         // ── Trang 15: blade la-so-dai-van (Đại Vận) ─────────────────────────
@@ -166,7 +181,7 @@ class PdfExportController extends Controller
             'templatePath' => $q2Dir . '/page-13-bg.png',
             'bangDaiVan'   => $bangDaiVan,
         ], $page15Path);
-        $pdfsToMerge[] = $page15Path;
+        self::tocPush($tocTracker, $bodyPaths, $page15Path);
         $tempFiles[]     = $page15Path;
 
         // ── Trang 15b: blade la-so-nien-van (Niên Vận) ───────────────────────
@@ -175,7 +190,7 @@ class PdfExportController extends Controller
             'templatePath' => $q2Dir . '/page-13-bg.png',
             'nienVan'      => $nienVan,
         ], $page15bPath);
-        $pdfsToMerge[] = $page15bPath;
+        self::tocPush($tocTracker, $bodyPaths, $page15bPath);
         $tempFiles[]     = $page15bPath;
 
         // ── Trang 16: blade la-so-chat-luong (Radar ngũ hành + Thập Thần) ────
@@ -188,7 +203,7 @@ class PdfExportController extends Controller
             'chatLuongThapThan' => $chatLuongThapThan,
             'nienVanYear'       => $nienMenhYear,
         ], $page16Path);
-        $pdfsToMerge[] = $page16Path;
+        self::tocPush($tocTracker, $bodyPaths, $page16Path);
         $tempFiles[]     = $page16Path;
 
         // ── Trang 17: blade la-so-6-khia-canh (Biểu đồ 6 khía cạnh) ─────────
@@ -198,17 +213,29 @@ class PdfExportController extends Controller
             'chiSoBieuDoCot' => $chiSoBieuDoCot,
             'gender'         => $req->input('g', 'male'),
         ], $page17Path);
-        $pdfsToMerge[] = $page17Path;
+        self::tocPush($tocTracker, $bodyPaths, $page17Path);
         $tempFiles[]     = $page17Path;
 
         // ── Trang 18: page-18.png (Phần 3 cover, cache) ─────────────────────
-        self::appendStaticPage($pdfsToMerge, $pdfDir . '/page-18.png', 'Q1 page-18.png');
+        $tocTracker->mark('phan3', 'PHẦN 3: TỔNG QUAN NGŨ HÀNH BẢN MỆNH');
+        self::tocAppendStatic($tocTracker, $bodyPaths, $pdfDir . '/page-18.png', 'Q1 page-18.png');
 
         // ── Trang 19–21: PHẦN 3 (1 query DinhViGocNhin) ───────────────────
         $phan3Records = DinhViGocNhin::whereIn('slug', [
             'phan3_dinh_vi_goc_nhin',
             'phan3_bocuc_ngu_hanh_ii',
         ])->get()->keyBy('slug');
+
+        $record3I = $phan3Records->get('phan3_dinh_vi_goc_nhin');
+        $record3II = $phan3Records->get('phan3_bocuc_ngu_hanh_ii');
+        $label3I = trim((string) ($record3I?->title ?? ''));
+        if ($label3I === '') {
+            $label3I = 'I. ĐỊNH VỊ VÀ GÓC NHÌN';
+        }
+        $label3II = trim((string) ($record3II?->title ?? ''));
+        if ($label3II === '') {
+            $label3II = 'II. BỐ CỤC NGŨ HÀNH BẢN MỆNH';
+        }
 
         $phan3Salt = implode('|', [
             (string) optional($phan3Records->get('phan3_dinh_vi_goc_nhin'))->updated_at,
@@ -242,9 +269,10 @@ class PdfExportController extends Controller
         );
 
         $page19Path = $tempDir . '/q1p19-' . $uid . '.pdf';
-        $pdfsToMerge[] = PdfViewCache::saveView('pdfs.quyen-1.la-so-tong-quan-ngu-hanh', array_merge([
+        $tocTracker->mark('phan3.i', $label3I);
+        self::tocPush($tocTracker, $bodyPaths, PdfViewCache::saveView('pdfs.quyen-1.la-so-tong-quan-ngu-hanh', array_merge([
             'templatePath' => $pdfDir . '/page-19-bg.png',
-        ], $phan3SectionI), $page19Path, $phan3Salt);
+        ], $phan3SectionI), $page19Path, $phan3Salt));
         $tempFiles[] = $page19Path;
 
         $contentBg = $pdfDir . '/page-content-bg.png';
@@ -263,9 +291,9 @@ class PdfExportController extends Controller
 
             if ($phan3Sub2Pages !== []) {
                 $page20Path = $tempDir . '/q1p20-' . $uid . '.pdf';
-                $pdfsToMerge[] = PdfViewCache::saveView('pdfs.quyen-1.la-so-bocuc-ngu-hanh', [
+                self::tocPush($tocTracker, $bodyPaths, PdfViewCache::saveView('pdfs.quyen-1.la-so-bocuc-ngu-hanh', [
                     'pages' => $phan3Sub2Pages,
-                ], $page20Path, $phan3Salt);
+                ], $page20Path, $phan3Salt));
                 $tempFiles[] = $page20Path;
             }
         }
@@ -281,9 +309,10 @@ class PdfExportController extends Controller
         );
 
         $page21Path = $tempDir . '/q1p21-' . $uid . '.pdf';
-        $pdfsToMerge[] = PdfViewCache::saveView('pdfs.quyen-1.la-so-bocuc-ngu-hanh', [
+        $tocTracker->mark('phan3.ii', $label3II);
+        self::tocPush($tocTracker, $bodyPaths, PdfViewCache::saveView('pdfs.quyen-1.la-so-bocuc-ngu-hanh', [
             'pages' => $phan3BocucPages,
-        ], $page21Path, $phan3Salt);
+        ], $page21Path, $phan3Salt));
         $tempFiles[] = $page21Path;
 
         // ── II tiếp: Ngũ hành bản mệnh (Kim → Thổ) — sau mục 2.2 Giải mã bức tranh năng lượng ─
@@ -299,7 +328,7 @@ class PdfExportController extends Controller
             PdfRenderService::saveView('pdfs.quyen-1.la-so-ngu-hanh-ban-menh', [
                 'pages' => $nguHanhPages,
             ], $pageNguHanhPath);
-            $pdfsToMerge[] = $pageNguHanhPath;
+            self::tocPush($tocTracker, $bodyPaths, $pageNguHanhPath);
             $tempFiles[]   = $pageNguHanhPath;
         }
 
@@ -313,17 +342,21 @@ class PdfExportController extends Controller
 
             if ($clncPages !== []) {
                 $pageClncPath = $tempDir . '/q1p-clnc-' . $uid . '.pdf';
+                $tocTracker->mark('phan3.iii', 'III. CHẤT LƯỢNG NHẬT CHỦ');
                 PdfRenderService::saveView('pdfs.quyen-1.la-so-bocuc-ngu-hanh', [
                     'pages' => $clncPages,
                 ], $pageClncPath);
-                $pdfsToMerge[] = $pageClncPath;
+                self::tocPush($tocTracker, $bodyPaths, $pageClncPath);
                 $tempFiles[]   = $pageClncPath;
+                $hasClnc = true;
             }
         }
 
         // ── PHẦN 5: bìa + I. Tổng quan các khía cạnh ────────────────────────
-        self::appendStaticPage(
-            $pdfsToMerge,
+        $tocTracker->mark('phan5', 'PHẦN 5: THẬP THẦN VÀ CÁC KHÍA CẠNH TRONG CUỘC SỐNG');
+        self::tocAppendStatic(
+            $tocTracker,
+            $bodyPaths,
             Phan5PdfService::coverImagePath(),
             'Q1 phan5-bia'
         );
@@ -332,7 +365,8 @@ class PdfExportController extends Controller
         if (! empty($phan5TongQuan['pages'])) {
             $pagePhan5Path = $tempDir . '/q1p-phan5-tq-' . $uid . '.pdf';
             PdfRenderService::saveView('pdfs.phan-5.la-so-tong-quan-khia-canh', $phan5TongQuan, $pagePhan5Path);
-            $pdfsToMerge[] = $pagePhan5Path;
+            $tocTracker->mark('phan5.i', 'I. TỔNG QUAN CÁC KHÍA CẠNH');
+            self::tocPush($tocTracker, $bodyPaths, $pagePhan5Path);
             $tempFiles[]   = $pagePhan5Path;
         }
 
@@ -340,14 +374,16 @@ class PdfExportController extends Controller
         if ($phan5SuNghiep !== null && ! empty($phan5SuNghiep['pages'])) {
             $pagePhan5SnPath = $tempDir . '/q1p-phan5-sn-' . $uid . '.pdf';
             PdfRenderService::saveView('pdfs.phan-5.la-so-su-nghiep', $phan5SuNghiep, $pagePhan5SnPath);
-            $pdfsToMerge[] = $pagePhan5SnPath;
+            $tocTracker->mark('phan5.ii', 'II. SỰ NGHIỆP');
+            self::tocPush($tocTracker, $bodyPaths, $pagePhan5SnPath);
             $tempFiles[]   = $pagePhan5SnPath;
+            $phan5Slugs[] = 'su_nghiep';
         }
 
         foreach (Phan5PdfService::buildSuNghiepThienCanPages($batTuData) as $idx => $phan5SnItemPage) {
             $pagePhan5SnItemPath = $tempDir . '/q1p-phan5-sn-item-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan5SnItemPage['view'], $phan5SnItemPage['data'], $pagePhan5SnItemPath);
-            $pdfsToMerge[] = $pagePhan5SnItemPath;
+            self::tocPush($tocTracker, $bodyPaths, $pagePhan5SnItemPath);
             $tempFiles[]   = $pagePhan5SnItemPath;
         }
 
@@ -358,24 +394,49 @@ class PdfExportController extends Controller
                 $unknowBirthtime,
                 ['chat_luong_thap_than' => $chatLuongThapThan]
             );
+            $markedPhan5Slugs = [];
+            foreach ($phan5Payload['khia_canh'] ?? [] as $block) {
+                $slug = (string) ($block['slug'] ?? '');
+                if ($slug !== '' && $slug !== 'su_nghiep') {
+                    $phan5Slugs[] = $slug;
+                }
+            }
+            $phan5Slugs = array_values(array_unique($phan5Slugs));
+
             foreach (Phan5PdfService::buildOtherKhiaCanhPdfPages($phan5Payload['khia_canh'] ?? [], $batTuData) as $idx => $phan5KcPage) {
                 $pagePhan5KcPath = $tempDir . '/q1p-phan5-kc-' . $idx . '-' . $uid . '.pdf';
                 PdfRenderService::saveView($phan5KcPage['view'], $phan5KcPage['data'], $pagePhan5KcPath);
-                $pdfsToMerge[] = $pagePhan5KcPath;
+                $layoutKey = (string) ($phan5KcPage['data']['layoutKey'] ?? '');
+                if ($layoutKey === 'lbtv119') {
+                    $slug = (string) ($phan5KcPage['data']['slug'] ?? '');
+                    if ($slug === '' && ! empty($phan5KcPage['data']['sectionTitle'])) {
+                        foreach ($phan5Payload['khia_canh'] ?? [] as $block) {
+                            if (trim((string) ($block['title'] ?? '')) === trim((string) $phan5KcPage['data']['sectionTitle'])) {
+                                $slug = (string) ($block['slug'] ?? '');
+                                break;
+                            }
+                        }
+                    }
+                    if ($slug !== '' && ! isset($markedPhan5Slugs[$slug])) {
+                        $key = self::phan5TocBookmarkKey($slug);
+                        $title = trim((string) ($phan5KcPage['data']['sectionTitle'] ?? ''));
+                        if ($title !== '') {
+                            $tocTracker->mark($key, $title);
+                        }
+                        $markedPhan5Slugs[$slug] = true;
+                    }
+                }
+                self::tocPush($tocTracker, $bodyPaths, $pagePhan5KcPath);
                 $tempFiles[]   = $pagePhan5KcPath;
             }
         }
 
         // ── PHẦN 6: bìa + nội dung dòng chảy năng lượng ───────────────────────
-        $phan6MergeStartIndex = count($pdfsToMerge);
-        $phan6MergePaths      = [];
+        $tocTracker->mark('phan6', 'PHẦN 6: LUẬN GIẢI DÒNG NĂNG LƯỢNG TRONG LÁ SỐ');
         $phan6BiaPath         = PdfStaticPageCache::resolve(Phan6PdfService::coverImagePath());
         if ($phan6BiaPath !== null) {
-            $pdfsToMerge[] = $phan6BiaPath;
-            $taggedFooterSegments[] = [
-                'path'       => $phan6BiaPath,
-                'coverPages' => 'all',
-            ];
+            self::tocPush($tocTracker, $bodyPaths, $phan6BiaPath);
+            self::pushMergeSegment($taggedFooterSegments, $phan6BiaPath, 'darkName');
         } else {
             Log::warning('PdfExport Q1: không tìm thấy bìa Phần 6');
         }
@@ -385,18 +446,23 @@ class PdfExportController extends Controller
         if ($phan6Content !== null) {
             $pagePhan6Path = $tempDir . '/q1p-phan6-content-' . $uid . '.pdf';
             PdfRenderService::saveView($phan6Content['view'], $phan6Content['data'], $pagePhan6Path);
-            $pdfsToMerge[] = $pagePhan6Path;
+            $phan6Start = $tocTracker->physicalPage() + 1;
+            self::tocPush($tocTracker, $bodyPaths, $pagePhan6Path);
+            self::tocMarkChapters($tocTracker, $phan6Content, $phan6Start, [
+                'I.' => 'phan6.i',
+                'II.' => 'phan6.ii',
+                'III.' => 'phan6.iii',
+                'IV.' => 'phan6.iv',
+            ]);
             $tempFiles[]   = $pagePhan6Path;
-            $taggedFooterSegments[] = [
-                'path'       => $pagePhan6Path,
-                'coverPages' => 'all',
-            ];
+            self::pushMergeSegment($taggedFooterSegments, $pagePhan6Path, 'darkName');
         }
-        $phan6MergePaths = array_slice($pdfsToMerge, $phan6MergeStartIndex);
 
         // ── PHẦN 8 (8A): bìa + Đại Vận + IV. Những năm cần chú ý ─────────────
-        self::appendStaticPage(
-            $pdfsToMerge,
+        $tocTracker->mark('phan8', 'PHẦN 8: DỰ BÁO HẠN VẬN – ĐẠI VẬN');
+        self::tocAppendStatic(
+            $tocTracker,
+            $bodyPaths,
             Phan8PdfService::coverImagePath(),
             'Q1 phan8-bia'
         );
@@ -404,13 +470,20 @@ class PdfExportController extends Controller
         foreach (Phan8PdfService::buildPdfPages($req, '8a') as $idx => $phan8Page) {
             $pagePhan8Path = $tempDir . '/q1p-phan8-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan8Page['view'], $phan8Page['data'], $pagePhan8Path);
-            $pdfsToMerge[] = $pagePhan8Path;
+            $phan8Start = $tocTracker->physicalPage() + 1;
+            self::tocPush($tocTracker, $bodyPaths, $pagePhan8Path);
+            self::tocMarkChapters($tocTracker, $phan8Page, $phan8Start, [
+                'I.' => 'phan8.i',
+                'IV.' => 'phan8.iv',
+            ]);
             $tempFiles[]   = $pagePhan8Path;
         }
 
         // ── PHẦN 9: bìa tĩnh (LBTV-236) + nội dung (LBTV-119) (y hệt Q1) ────
-        self::appendStaticPage(
-            $pdfsToMerge,
+        $tocTracker->mark('phan9', 'PHẦN 9: GIẢI PHÁP TỐI ƯU ĐỂ KIẾN TẠO VẬN MỆNH');
+        self::tocAppendStatic(
+            $tocTracker,
+            $bodyPaths,
             Phan9PdfService::coverImagePath(),
             'Q1 phan9-bia'
         );
@@ -419,14 +492,29 @@ class PdfExportController extends Controller
         foreach (Phan9PdfService::buildPdfPages($phan9NguHanh) as $idx => $phan9Page) {
             $pagePhan9Path = $tempDir . '/q1p-phan9-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan9Page['view'], $phan9Page['data'], $pagePhan9Path);
-            $pdfsToMerge[] = $pagePhan9Path;
+            $phan9Start = $tocTracker->physicalPage() + 1;
+            self::tocPush($tocTracker, $bodyPaths, $pagePhan9Path);
+            self::tocMarkChapters($tocTracker, $phan9Page, $phan9Start, [
+                'I.' => 'phan9.i',
+                'II.' => 'phan9.ii',
+            ]);
             $tempFiles[]   = $pagePhan9Path;
         }
 
-        // ── Kết bài: 562–564 (bìa) + 566–569, 572, 581 (worksheet — tên footer đen) ─
+        // ── Kết bài: 562–564 + 566–569, 572, 581 (sau Phần 9 — tên footer đen; trang cuối PDF vẫn trắng) ─
         $phan9Dir      = resource_path('views/pdfs/phan-9');
         $q1AppendixDir = resource_path('views/pdfs/q2-appendix');
-        self::appendPhan9KetBaiSegments($pdfsToMerge, $footerSegments, $phan9Dir, $q1AppendixDir);
+        self::appendPhan9KetBaiSegments($bodyPaths, $footerSegments, $phan9Dir, $q1AppendixDir, $tocTracker);
+
+        $tocPath = $tempDir . '/q1-toc-' . $uid . '.pdf';
+        PdfTocRenderer::renderQuyen1($tocTracker, $req, [
+            'phan3_records' => $phan3Records,
+            'has_clnc'      => $hasClnc,
+            'phan5_slugs'   => $phan5Slugs,
+        ], $tocPath);
+        $tempFiles[] = $tocPath;
+
+        $pdfsToMerge = array_merge($headPaths, [$tocPath], $bodyPaths);
 
         $fullName = trim((string) $req->input('full_name', ''));
 
@@ -445,13 +533,6 @@ class PdfExportController extends Controller
 
         $allTaggedSegments = array_merge($taggedFooterSegments, $footerSegments);
         $whiteNamePages    = PdfFooterService::resolveCoverNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
-        if ($phan6MergePaths !== []) {
-            $offsetBeforePhan6 = PdfFooterService::totalPhysicalPages(
-                array_slice($pdfsToMerge, 0, $phan6MergeStartIndex)
-            );
-            $phan6WhitePages = PdfFooterService::whitePagesFromOffset($offsetBeforePhan6, $phan6MergePaths);
-            $whiteNamePages  = array_values(array_unique(array_merge($whiteNamePages, $phan6WhitePages)));
-        }
         $darkNamePages = PdfFooterService::resolveDarkNamePagesFromFullMerge($pdfsToMerge, $allTaggedSegments);
 
         foreach ($tempFiles as $tmp) {
@@ -513,7 +594,7 @@ class PdfExportController extends Controller
      *   Trang  2 : blade la-so-trang-2           (page-02-bg.png nền + text cá nhân)
      *   Trang  3 : page-03.pdf
      *   Trang  4 : page-04.png
-     *   Trang  5 : page-05.png
+     *   Trang  5 : la-so-muc-luc (LBTV-586 – mục lục động)
      *   Trang  6 : page-06.png
      *   Trang  7 : page-07.png
      *   Trang  8 : page-08.png
@@ -561,13 +642,18 @@ class PdfExportController extends Controller
 
         $mergeSegments = [];
         $tempFiles   = [];
+        $tocTracker  = new PdfTocTracker();
+        $headPaths   = [];
+        $bodyPaths   = [];
+        $headMergeSegmentCount = 0;
 
         // ── Trang 1: page-01.png (cache) ────────────────────────────────────
         $page1Path = PdfStaticPageCache::resolve($pdfDir . '/page-01.png');
         if ($page1Path === null) {
             throw new \RuntimeException('Không tìm thấy page-01.png');
         }
-        self::pushMergeSegment($mergeSegments, $page1Path);
+        self::tocPushMergeSegment($tocTracker, $headPaths, $mergeSegments, $page1Path);
+        $headMergeSegmentCount = count($mergeSegments);
 
         // ── Trang 2: blade cuộn lịch ─────────────────────────────────────────
         $batTuRaw = $req->input('bat_tu', '');
@@ -584,14 +670,16 @@ class PdfExportController extends Controller
             'batTu'        => $batTu,
             'address'      => $req->input('address', ''),
         ], $page2Path);
-        self::pushMergeSegment($mergeSegments, $page2Path);
+        self::tocPushMergeSegment($tocTracker, $headPaths, $mergeSegments, $page2Path);
         $tempFiles[]     = $page2Path;
+        $headMergeSegmentCount = count($mergeSegments);
 
-        // ── Trang 3–11: bundle PDF tĩnh (cache) ─────────────────────────────
-        $q2StaticSources = [
+        // ── Trang 3–4 (trước mục lục) + 6–11 (sau mục lục): bundle tĩnh ─────
+        $q2BeforeTocSources = [
             $pdfDir . '/page-03.pdf',
             $pdfDir . '/page-04.png',
-            $pdfDir . '/page-05.png',
+        ];
+        $q2AfterTocSources = [
             $pdfDir . '/page-06.png',
             $pdfDir . '/page-07.png',
             $pdfDir . '/page-08.png',
@@ -599,12 +687,20 @@ class PdfExportController extends Controller
             $pdfDir . '/page-10.png',
             $pdfDir . '/page-11.png',
         ];
-        $staticMid = PdfStaticPageCache::resolveBundle('q2-pages-3-11', $q2StaticSources);
-        if ($staticMid !== null) {
-            // Trang 11 trong cuốn = trang bìa section (trang thứ 9 trong bundle 3–11)
-            self::pushMergeSegment($mergeSegments, $staticMid, [9]);
+        $beforeTocBundle = PdfStaticPageCache::resolveBundle('q2-pages-3-4-v1', $q2BeforeTocSources);
+        if ($beforeTocBundle !== null) {
+            self::tocPushMergeSegment($tocTracker, $headPaths, $mergeSegments, $beforeTocBundle);
         } else {
-            Log::warning('PdfExport Q2: không tạo được bundle trang 3–11');
+            Log::warning('PdfExport Q2: không tạo được bundle trang 3–4');
+        }
+        $headMergeSegmentCount = count($mergeSegments);
+
+        $afterTocBundle = PdfStaticPageCache::resolveBundle('q2-pages-6-11-v1', $q2AfterTocSources);
+        if ($afterTocBundle !== null) {
+            // Trang 11 trong cuốn = trang bìa section (trang thứ 6 trong bundle 6–11)
+            self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $afterTocBundle, [6]);
+        } else {
+            Log::warning('PdfExport Q2: không tạo được bundle trang 6–11');
         }
 
         // ── Tính Bát Tự nếu có đủ tham số y/m/d ─────────────────────────────
@@ -645,7 +741,7 @@ class PdfExportController extends Controller
             'batTu'           => $batTuData,
             'quyNhanVanXuong' => $quyNhanVanXuong,
         ], $page12Path);
-        self::pushMergeSegment($mergeSegments, $page12Path);
+        self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $page12Path);
         $tempFiles[]     = $page12Path;
 
         // ── Trang 13: la-so-dai-van (Đại Vận) ───────────────────────────────
@@ -654,7 +750,7 @@ class PdfExportController extends Controller
             'templatePath' => $pdfDir . '/page-13-bg.png',
             'bangDaiVan'   => $bangDaiVan,
         ], $page13Path);
-        self::pushMergeSegment($mergeSegments, $page13Path);
+        self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $page13Path);
         $tempFiles[]     = $page13Path;
 
         // ── Trang 13b: la-so-nien-van (Niên Vận) ────────────────────────────
@@ -663,7 +759,7 @@ class PdfExportController extends Controller
             'templatePath' => $pdfDir . '/page-13-bg.png',
             'nienVan'      => $nienVan,
         ], $page13bPath);
-        self::pushMergeSegment($mergeSegments, $page13bPath);
+        self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $page13bPath);
         $tempFiles[]     = $page13bPath;
 
         // ── Trang 14: la-so-chat-luong ───────────────────────────────────────
@@ -676,7 +772,7 @@ class PdfExportController extends Controller
             'chatLuongThapThan' => $chatLuongThapThan,
             'nienVanYear'       => $nienMenhYear,
         ], $page14Path);
-        self::pushMergeSegment($mergeSegments, $page14Path);
+        self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $page14Path);
         $tempFiles[]     = $page14Path;
 
         // ── Trang 15: la-so-6-khia-canh ─────────────────────────────────────
@@ -686,13 +782,26 @@ class PdfExportController extends Controller
             'chiSoBieuDoCot' => $chiSoBieuDoCot,
             'gender'         => $req->input('g', 'male'),
         ], $page15Path);
-        self::pushMergeSegment($mergeSegments, $page15Path);
+        self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $page15Path);
         $tempFiles[]     = $page15Path;
+
+        $labelPhan4I = trim((string) ($nhatChuChapters[0]['chapter'] ?? 'I.'));
+        $labelPhan4II = trim((string) ($nhatChuChapters[1]['chapter'] ?? 'II.'));
+        $labelPhan4III = trim((string) ($nhatChuChapters[2]['chapter'] ?? 'III.'));
+        $labelPhan4IV = trim((string) ($nhatChuChapters[3]['chapter'] ?? 'IV.'));
 
         // ── Trang 16: page-16.png (PHẦN 4 cover, cache) ─────────────────────
         $page16Cover = PdfStaticPageCache::resolve($pdfDir . '/page-16.png');
         if ($page16Cover !== null) {
-            self::pushMergeSegment($mergeSegments, $page16Cover, 'all');
+            self::tocPushMergeSegment(
+                $tocTracker,
+                $bodyPaths,
+                $mergeSegments,
+                $page16Cover,
+                'all',
+                'phan4',
+                'PHẦN 4: NHẬT CHỦ TRỤ NGÀY'
+            );
         } else {
             Log::warning('PdfExport Q2: không tìm thấy page-16.png');
         }
@@ -715,17 +824,20 @@ class PdfExportController extends Controller
             [
                 'templatePath' => $pdfDir.'/page-17-bg.png',
                 'nhatChuTitle' => $nhatChuTitle,
-            ]
+            ],
+            $tocTracker,
+            $bodyPaths,
+            'phan4.i',
+            $labelPhan4I
         );
 
         // ── Trang 18: la-so-phan-tich-nhat-chu ──────────────────────────────
         $page18Path = $tempDir . '/p18-' . $uid . '.pdf';
         PdfRenderService::saveView('pdfs.quyen-2.la-so-phan-tich-nhat-chu', [
-            'templatePath' => $pdfDir . '/page-19-bg.png',
-            'tuyHyPath'    => $pdfDir . '/tuy hy.png',
+            'templatePath' => $pdfDir . '/page-18-bg.png',
             'chapters'     => $nhatChuChapters,
         ], $page18Path);
-        self::pushMergeSegment($mergeSegments, $page18Path);
+        self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $page18Path);
         $tempFiles[]     = $page18Path;
 
         // ── Trang 19–21: NHẬT CHỦ chapter II–IV (phân trang, chừa footer) ───
@@ -737,7 +849,13 @@ class PdfExportController extends Controller
             NhatChuChapterPdfService::buildXuHuongPages($nhatChuChapters, $pdfDir),
             'p19',
             'pdfs.quyen-2.la-so-xu-huong-tinh-cach',
-            ['templatePath' => $pdfDir.'/page-19-bg.png', 'chapters' => $nhatChuChapters]
+            ['templatePath' => $pdfDir.'/page-19-bg.png', 'chapters' => $nhatChuChapters],
+            null,
+            [],
+            $tocTracker,
+            $bodyPaths,
+            'phan4.ii',
+            $labelPhan4II
         );
 
         self::appendNhatChuChapterPdf(
@@ -748,7 +866,13 @@ class PdfExportController extends Controller
             NhatChuChapterPdfService::buildChapterIiiPages($nhatChuChapters, $pdfDir),
             'p20',
             'pdfs.quyen-2.la-so-chapter-iii',
-            ['templatePath' => $pdfDir.'/page-20-bg.png', 'chapters' => $nhatChuChapters]
+            ['templatePath' => $pdfDir.'/page-20-bg.png', 'chapters' => $nhatChuChapters],
+            null,
+            [],
+            $tocTracker,
+            $bodyPaths,
+            'phan4.iii',
+            $labelPhan4III
         );
 
         self::appendNhatChuChapterPdf(
@@ -759,19 +883,41 @@ class PdfExportController extends Controller
             NhatChuChapterPdfService::buildChapterIvPages($nhatChuChapters, $pdfDir),
             'p21',
             'pdfs.quyen-2.la-so-chapter-iv',
-            ['templatePath' => $pdfDir.'/page-21-bg.png', 'chapters' => $nhatChuChapters]
+            ['templatePath' => $pdfDir.'/page-21-bg.png', 'chapters' => $nhatChuChapters],
+            null,
+            [],
+            $tocTracker,
+            $bodyPaths,
+            'phan4.iv',
+            $labelPhan4IV
         );
 
         // ── PHẦN 7: bìa + trang mở đầu Mục I (tĩnh) ─────────────────────────────
         $phan7Pages = Phan7PdfService::staticPagePaths();
         $phan7Bundle = PdfStaticPageCache::resolveBundle(Phan7PdfService::bundleCacheKey(), $phan7Pages);
         if ($phan7Bundle !== null) {
-            self::pushMergeSegment($mergeSegments, $phan7Bundle, 'all');
+            self::tocPushMergeSegment(
+                $tocTracker,
+                $bodyPaths,
+                $mergeSegments,
+                $phan7Bundle,
+                'all',
+                'phan7',
+                'PHẦN 7: BÀI HỌC CUỘC SỐNG'
+            );
         } else {
             foreach ($phan7Pages as $phan7Path) {
                 $resolved = PdfStaticPageCache::resolve($phan7Path);
                 if ($resolved !== null) {
-                    self::pushMergeSegment($mergeSegments, $resolved, 'all');
+                    self::tocPushMergeSegment(
+                        $tocTracker,
+                        $bodyPaths,
+                        $mergeSegments,
+                        $resolved,
+                        'all',
+                        'phan7',
+                        'PHẦN 7: BÀI HỌC CUỘC SỐNG'
+                    );
                 }
             }
         }
@@ -781,7 +927,15 @@ class PdfExportController extends Controller
         if ($phan7Muc1Spec !== null) {
             $pagePhan7Muc1Path = $tempDir . '/q2p-phan7-muc1-' . $uid . '.pdf';
             PdfRenderService::saveView($phan7Muc1Spec['view'], $phan7Muc1Spec['data'], $pagePhan7Muc1Path);
-            self::pushMergeSegment($mergeSegments, $pagePhan7Muc1Path);
+            self::tocPushMergeSegment(
+                $tocTracker,
+                $bodyPaths,
+                $mergeSegments,
+                $pagePhan7Muc1Path,
+                null,
+                'phan7.i',
+                'I. TAM THẾ'
+            );
             $tempFiles[]   = $pagePhan7Muc1Path;
         }
 
@@ -790,7 +944,15 @@ class PdfExportController extends Controller
         if ($phan7Muc2Spec !== null) {
             $pagePhan7Muc2Path = $tempDir . '/q2p-phan7-muc2-' . $uid . '.pdf';
             PdfRenderService::saveView($phan7Muc2Spec['view'], $phan7Muc2Spec['data'], $pagePhan7Muc2Path);
-            self::pushMergeSegment($mergeSegments, $pagePhan7Muc2Path);
+            self::tocPushMergeSegment(
+                $tocTracker,
+                $bodyPaths,
+                $mergeSegments,
+                $pagePhan7Muc2Path,
+                null,
+                'phan7.ii',
+                'II. BÀI HỌC CUỘC SỐNG'
+            );
             $tempFiles[]   = $pagePhan7Muc2Path;
         }
 
@@ -799,26 +961,42 @@ class PdfExportController extends Controller
         if ($phan7Muc1CuoiSpec !== null) {
             $pagePhan7Muc1CuoiPath = $tempDir . '/q2p-phan7-muc1-cuoi-' . $uid . '.pdf';
             PdfRenderService::saveView($phan7Muc1CuoiSpec['view'], $phan7Muc1CuoiSpec['data'], $pagePhan7Muc1CuoiPath);
-            self::pushMergeSegment($mergeSegments, $pagePhan7Muc1CuoiPath);
+            self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $pagePhan7Muc1CuoiPath);
             $tempFiles[]   = $pagePhan7Muc1CuoiPath;
         }
 
         // ── PHẦN 8 (8B): Niên Vận tiếp theo + III. Dự báo khía cạnh ─────────
-        // Không dùng bia-phan-8.png (ghi «DỰ BÁO ĐẠI VẬN» — chỉ dành cho 8A / Q1).
         foreach (Phan8PdfService::buildPdfPages($req, '8b') as $idx => $phan8Page) {
             $pagePhan8Path = $tempDir . '/q2p-phan8-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan8Page['view'], $phan8Page['data'], $pagePhan8Path);
             $isCover = ($phan8Page['view'] ?? '') === 'pdfs.phan-8.la-so-phan-8-nien-van-cover';
-            self::pushMergeSegment($mergeSegments, $pagePhan8Path, $isCover ? 'all' : null);
+            $phan8Start = $tocTracker->physicalPage() + 1;
+            if ($idx === 0) {
+                self::tocPushMergeSegment(
+                    $tocTracker,
+                    $bodyPaths,
+                    $mergeSegments,
+                    $pagePhan8Path,
+                    $isCover ? 'all' : null,
+                    'phan8',
+                    'PHẦN 8: DỰ BÁO HẠN VẬN'
+                );
+            } else {
+                self::tocPushMergeSegment(
+                    $tocTracker,
+                    $bodyPaths,
+                    $mergeSegments,
+                    $pagePhan8Path,
+                    $isCover ? 'all' : null
+                );
+            }
+            if (($phan8Page['view'] ?? '') === 'pdfs.phan-8.la-so-phan-8-content') {
+                self::tocMarkChapters($tocTracker, $phan8Page, $phan8Start, [
+                    'II.' => 'phan8.ii',
+                    'III.' => 'phan8.iii',
+                ]);
+            }
             $tempFiles[]   = $pagePhan8Path;
-        }
-
-        // ── PHẦN 9B: bìa + cuộn thư + nội dung (Cuốn 2) ─────────────────────
-        $phan9Bia = PdfStaticPageCache::resolve(Phan9bPdfService::coverImagePath());
-        if ($phan9Bia !== null) {
-            self::pushMergeSegment($mergeSegments, $phan9Bia, 'all');
-        } else {
-            Log::warning('PdfExport Q2: không tìm thấy bìa Phần 9B');
         }
 
         $phan9bSpecs = Phan9bPdfService::buildPdfPages(
@@ -828,27 +1006,60 @@ class PdfExportController extends Controller
             $batTuData,
             is_array($baziData['luc_than'] ?? null) ? $baziData['luc_than'] : null
         );
-        if ($phan9bSpecs === []) {
+        $hasPhan9b = $phan9bSpecs !== [];
+        if (! $hasPhan9b) {
             Log::warning('PdfExport Q2: Phần 9B không có trang nội dung (chỉ bìa)', [
                 'has_bat_tu' => $batTuData !== [],
                 'ngu_hanh_dong_empty' => $nguHanhDong === [],
             ]);
         }
 
+        // ── PHẦN 9B: bìa + cuộn thư + nội dung (Cuốn 2) ─────────────────────
+        $phan9Bia = PdfStaticPageCache::resolve(Phan9bPdfService::coverImagePath());
+        if ($phan9Bia !== null) {
+            self::tocPushMergeSegment(
+                $tocTracker,
+                $bodyPaths,
+                $mergeSegments,
+                $phan9Bia,
+                'all',
+                $hasPhan9b ? 'phan9b' : null,
+                $hasPhan9b ? 'PHẦN 9B: GIẢI PHÁP CÂN BẰNG' : null
+            );
+        } else {
+            Log::warning('PdfExport Q2: không tìm thấy bìa Phần 9B');
+        }
+
         foreach ($phan9bSpecs as $idx => $phan9Page) {
             $pagePhan9Path = $tempDir . '/q2p-phan9b-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan9Page['view'], $phan9Page['data'], $pagePhan9Path);
-            self::pushMergeSegment($mergeSegments, $pagePhan9Path);
+            $phan9Start = $tocTracker->physicalPage() + 1;
+            self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $pagePhan9Path);
+            self::tocMarkChapters($tocTracker, $phan9Page, $phan9Start, [
+                'I.' => 'phan9b.i',
+                'II.' => 'phan9b.ii',
+                'III.' => 'phan9b.iii',
+                'IV.' => 'phan9b.iv',
+            ]);
             $tempFiles[]   = $pagePhan9Path;
         }
 
-        // ── Phụ lục Q2: 562–564 (bìa) + 572, 581 (worksheet — tên footer đen) ─
+        // ── Phụ lục Q2: bìa 562–564 (tên trắng) + worksheet 572, 581 (tên đen; trang cuối PDF trắng) ─
         $q2AppendixDir = resource_path('views/pdfs/q2-appendix');
-        self::appendQ2AppendixSegments($mergeSegments, $q2AppendixDir);
+        self::appendQ2AppendixSegments($mergeSegments, $q2AppendixDir, $tocTracker, $bodyPaths);
 
-        $pdfsToMerge = array_column($mergeSegments, 'path');
-        $whiteNamePages = PdfFooterService::resolveCoverNamePages($mergeSegments);
-        $darkNamePages = PdfFooterService::resolveDarkNamePages($mergeSegments);
+        $tocPath = $tempDir . '/q2-toc-' . $uid . '.pdf';
+        PdfTocRenderer::renderQuyen2($tocTracker, $req, [
+            'nhat_chu_chapters' => $nhatChuChapters,
+            'has_phan9b'        => $hasPhan9b,
+            'nien_van_year'     => $nienMenhYear,
+        ], $tocPath);
+        $tempFiles[] = $tocPath;
+
+        array_splice($mergeSegments, $headMergeSegmentCount, 0, [['path' => $tocPath]]);
+        $pdfsToMerge = array_merge($headPaths, [$tocPath], $bodyPaths);
+        $whiteNamePages = PdfFooterService::resolveCoverNamePagesFromFullMerge($pdfsToMerge, $mergeSegments);
+        $darkNamePages = PdfFooterService::resolveDarkNamePagesFromFullMerge($pdfsToMerge, $mergeSegments);
 
         // ── Merge + footer (banner 08.png, số trang, tên người nhập) ─────────
         $mergedTemp = $tempDir.'/merged-q2-'.$uid.'.pdf';
@@ -918,7 +1129,12 @@ class PdfExportController extends Controller
         string $fallbackView,
         array $fallbackData,
         ?string $paginatedView = null,
-        array $paginatedExtra = []
+        array $paginatedExtra = [],
+        ?PdfTocTracker $tocTracker = null,
+        ?array &$pathList = null,
+        ?string $bookmarkKey = null,
+        ?string $bookmarkLabel = null,
+        $coverPages = null
     ): void {
         $path = $tempDir.'/'.$filePrefix.'-'.$uid.'.pdf';
 
@@ -929,7 +1145,19 @@ class PdfExportController extends Controller
             PdfRenderService::saveView($fallbackView, $fallbackData, $path);
         }
 
-        self::pushMergeSegment($segments, $path);
+        if ($tocTracker !== null && $pathList !== null) {
+            self::tocPushMergeSegment(
+                $tocTracker,
+                $pathList,
+                $segments,
+                $path,
+                $coverPages,
+                $bookmarkKey,
+                $bookmarkLabel
+            );
+        } else {
+            self::pushMergeSegment($segments, $path, $coverPages);
+        }
         $tempFiles[] = $path;
     }
 
@@ -959,7 +1187,8 @@ class PdfExportController extends Controller
         array &$pdfsToMerge,
         array &$mergeSegments,
         string $phan9Dir,
-        string $appendixDir
+        string $appendixDir,
+        ?PdfTocTracker $tocTracker = null
     ): void {
         $coverSources = [
             $appendixDir . '/page-562.png',
@@ -978,27 +1207,43 @@ class PdfExportController extends Controller
 
         $coverBundle = PdfStaticPageCache::resolveBundle('q1-ket-bai-covers-v1', $coverSources);
         if ($coverBundle !== null) {
-            $pdfsToMerge[] = $coverBundle;
-            self::pushMergeSegment($mergeSegments, $coverBundle, 'all');
+            if ($tocTracker !== null) {
+                self::tocPush($tocTracker, $pdfsToMerge, $coverBundle);
+            } else {
+                $pdfsToMerge[] = $coverBundle;
+            }
+            self::pushMergeSegment($mergeSegments, $coverBundle, 'darkName');
         } else {
             foreach ($coverSources as $source) {
                 $resolved = PdfStaticPageCache::resolve($source);
                 if ($resolved !== null) {
-                    $pdfsToMerge[] = $resolved;
-                    self::pushMergeSegment($mergeSegments, $resolved, 'all');
+                    if ($tocTracker !== null) {
+                        self::tocPush($tocTracker, $pdfsToMerge, $resolved);
+                    } else {
+                        $pdfsToMerge[] = $resolved;
+                    }
+                    self::pushMergeSegment($mergeSegments, $resolved, 'darkName');
                 }
             }
         }
 
         $worksheetBundle = PdfStaticPageCache::resolveBundle('q1-ket-bai-worksheets-v1', $worksheetSources);
         if ($worksheetBundle !== null) {
-            $pdfsToMerge[] = $worksheetBundle;
+            if ($tocTracker !== null) {
+                self::tocPush($tocTracker, $pdfsToMerge, $worksheetBundle);
+            } else {
+                $pdfsToMerge[] = $worksheetBundle;
+            }
             self::pushMergeSegment($mergeSegments, $worksheetBundle, 'darkName');
         } else {
             foreach ($worksheetSources as $source) {
                 $resolved = PdfStaticPageCache::resolve($source);
                 if ($resolved !== null) {
-                    $pdfsToMerge[] = $resolved;
+                    if ($tocTracker !== null) {
+                        self::tocPush($tocTracker, $pdfsToMerge, $resolved);
+                    } else {
+                        $pdfsToMerge[] = $resolved;
+                    }
                     self::pushMergeSegment($mergeSegments, $resolved, 'darkName');
                 }
             }
@@ -1006,12 +1251,16 @@ class PdfExportController extends Controller
     }
 
     /**
-     * Phụ lục cuối Cuốn 2 — bìa tối (562–564) + worksheet nền sáng (572, 581).
+     * Phụ lục cuối Cuốn 2 — bìa tối (562–564, tên trắng) + worksheet nền sáng (572, 581, tên đen).
      *
      * @param  array<int, array{path: string, coverPages?: mixed, darkNamePages?: mixed}>  $mergeSegments
      */
-    private static function appendQ2AppendixSegments(array &$mergeSegments, string $appendixDir): void
-    {
+    private static function appendQ2AppendixSegments(
+        array &$mergeSegments,
+        string $appendixDir,
+        ?PdfTocTracker $tocTracker = null,
+        ?array &$pathList = null
+    ): void {
         $coverSources = [
             $appendixDir . '/page-562.png',
             $appendixDir . '/page-563.png',
@@ -1025,27 +1274,123 @@ class PdfExportController extends Controller
 
         $coverBundle = PdfStaticPageCache::resolveBundle('q2-appendix-covers-v1', $coverSources);
         if ($coverBundle !== null) {
-            self::pushMergeSegment($mergeSegments, $coverBundle, 'all');
+            if ($tocTracker !== null && $pathList !== null) {
+                self::tocPushMergeSegment($tocTracker, $pathList, $mergeSegments, $coverBundle, 'all');
+            } else {
+                self::pushMergeSegment($mergeSegments, $coverBundle, 'all');
+            }
         } else {
             foreach ($coverSources as $source) {
                 $resolved = PdfStaticPageCache::resolve($source);
                 if ($resolved !== null) {
-                    self::pushMergeSegment($mergeSegments, $resolved, 'all');
+                    if ($tocTracker !== null && $pathList !== null) {
+                        self::tocPushMergeSegment($tocTracker, $pathList, $mergeSegments, $resolved, 'all');
+                    } else {
+                        self::pushMergeSegment($mergeSegments, $resolved, 'all');
+                    }
                 }
             }
         }
 
         $worksheetBundle = PdfStaticPageCache::resolveBundle('q2-appendix-worksheets-v1', $worksheetSources);
         if ($worksheetBundle !== null) {
-            self::pushMergeSegment($mergeSegments, $worksheetBundle, 'darkName');
+            if ($tocTracker !== null && $pathList !== null) {
+                self::tocPushMergeSegment($tocTracker, $pathList, $mergeSegments, $worksheetBundle, 'darkName');
+            } else {
+                self::pushMergeSegment($mergeSegments, $worksheetBundle, 'darkName');
+            }
         } else {
             foreach ($worksheetSources as $source) {
                 $resolved = PdfStaticPageCache::resolve($source);
                 if ($resolved !== null) {
-                    self::pushMergeSegment($mergeSegments, $resolved, 'darkName');
+                    if ($tocTracker !== null && $pathList !== null) {
+                        self::tocPushMergeSegment($tocTracker, $pathList, $mergeSegments, $resolved, 'darkName');
+                    } else {
+                        self::pushMergeSegment($mergeSegments, $resolved, 'darkName');
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * @param  array<int, string>  $list
+     */
+    private static function tocPush(PdfTocTracker $tracker, array &$list, string $path): void
+    {
+        if ($path === '' || ! is_file($path)) {
+            return;
+        }
+
+        $list[] = $path;
+        $tracker->addSegment($path);
+    }
+
+    /**
+     * @param  array<int, string>  $list
+     */
+    private static function tocAppendStatic(
+        PdfTocTracker $tracker,
+        array &$list,
+        string $path,
+        string $label = ''
+    ): void {
+        $resolved = PdfStaticPageCache::resolve($path);
+        if ($resolved !== null) {
+            self::tocPush($tracker, $list, $resolved);
+
+            return;
+        }
+
+        if ($label !== '') {
+            Log::warning("PdfExport: $label không tồn tại hoặc không convert được");
+        }
+    }
+
+    /**
+     * @param  array<int, string>  $pathList
+     * @param  array<int, array{path: string, coverPages?: mixed, darkNamePages?: mixed}>  $mergeSegments
+     */
+    private static function tocPushMergeSegment(
+        PdfTocTracker $tracker,
+        array &$pathList,
+        array &$mergeSegments,
+        string $path,
+        $coverPages = null,
+        ?string $bookmarkKey = null,
+        ?string $bookmarkLabel = null
+    ): void {
+        if ($bookmarkKey !== null && $bookmarkLabel !== null && $bookmarkLabel !== '') {
+            $tracker->mark($bookmarkKey, $bookmarkLabel);
+        }
+
+        self::tocPush($tracker, $pathList, $path);
+        self::pushMergeSegment($mergeSegments, $path, $coverPages);
+    }
+
+    /**
+     * @param  array{view?: string, data?: array<string, mixed>}  $spec
+     * @param  array<string, string>  $prefixMap
+     */
+    private static function tocMarkChapters(
+        PdfTocTracker $tracker,
+        array $spec,
+        int $segmentStartPhysical,
+        array $prefixMap
+    ): void {
+        $tracker->markChaptersFromSpec($spec, $segmentStartPhysical, $prefixMap);
+    }
+
+    private static function phan5TocBookmarkKey(string $slug): string
+    {
+        return match ($slug) {
+            'su_nghiep' => 'phan5.ii',
+            'tai_chinh' => 'phan5.iii',
+            'tinh_duyen' => 'phan5.iv',
+            'phat_trien_ban_than' => 'phan5.vi',
+            'ket_noi_xa_hoi' => 'phan5.vii',
+            default => 'phan5.'.$slug,
+        };
     }
 
     /**

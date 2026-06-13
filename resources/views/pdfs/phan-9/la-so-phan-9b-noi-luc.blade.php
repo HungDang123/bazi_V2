@@ -134,6 +134,8 @@
 </head>
 <body>
 
+@php use App\Services\NguHanhTitleRenderer; @endphp
+
 @foreach ($pages ?? [] as $page)
 <div class="page">
     <img class="bg-img" src="{{ $page['bgPath'] }}">
@@ -144,40 +146,52 @@
             @if ($kind === 'header')
                 @php $hd = $it['data'] ?? []; @endphp
 
-                @if (!empty($hd['titleImagePath']))
                 @php
+                    $titleSrc = NguHanhTitleRenderer::embedPath((string) ($hd['titleImagePath'] ?? ''));
+                    if ($titleSrc === '' && ! empty($hd['title'])) {
+                        $titleSrc = NguHanhTitleRenderer::goldTitleEmbedded($hd['title'], 25, 162.0)['src'];
+                    }
                     $titleStyle = 'width:162mm;height:auto;object-fit:contain;';
                     if (!empty($hd['titleImageHeightMm'])) {
                         $titleStyle .= 'max-height:'.$hd['titleImageHeightMm'].'mm;';
                     }
                 @endphp
-                <img class="golden-title-img" src="{{ $hd['titleImagePath'] }}" style="{{ $titleStyle }}">
+                @if ($titleSrc !== '')
+                <img class="golden-title-img" src="{!! $titleSrc !!}" style="{{ $titleStyle }}">
                 @elseif (!empty($hd['title']))
                 <div class="golden-title">{{ $hd['title'] }}</div>
                 @endif
 
-                @if (!empty($hd['subtitleImagePath']))
                 @php
+                    $subSrc = NguHanhTitleRenderer::embedPath((string) ($hd['subtitleImagePath'] ?? ''));
+                    if ($subSrc === '' && ! empty($hd['subtitle'])) {
+                        $subSrc = NguHanhTitleRenderer::goldTitleEmbedded($hd['subtitle'], 16, 162.0)['src'];
+                    }
                     $subStyle = 'width:162mm;height:auto;object-fit:contain;';
                     if (!empty($hd['subtitleImageHeightMm'])) {
                         $subStyle .= 'max-height:'.$hd['subtitleImageHeightMm'].'mm;';
                     }
                 @endphp
-                <img class="golden-subtitle-img" src="{{ $hd['subtitleImagePath'] }}" style="{{ $subStyle }}">
+                @if ($subSrc !== '')
+                <img class="golden-subtitle-img" src="{!! $subSrc !!}" style="{{ $subStyle }}">
                 @elseif (!empty($hd['subtitle']))
                 <div class="golden-subtitle">{{ $hd['subtitle'] }}</div>
                 @endif
 
             @elseif ($kind === 'cont')
                 @php $cd = $it['data'] ?? []; @endphp
-                @if (!empty($cd['contTitleImagePath']))
                 @php
+                    $contSrc = NguHanhTitleRenderer::embedPath((string) ($cd['contTitleImagePath'] ?? ''));
+                    if ($contSrc === '' && ! empty($cd['continuationTitle'])) {
+                        $contSrc = NguHanhTitleRenderer::goldTitleEmbedded($cd['continuationTitle'], 12, 162.0)['src'];
+                    }
                     $contStyle = 'width:162mm;height:auto;object-fit:contain;';
                     if (!empty($cd['contTitleImageHeightMm'])) {
                         $contStyle .= 'max-height:'.$cd['contTitleImageHeightMm'].'mm;';
                     }
                 @endphp
-                <img class="golden-title-img" src="{{ $cd['contTitleImagePath'] }}" style="{{ $contStyle }}">
+                @if ($contSrc !== '')
+                <img class="golden-title-img" src="{!! $contSrc !!}" style="{{ $contStyle }}">
                 @elseif (!empty($cd['continuationTitle']))
                 <div class="continuation-title">{{ $cd['continuationTitle'] }}</div>
                 @endif

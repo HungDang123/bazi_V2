@@ -13,8 +13,8 @@ class Phan5TraitLayout
     /** margin-bottom 2.5mm giữa các <p> — khớp .trait-body-cell p */
     public const P_MARGIN_MM = 2.5;
 
-    /** padding-bottom 4mm + buffer nhỏ dưới body. */
-    public const BODY_PADDING_MM = 12.0;
+    /** padding dọc .trait-body-cell (top 2mm + bottom 5mm) + buffer. */
+    public const BODY_PADDING_MM = 15.0;
 
     /** Đệm chống clip + slack render DomPDF (justify wrap thực tế cao hơn ước lượng). */
     public const BOX_SAFETY_MM = 8.0;
@@ -26,8 +26,8 @@ class Phan5TraitLayout
     /** border-spacing giữa 2 cột traits-row. */
     public const COL_SPACING_MM = 4.0;
 
-    /** padding ngang .trait-body-cell (4mm × 2). */
-    public const COL_BODY_PADDING_H_MM = 8.0;
+    /** padding ngang .trait-body-cell (6.5mm × 2). */
+    public const COL_BODY_PADDING_H_MM = 13.0;
 
     /** border 0.5mm × 2 mỗi cột. */
     public const COL_BORDER_MM = 1.0;
@@ -112,6 +112,54 @@ class Phan5TraitLayout
         float $contentWidthMm = self::DEFAULT_CONTENT_WIDTH_MM
     ): float {
         return self::boxHeightMm($tichCuc, $tieuCuc, 11.0, $contentWidthMm) + self::ROW_MARGIN_MM;
+    }
+
+    /** Chiều cao khối Giải nghĩa + Tích cực/Tiêu cực (1 trang). */
+    public static function energyTraitsBlockHeightMm(
+        ?string $giaiNghia,
+        ?string $tichCuc,
+        ?string $tieuCuc,
+        float $contentWidthMm = self::DEFAULT_CONTENT_WIDTH_MM
+    ): float {
+        $height = 0.0;
+        $giaiNghia = $giaiNghia !== null ? trim($giaiNghia) : '';
+        $tichCuc   = $tichCuc !== null ? trim($tichCuc) : '';
+        $tieuCuc   = $tieuCuc !== null ? trim($tieuCuc) : '';
+
+        if ($giaiNghia !== '') {
+            $height += 8.0 + 2.0; // muc_label + gap
+            $height += self::giaiNghiaBodyHeightMm($giaiNghia, $contentWidthMm) + 3.0;
+        }
+
+        if ($tichCuc !== '' || $tieuCuc !== '') {
+            $height += self::blockHeightMm($tichCuc, $tieuCuc, $contentWidthMm);
+        }
+
+        return round(max($height, 20.0), 2);
+    }
+
+    public static function giaiNghiaBodyHeightMm(string $text, float $contentWidthMm = self::DEFAULT_CONTENT_WIDTH_MM): float
+    {
+        $text = trim($text);
+        if ($text === '') {
+            return 0.0;
+        }
+
+        $height = 0.0;
+        foreach (preg_split('/\r\n|\r|\n/', $text) ?: [] as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+            $height += PdfTextWrapHelper::renderedHeightMmByWidth(
+                $line,
+                $contentWidthMm,
+                self::LINE_MM,
+                self::P_MARGIN_MM
+            );
+        }
+
+        return $height;
     }
 
     /**

@@ -5,7 +5,6 @@
     <style>
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        @include('pdfs.partials.pdf-justify-styles')
         body {
             width: 210mm;
             height: 297mm;
@@ -13,7 +12,6 @@
             font-size: 14px;
             font-weight: normal;
             line-height: 140%;
-            text-align: justify;
             letter-spacing: 0;
         }
         .page {
@@ -29,97 +27,94 @@
         }
         .content {
             position: absolute;
-            top: 16mm;
-            left: 17mm;
-            width: 176mm;
+            top: 44mm;
+            left: 16mm;
+            width: 178mm;
         }
 
-        /* ── Bảng Đại Vận ───────────────────────────────────── */
         .dv-table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            border: 1.5pt solid #6E0101;
+            border: 1.2pt solid #6E0101;
         }
         .dv-table th,
         .dv-table td {
             border: 0.5pt solid #FFFFFF;
             text-align: center;
             vertical-align: middle;
-            padding: 0.5mm;
+            padding: 0.8mm 0.5mm;
         }
 
-        /* Header hàng ĐẠI VẬN */
         .dv-hdr th {
             background-color: #6E0101;
-            color: #ffffff;
+            color: #FFFFFF;
             font-size: 8.5pt;
             font-weight: bold;
-            height: 9mm;
+            height: 10mm;
+            line-height: 1.2;
             border: 0.5pt solid #6E0101;
         }
 
-        /* Header hàng (th) – đỏ */
         th.lbl {
             background-color: #6E0101 !important;
-            color: #ffffff !important;
-            font-size: 8pt;
+            color: #E5CA8E !important;
+            font-size: 7.5pt;
             font-weight: bold;
-            width: 9%;
+            width: 10%;
+            line-height: 1.25;
         }
-        /* Nhãn hàng dữ liệu (td) – xám */
         td.lbl {
-            background-color: #F3F3F3 !important;
+            background-color: #EBE7E0 !important;
             color: #333333 !important;
-            font-size: 8pt;
+            font-size: 7.5pt;
             font-weight: bold;
-            width: 9%;
+            width: 10%;
+            line-height: 1.25;
         }
 
-        /* Thiên Can row */
-        .tc-row td  { height: 26mm; background-color: #F3F3F3; }
-        .dv-name    { font-size: 10pt;  font-weight: bold; color: #6E0101; line-height: 1.15; }
-        .dv-meta    { font-size: 7pt;   color: #555555; line-height: 1.15; }
-        .dv-tt      { font-size: 7pt;   font-weight: bold; color: #6E0101; line-height: 1.15; }
+        .tc-row td  { height: 21mm; background-color: #F8F6F2; }
+        .dc-row td  { height: 14mm; background-color: #F3F3F3; }
+        .tang-row td { height: auto; min-height: 17mm; background-color: #F8F6F2; vertical-align: middle; padding: 1.2mm 0.4mm; }
 
-        /* Địa Chi row */
-        .dc-row td  { height: 15mm; background-color: #F3F3F3; }
+        .dv-name { font-size: 10.5pt; font-weight: bold; color: #6E0101; line-height: 1.2; }
+        .dv-meta { font-size: 7.5pt; color: #444444; line-height: 1.2; margin-top: 0.6mm; }
+        .dv-tt   { font-size: 7.5pt; font-weight: bold; color: #6E0101; line-height: 1.2; margin-top: 0.6mm; }
+        .kv-note { font-size: 6pt; font-style: italic; color: #888888; margin-top: 0.4mm; }
 
-        /* Tàng Cang row */
-        .tang-row td { height: 13mm; background-color: #F3F3F3; }
+        .tang-stack {
+            width: 100%;
+            text-align: center;
+            font-size: 0;
+        }
+        .tang-item {
+            display: inline-block;
+            vertical-align: top;
+            width: 31%;
+            padding: 0 0.3mm;
+            text-align: center;
+        }
+        .tang-item .t-can  { display: block; font-size: 7pt; font-weight: bold; color: #6E0101; line-height: 1.25; }
+        .tang-item .t-meta { display: block; font-size: 6.5pt; color: #555555; line-height: 1.25; margin-top: 0.3mm; }
+        .tang-item .t-pho  { display: block; font-size: 6.5pt; font-weight: bold; color: #6E0101; line-height: 1.25; margin-top: 0.3mm; }
 
-        /* Sub-table Tàng Can (dùng chung) */
-        .tc-sub { width: 100%; border-collapse: collapse; }
-        .tc-sub td { border: none !important; padding: 0.2mm; text-align: center; font-size: 6pt; line-height: 1.15; vertical-align: middle; }
-        .t-can  { color: #6E0101; font-weight: bold; }
-        .t-meta { color: #555555; }
-        .t-pho  { color: #6E0101; font-weight: bold; }
-
-        /* Year rows (phần 2 — 10 năm) */
         .yr-row td {
-            height: 6.2mm;
-            font-size: 6.5pt;
-            line-height: 1.15;
-            color: #333;
+            height: 8.5mm;
+            background-color: #F8F6F2;
             vertical-align: middle;
-            padding: 0.2mm 0.3mm;
-            background-color: #F3F3F3;
+            padding: 0.4mm 0.3mm;
         }
-        .yr-row-alt td { background-color: #EBEBEB; }
-        .kv-note { font-size: 5.5pt; font-style: italic; color: #888; }
-
+        .yr-row-alt td { background-color: #EDE8DF; }
+        .yr-can { font-size: 7pt; font-weight: bold; color: #6E0101; line-height: 1.15; }
+        .yr-num { font-size: 6.5pt; color: #333333; line-height: 1.15; margin-top: 0.2mm; }
     </style>
 </head>
 <body>
 <div class="page">
 
-    {{-- Nền trang trí LBTV-532 --}}
     <img class="bg-img" src="{{ $templatePath }}">
 
     <div class="content">
-
-        {{-- ══════════════════════════════════════════════
-             BẢNG ĐẠI VẬN  (9 kỳ × 10 năm)
-             ══════════════════════════════════════════════ --}}
         <table class="dv-table">
             <thead>
                 <tr class="dv-hdr">
@@ -131,7 +126,6 @@
             </thead>
             <tbody>
 
-                {{-- ─── Thiên Can ─── --}}
                 <tr class="tc-row">
                     <td class="lbl">Thiên<br>Can</td>
                     @foreach($bangDaiVan as $dv)
@@ -143,7 +137,6 @@
                     @endforeach
                 </tr>
 
-                {{-- ─── Địa Chi ─── --}}
                 <tr class="dc-row">
                     <td class="lbl">Địa<br>Chi</td>
                     @foreach($bangDaiVan as $dv)
@@ -155,33 +148,23 @@
                     @endforeach
                 </tr>
 
-                {{-- ─── Tàng Cang ─── --}}
                 <tr class="tang-row">
-                    <td class="lbl">Tàng<br>Cang</td>
+                    <td class="lbl">Tàng<br>Can</td>
                     @foreach($bangDaiVan as $dv)
                     <td>
-                        <table class="tc-sub">
-                            <tr>
-                                @foreach($dv['cantang'] as $tc)
-                                <td><span class="t-can">{{ $tc['can_tang'] }}</span></td>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($dv['cantang'] as $tc)
-                                <td><span class="t-meta">{{ preg_replace('/^[+\-]\s*/u', '', $tc['menh']) }}</span></td>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($dv['cantang'] as $tc)
-                                <td><span class="t-pho">{{ $tc['pho_tinh'] }}</span></td>
-                                @endforeach
-                            </tr>
-                        </table>
+                        <div class="tang-stack">
+                            @foreach($dv['cantang'] as $tc)
+                            <div class="tang-item">
+                                <span class="t-can">{{ $tc['can_tang'] }}</span>
+                                <span class="t-meta">{{ preg_replace('/^[+\-]\s*/u', '', $tc['menh']) }}</span>
+                                <span class="t-pho">{{ $tc['pho_tinh'] }}</span>
+                            </div>
+                            @endforeach
+                        </div>
                     </td>
                     @endforeach
                 </tr>
 
-                {{-- ─── 10 năm trong mỗi kỳ Đại Vận ─── --}}
                 @for($j = 0; $j < 10; $j++)
                 <tr class="{{ $j % 2 === 0 ? 'yr-row' : 'yr-row yr-row-alt' }}">
                     <td class="lbl"></td>
@@ -189,7 +172,8 @@
                     @php $yr = $dv['list_year'][$j] ?? null; @endphp
                     <td>
                         @if($yr)
-                        {{ $yr['can_chi'] }}<br>{{ $yr['nam'] }}
+                        <div class="yr-can">{{ $yr['can_chi'] }}</div>
+                        <div class="yr-num">{{ $yr['nam'] }}</div>
                         @if(!empty($yr['khong_vong']))<div class="kv-note">(KV)</div>@endif
                         @endif
                     </td>
@@ -199,9 +183,7 @@
 
             </tbody>
         </table>
-
-
-    </div>{{-- .content --}}
-</div>{{-- .page --}}
+    </div>
+</div>
 </body>
 </html>

@@ -120,18 +120,20 @@
             @foreach ($rows as $row)
             @php
                 $labelImg = NguHanhTitleRenderer::scrollLabelImagePath($row['label'], $labelW, $labelH, $labelPx);
+                $labelSrc = NguHanhTitleRenderer::embedPath($labelImg);
                 $valueText = $kwPlain($row['value']);
                 $valueMeta = $valueText !== ''
                     ? NguHanhTitleRenderer::scrollValueImageMetrics($valueText, $valueW, $row['valPx'], $row['minH'])
                     : ['path' => '', 'widthMm' => $valueW, 'heightMm' => $row['minH']];
+                $valueSrc = NguHanhTitleRenderer::embedPath((string) ($valueMeta['path'] ?? ''));
             @endphp
             <tr style="height: {{ $rowHeight }}mm;">
                 <td>
-                    @if ($labelImg !== '')
-                    <img class="field-label-img" style="width: {{ $labelW }}mm; height: {{ $labelH }}mm;" src="{{ $labelImg }}" alt="">
+                    @if ($labelSrc !== '')
+                    <img class="field-label-img" style="width: {{ $labelW }}mm; height: {{ $labelH }}mm;" src="{!! $labelSrc !!}" alt="">
                     @endif
-                    @if ($valueMeta['path'] !== '')
-                    <img class="val-kw-img" style="width: {{ $valueMeta['widthMm'] }}mm; height: {{ $valueMeta['heightMm'] }}mm;" src="{{ $valueMeta['path'] }}" alt="">
+                    @if ($valueSrc !== '')
+                    <img class="val-kw-img" style="width: {{ $valueMeta['widthMm'] }}mm; height: {{ $valueMeta['heightMm'] }}mm;" src="{!! $valueSrc !!}" alt="">
                     @endif
                 </td>
             </tr>

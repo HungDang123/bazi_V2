@@ -41,6 +41,12 @@
         'tichCuc' => $block['tichCuc'] ?? '',
         'tieuCuc' => $block['tieuCuc'] ?? '',
     ])
+    @elseif ($type === 'energy_traits')
+    @include('pdfs.phan-5.partials.energy-traits-section', [
+        'giaiNghia' => $block['giaiNghia'] ?? '',
+        'tichCuc'   => $block['tichCuc'] ?? '',
+        'tieuCuc'   => $block['tieuCuc'] ?? '',
+    ])
     @else
     <div class="para-text">
         @include('pdfs.partials.pdf-text-chunks', [

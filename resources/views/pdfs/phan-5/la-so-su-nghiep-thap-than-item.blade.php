@@ -37,15 +37,6 @@
             text-transform: uppercase;
         }
 
-        .muc-label {
-            color: #6E0101;
-            font-weight: bold;
-            font-style: italic;
-            font-size: 14px;
-            line-height: 130%;
-            margin-bottom: 3mm;
-        }
-
         .content-img {
             display: block;
             width: 100%;
@@ -68,6 +59,9 @@
             background: transparent;
         }
         .para-text p:last-child { padding-bottom: 0; }
+
+        .energy-giai-nghia { margin-bottom: 3mm; }
+        .energy-traits-wrap .traits-row { margin-top: 1mm; }
 
         @include('pdfs.phan-5.partials.keyword-box-styles')
 

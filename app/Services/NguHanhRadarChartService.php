@@ -53,7 +53,6 @@ class NguHanhRadarChartService
         imagefill($im, 0, 0, $white);
 
         $gridColor   = imagecolorallocate($im, 229, 229, 229);
-        $labelColor  = imagecolorallocate($im, 31, 41, 55);
         $tickColor   = imagecolorallocate($im, 55, 65, 81);
         $bmFill      = imagecolorallocatealpha($im, 79, 70, 229, 102);
         $bmStroke    = imagecolorallocate($im, 79, 70, 229);
@@ -123,20 +122,7 @@ class NguHanhRadarChartService
                 imagefilledellipse($im, $px, $py, 8, 8, $pointColor);
             }
 
-            $tenNh   = trim((string) ($ax['ten_ngu_hanh'] ?? ''));
-            $lucThan = trim((string) ($ax['luc_than'] ?? ''));
-            $label   = $lucThan !== '' ? $tenNh.' ('.$lucThan.')' : $tenNh;
-
-            if ($fontBold !== null && $label !== '') {
-                $lr     = self::RADIUS + 28;
-                [$lx, $ly] = self::polar($lr, $axes[$idx]);
-                $box    = imagettfbbox(13, 0, $fontBold, $label);
-                $tw     = ($box[2] ?? 0) - ($box[0] ?? 0);
-                $th     = ($box[1] ?? 0) - ($box[7] ?? 0);
-                $textX  = (int) round($lx - $tw / 2);
-                $textY  = (int) round($ly + $th / 2);
-                imagettftext($im, 13, 0, $textX, $textY, $labelColor, $fontBold, $label);
-            }
+            // Nhãn trục render bằng HTML (DomPDF) trong la-so-chat-luong — tránh mất chữ tiếng Việt trên PNG.
         }
 
         self::drawLegend($im, $fontBold, $bmStroke, $nvStroke, $hasNv);

@@ -5,8 +5,6 @@
     <style>
         @page { margin: 0; padding: 0; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        @include('pdfs.partials.pdf-justify-styles')
-
         body {
             width: 210mm;
             height: 297mm;
@@ -14,249 +12,169 @@
             font-size: 14px;
             font-weight: normal;
             line-height: 140%;
-            text-align: justify;
             letter-spacing: 0;
         }
-
         .page {
             position: relative;
             width: 210mm;
             height: 297mm;
             overflow: hidden;
         }
-
-        /* Nền trang trí (khung + scroll header) */
         .bg-img {
             position: absolute;
             top: 0; left: 0;
             width: 210mm; height: 297mm;
         }
-
-        /* Vùng nội dung bảng */
         .content {
             position: absolute;
-            top: 16mm;
-            left: 17mm;
-            width: 176mm;
+            top: 18mm;
+            left: 16mm;
+            width: 178mm;
         }
 
-        /* ── Bảng Tứ Trụ chính ─────────────────────────────────── */
-        .bt-table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1.5pt solid #6E0101;
-        }
-        .bt-table th,
-        .bt-table td {
-            border: 1pt solid #9C3030;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        /* Header row đỏ */
-        .hdr th {
-            background-color: #6E0101;
-            color: #FFFFFF;
-            font-size: 9.5pt;
-            font-weight: bold;
-            padding: 3mm 1mm;
-            height: 12mm;
-        }
-
-        /* Cột nhãn (Thiên Can / Địa Chi / Tàng can) */
-        .lbl-col {
-            width: 14%;
-            font-size: 8.5pt;
-            font-weight: bold;
-            color: #333;
-            text-align: center !important;
-            padding: 2mm !important;
-            background-color: #F2F2F2;
-        }
-
-        /* Cell dữ liệu Thiên Can / Địa Chi */
-        .data-cell {
-            width: 21.5%;
-            height: 43mm;
-            padding: 2mm 1mm;
-            background-color: #FAFAFA;
-            vertical-align: middle;
-        }
-
-        /* Tên can/chi lớn */
-        .name-lg {
-            font-size: 24pt;
-            font-weight: bold;
-            color: #6E0101;
-            margin-bottom: 2mm;
-        }
-        /* Âm dương + ngũ hành */
-        .meta-sm {
-            font-size: 12pt;
-            color: #555555;
-            margin-bottom: 1mm;
-        }
-        /* Thập thần */
-        .thap-than {
-            font-size: 12pt;
-            font-weight: bold;
-            color: #6E0101;
-        }
-        /* Không vong */
-        .kv-txt {
-            font-size: 7pt;
-            font-style: italic;
-            color: #777;
-            margin-bottom: 0.5mm;
-        }
-
-        /* Cell Tàng Can */
-        .tc-cell {
-            width: 21.5%;
-            height: 38mm;
-            padding: 2mm 1mm;
-            background-color: #FAFAFA;
-            vertical-align: middle;
-        }
-
-        /* Sub-table Tàng Can */
-        .tc-sub {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .tc-sub td {
-            border: none !important;
-            padding: 0.8mm 0.5mm;
-            text-align: center;
-            vertical-align: top;
-        }
-        .tc-can  { font-size: 7pt; font-weight: bold; color: #6E0101; }
-        .tc-meta { font-size: 7pt; color: #555555; }
-        .tc-pho  { font-size: 7pt; font-weight: bold; color: #6E0101; }
-
-        /* ── Bảng Thần Sát ─────────────────────────────────────── */
+        .bt-table,
         .ts-table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            border: 1.5pt solid #6E0101;
-            margin-top: 5mm;
+            border: 1.2pt solid #6E0101;
         }
+        .bt-table th,
+        .bt-table td,
         .ts-table th,
         .ts-table td {
-            border: 1pt solid #9C3030;
-            padding: 2.5mm 2mm;
+            border: 0.5pt solid #FFFFFF;
             text-align: center;
-            font-size: 9pt;
+            vertical-align: middle;
+            padding: 0.8mm 0.5mm;
         }
-        .ts-hdr {
+
+        .bt-hdr th,
+        .ts-hdr th {
             background-color: #6E0101;
             color: #FFFFFF;
+            font-size: 8.5pt;
             font-weight: bold;
             height: 10mm;
-            font-size: 9pt;
+            line-height: 1.2;
+            border: 0.5pt solid #6E0101;
         }
-        .ts-lbl {
+        th.lbl {
+            background-color: #6E0101 !important;
+            color: #E5CA8E !important;
+            font-size: 7.5pt;
             font-weight: bold;
-            color: #333;
-            background-color: #F5F5F5;
-            width: 50%;
+            width: 12%;
+            line-height: 1.25;
         }
-        .ts-val {
-            color: #333;
+        td.lbl {
+            background-color: #EBE7E0 !important;
+            color: #333333 !important;
+            font-size: 7.5pt;
             font-weight: bold;
-            width: 50%;
+            width: 12%;
+            line-height: 1.25;
         }
-        .ts-even {
-            background-color: #FAFAFA;
+
+        .tc-row td  { height: 24mm; background-color: #F8F6F2; }
+        .dc-row td  { height: 20mm; background-color: #F3F3F3; }
+        .tang-row td { height: auto; min-height: 22mm; background-color: #F8F6F2; vertical-align: middle; padding: 1.2mm 0.4mm; }
+
+        .bt-name { font-size: 12pt; font-weight: bold; color: #6E0101; line-height: 1.2; }
+        .bt-meta { font-size: 8pt; color: #444444; line-height: 1.2; margin-top: 0.6mm; }
+        .bt-tt   { font-size: 8pt; font-weight: bold; color: #6E0101; line-height: 1.2; margin-top: 0.6mm; }
+        .kv-note { font-size: 6.5pt; font-style: italic; color: #888888; margin-top: 0.4mm; }
+
+        .tang-stack {
+            width: 100%;
+            text-align: center;
+            font-size: 0;
         }
-        .ts-odd {
-            background-color: #FFFFFF;
+        .tang-item {
+            display: inline-block;
+            vertical-align: top;
+            padding: 0 0.4mm;
+            text-align: center;
         }
+        .tang-item.w1 { width: 96%; }
+        .tang-item.w2 { width: 48%; }
+        .tang-item.w3 { width: 31%; }
+        .tang-item .t-can  { display: block; font-size: 7.5pt; font-weight: bold; color: #6E0101; line-height: 1.25; }
+        .tang-item .t-meta { display: block; font-size: 6.5pt; color: #555555; line-height: 1.25; margin-top: 0.3mm; }
+        .tang-item .t-pho  { display: block; font-size: 6.5pt; font-weight: bold; color: #6E0101; line-height: 1.25; margin-top: 0.3mm; }
+
+        .ts-table { margin-top: 5mm; }
+        .ts-row td.ts-val { height: 8mm; background-color: #F8F6F2; font-size: 8pt; font-weight: bold; color: #333333; width: 50%; }
+        .ts-row-alt td.ts-val { background-color: #EDE8DF; }
+        .ts-row td.lbl { width: 50%; }
     </style>
 </head>
 <body>
 <div class="page">
 
-    {{-- Nền trang trí LBTV-531 --}}
     <img class="bg-img" src="{{ $templatePath }}">
 
     <div class="content">
 
-        {{-- ════════════════════════════════════════════════
-             BẢNG TỨ TRỤ
-             ════════════════════════════════════════════════ --}}
         <table class="bt-table">
             <thead>
-                <tr class="hdr">
-                    <th style="width:14%; background-color:#6E0101;"></th>
-                    <th style="width:21.5%;">Giờ</th>
-                    <th style="width:21.5%;">Ngày<br>Nhật Chủ</th>
-                    <th style="width:21.5%;">Tháng</th>
-                    <th style="width:21.5%;">Năm</th>
+                <tr class="bt-hdr">
+                    <th class="lbl"></th>
+                    <th>Giờ</th>
+                    <th>Ngày<br>Nhật Chủ</th>
+                    <th>Tháng</th>
+                    <th>Năm</th>
                 </tr>
             </thead>
             <tbody>
 
-                {{-- ─── THIÊN CAN ─── --}}
-                <tr>
-                    <td class="lbl-col">Thiên Can</td>
-
+                <tr class="tc-row">
+                    <td class="lbl">Thiên<br>Can</td>
                     @foreach(['hour','day','month','year'] as $col)
                     @php
                         $can   = $batTu[$col]['can'] ?? [];
                         $isDay = ($col === 'day');
                         $tt    = $isDay ? '/' : ($can['chu_tinh'] ?? '');
                     @endphp
-                    <td class="data-cell">
-                        <div class="name-lg">{{ $can['thien_can'] ?? '' }}</div>
-                        <div class="meta-sm">{{ $can['am_duong'] ?? '' }} {{ $can['menh'] ?? '' }}</div>
-                        <div class="thap-than">{{ $tt }}</div>
+                    <td>
+                        <div class="bt-name">{{ $can['thien_can'] ?? '' }}</div>
+                        <div class="bt-meta">{{ $can['am_duong'] ?? '' }} {{ $can['menh'] ?? '' }}</div>
+                        <div class="bt-tt">{{ $tt }}</div>
                     </td>
                     @endforeach
                 </tr>
 
-                {{-- ─── ĐỊA CHI ─── --}}
-                <tr>
-                    <td class="lbl-col">Địa Chi</td>
+                <tr class="dc-row">
+                    <td class="lbl">Địa<br>Chi</td>
+                    @foreach(['hour','day','month','year'] as $col)
+                    @php $chi = $batTu[$col]['chi'] ?? []; @endphp
+                    <td>
+                        <div class="bt-name">{{ $chi['dia_chi'] ?? '' }}</div>
+                        <div class="bt-meta">{{ $chi['am_duong'] ?? '' }} {{ $chi['menh'] ?? '' }}</div>
+                        @if(!empty($chi['khong_vong']))<div class="kv-note">(KV)</div>@endif
+                        <div class="bt-tt">/</div>
+                    </td>
+                    @endforeach
+                </tr>
 
+                <tr class="tang-row">
+                    <td class="lbl">Tàng<br>Can</td>
                     @foreach(['hour','day','month','year'] as $col)
                     @php
-                        $chi = $batTu[$col]['chi'] ?? [];
-                        $kv  = !empty($chi['khong_vong']);
+                        $tangs = $batTu[$col]['can_tang'] ?? [];
+                        $cnt   = max(1, count($tangs));
+                        $wCls  = $cnt >= 3 ? 'w3' : ($cnt === 2 ? 'w2' : 'w1');
                     @endphp
-                    <td class="data-cell">
-                        <div class="name-lg">{{ $chi['dia_chi'] ?? '' }}</div>
-                        <div class="meta-sm">{{ $chi['am_duong'] ?? '' }} {{ $chi['menh'] ?? '' }}</div>
-                        @if($kv)<div class="kv-txt">(Không vong)</div>@endif
-                        <div class="thap-than">/</div>
-                    </td>
-                    @endforeach
-                </tr>
-
-                {{-- ─── TÀNG CAN ─── --}}
-                <tr>
-                    <td class="lbl-col">Tàng can</td>
-
-                    @foreach(['hour','day','month','year'] as $col)
-                    @php $tangs = $batTu[$col]['can_tang'] ?? []; @endphp
-                    <td class="tc-cell">
-                        <table class="tc-sub">
-                            <tr>
-                                @foreach($tangs as $tc)
-                                <td><div class="tc-can">{{ $tc['can_tang'] ?? '' }}</div></td>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($tangs as $tc)
-                                <td><div class="tc-meta">{{ ($tc['am_duong'] ?? '') }}{{ $tc['menh'] ?? '' }}</div></td>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                @foreach($tangs as $tc)
-                                <td><div class="tc-pho">{{ $tc['pho_tinh'] ?? '' }}</div></td>
-                                @endforeach
-                            </tr>
-                        </table>
+                    <td>
+                        <div class="tang-stack">
+                            @foreach($tangs as $tc)
+                            <div class="tang-item {{ $wCls }}">
+                                <span class="t-can">{{ $tc['can_tang'] ?? '' }}</span>
+                                <span class="t-meta">{{ ($tc['am_duong'] ?? '') }} {{ preg_replace('/^[+\-]\s*/u', '', (string) ($tc['menh'] ?? '')) }}</span>
+                                <span class="t-pho">{{ $tc['pho_tinh'] ?? '' }}</span>
+                            </div>
+                            @endforeach
+                        </div>
                     </td>
                     @endforeach
                 </tr>
@@ -264,9 +182,6 @@
             </tbody>
         </table>
 
-        {{-- ════════════════════════════════════════════════
-             BẢNG THẦN SÁT
-             ════════════════════════════════════════════════ --}}
         @php
             $nhatChu = trim(($batTu['day']['can']['thien_can'] ?? '') . ' ' . ($batTu['day']['chi']['dia_chi'] ?? ''));
             $thanSat = [
@@ -281,23 +196,23 @@
 
         <table class="ts-table">
             <thead>
-                <tr>
-                    <th class="ts-hdr" style="width:50%;">Ngày sinh / Nhật Chủ</th>
-                    <th class="ts-hdr" style="width:50%;">{{ $nhatChu }}</th>
+                <tr class="ts-hdr">
+                    <th style="width:50%;">Ngày sinh / Nhật Chủ</th>
+                    <th style="width:50%;">{{ $nhatChu }}</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($thanSat as $ten => $giaTri)
-                @php $cls = ($rowIdx % 2 === 0) ? 'ts-odd' : 'ts-even'; $rowIdx++; @endphp
-                <tr class="{{ $cls }}">
-                    <td class="ts-lbl">{{ $ten }}</td>
+                <tr class="{{ $rowIdx % 2 === 0 ? 'ts-row' : 'ts-row ts-row-alt' }}">
+                    <td class="lbl">{{ $ten }}</td>
                     <td class="ts-val">{{ $giaTri }}</td>
                 </tr>
+                @php $rowIdx++; @endphp
                 @endforeach
             </tbody>
         </table>
 
-    </div>{{-- .content --}}
-</div>{{-- .page --}}
+    </div>
+</div>
 </body>
 </html>

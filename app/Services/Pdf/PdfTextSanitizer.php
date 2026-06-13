@@ -37,11 +37,32 @@ class PdfTextSanitizer
         return implode("\n", $lines);
     }
 
-    /** Tiêu đề con (Phần 8/9): 1. / 5. / a. / Về … */
+    /**
+     * "Về sự nghiệp (Năng lượng hành Kim): Bạn rèn luyện..." → nhãn + thân đoạn.
+     *
+     * @return array{label: string, body: string}|null
+     */
+    public static function splitVeColonPrefix(string $line): ?array
+    {
+        $line = self::trimString($line);
+        if ($line === '' || preg_match('/^(Về\s+[^:]+):\s*(.+)$/u', $line, $m) !== 1) {
+            return null;
+        }
+
+        $label = trim($m[1]);
+        $body = trim($m[2]);
+        if ($label === '' || $body === '') {
+            return null;
+        }
+
+        return ['label' => $label, 'body' => $body];
+    }
+
+    /** Tiêu đề con (Phần 8/9): 1. / 5. / a. / Về … (chỉ dòng nhãn thuần, không kèm thân sau dấu :) */
     public static function isPhan9SubLabelLine(string $line): bool
     {
         $line = self::normalizeSubLabelLine($line);
-        if ($line === '') {
+        if ($line === '' || self::splitVeColonPrefix($line) !== null) {
             return false;
         }
 
@@ -89,7 +110,14 @@ class PdfTextSanitizer
                 continue;
             }
 
-            if (self::isPhan9SubLabelLine($line)) {
+            if ($veSplit = self::splitVeColonPrefix($line)) {
+                $blocks[] = [
+                    'type' => 'para',
+                    'text' => $line,
+                    've_label' => $veSplit['label'],
+                    've_body' => $veSplit['body'],
+                ];
+            } elseif (self::isPhan9SubLabelLine($line)) {
                 $norm = self::normalizeSubLabelLine($line);
                 $type = preg_match('/^[a-z]\.\s+/iu', $norm) === 1 ? 'sub_ab' : 'sub_title';
                 $blocks[] = ['type' => $type, 'text' => $line];

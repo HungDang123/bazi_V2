@@ -45,7 +45,6 @@
 
         .para-text {
             color: #1A1A1A;
-            margin-bottom: 2mm;
             font-size: 14px;
             text-align: justify;
             background: transparent;
@@ -67,6 +66,14 @@
             font-weight: bold;
             font-size: 14px;
             line-height: 15pt;
+        }
+
+        .content-img {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            margin: 2mm 0 3mm;
         }
 
         .huong-label { font-weight: bold; margin-top: 4px; margin-bottom: 3px; font-size: 14px; line-height: 130%; }
@@ -92,6 +99,21 @@
             <div class="red-title">{{ $block['text'] ?? '' }}</div>
             @elseif ($type === 'huong_label')
             <div class="huong-label {{ $block['tone'] ?? '' }}">{{ $block['text'] ?? '' }}</div>
+            @elseif ($type === 'image')
+            @php
+                $imgSrc = \App\Services\Pdf\PdfImageEmbed::src((string) ($block['path'] ?? ''));
+                $imgW = $block['renderWidthMm'] ?? ($page['contentWidthMm'] ?? 162);
+                $imgStyle = 'width:'.$imgW.'mm;';
+                if (!empty($block['renderHeightMm'])) {
+                    $imgStyle .= 'height:'.$block['renderHeightMm'].'mm;';
+                }
+                if (!empty($block['maxHeightMm'])) {
+                    $imgStyle .= 'max-height:'.$block['maxHeightMm'].'mm;';
+                }
+            @endphp
+            @if ($imgSrc !== '')
+            <img class="content-img" src="{!! $imgSrc !!}" style="{{ $imgStyle }}">
+            @endif
             @else
             <div class="para-text">
                 @include('pdfs.partials.pdf-text-chunks', [

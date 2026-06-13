@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Services\Pdf\PdfContentPaginator;
 use App\Services\Pdf\PdfPaginationProfiles;
 use App\Services\Pdf\PdfTextSanitizer;
-use App\Models\DongChayGioiThieu;
 use App\Models\Phan9aNgoaiLuc;
 use App\Models\Phan9aNoiLuc;
 
@@ -126,18 +125,6 @@ class Phan9PdfService
                         PdfTextSanitizer::appendParagraphBlocks($blocks, $para);
                     }
                 }
-            }
-        }
-
-        // ── Transition ───────────────────────────────────────────────────────
-        $transition = DongChayGioiThieu::query()
-            ->where('tru_loai', 'transition_phan9a')
-            ->first();
-
-        if ($transition !== null) {
-            $transText = trim((string) ($transition->noi_dung ?? ''));
-            if ($transText !== '') {
-                $blocks[] = ['type' => 'sub_title', 'text' => $transText];
             }
         }
 

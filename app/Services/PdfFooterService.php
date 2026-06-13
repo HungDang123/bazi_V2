@@ -51,7 +51,7 @@ class PdfFooterService
      * Gắn footer (banner 08.png + số trang + tên) lên từng trang PDF đã merge.
      *
      * @param  array<int, int>  $whiteNamePhysicalPages  Số trang vật lý (1-based) dùng chữ trắng cho tên
-     * @param  array<int, int>  $darkNamePhysicalPages   Số trang vật lý (1-based) luôn dùng chữ đen (ghi đè trang cuối / bìa)
+     * @param  array<int, int>  $darkNamePhysicalPages   Số trang vật lý (1-based) dùng chữ đen (worksheet nền sáng; trang cuối PDF vẫn trắng)
      */
     public static function applyToMergedPdf(
         string $inputPdf,
@@ -166,7 +166,7 @@ class PdfFooterService
     }
 
     /**
-     * Trang worksheet nền sáng — luôn chữ đen (ghi đè quy tắc trang cuối / bìa).
+     * Trang worksheet nền sáng — chữ tên đen (trừ trang cuối cùng toàn bộ PDF).
      *
      * @param  array<int, array{path: string, coverPages?: 'all'|array<int, int>, darkNamePages?: 'all'|array<int, int>}>  $segments
      * @return array<int, int>
@@ -456,13 +456,12 @@ class PdfFooterService
 
         $displayName = trim($fullName) !== '' ? mb_strtoupper(trim($fullName), 'UTF-8') : '';
 
-        // Trang đầu + trang cuối + trang bìa (nền tối) → chữ trắng; worksheet nền sáng → luôn chữ đen
-        $forceDarkName = $physicalPageNo > 0 && in_array($physicalPageNo, $darkNamePhysicalPages, true);
-        $whiteText = ! $forceDarkName && (
-            $isLastPage
-            || ($displayPage === self::FIRST_DISPLAY_PAGE_NUMBER)
-            || ($physicalPageNo > 0 && in_array($physicalPageNo, $whiteNamePhysicalPages, true))
-        );
+        // Trang cuối → trắng; bìa phần (whiteNamePages) → trắng; worksheet (darkNamePages) → đen
+        $onWhiteList = $physicalPageNo > 0 && in_array($physicalPageNo, $whiteNamePhysicalPages, true);
+        $onDarkList  = $physicalPageNo > 0 && in_array($physicalPageNo, $darkNamePhysicalPages, true);
+        $whiteText   = $isLastPage
+            || $onWhiteList
+            || (! $onDarkList && $displayPage === self::FIRST_DISPLAY_PAGE_NUMBER);
         $namePath  = $displayName !== '' ? self::renderNameStrip($displayName, $whiteText) : null;
         $nameWmm  = 0.0;
         $nameHmm  = 0.0;

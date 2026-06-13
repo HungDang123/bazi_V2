@@ -14,33 +14,19 @@
 
 .trait-box {
     width: 100%;
-    height: 100%;
     border: 0.5mm solid;
     border-radius: 3mm;
-    overflow: hidden;
+    overflow: visible;
     background: #FFFFFF;
     box-sizing: border-box;
-    padding: 0 1px;
 }
 
 .trait-box.tich-cuc { border-color: #4CAF50; }
 .trait-box.tieu-cuc { border-color: #C62828; }
 
-.trait-inner {
-    width: 100%;
-    height: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-
-.trait-inner td {
-    vertical-align: top;
-    padding: 0;
-}
-
 .trait-pill-wrap {
     text-align: center;
-    padding: 2.5mm 2.3mm 2mm;
+    padding: 2.5mm 2mm 2mm;
 }
 
 .trait-pill-img {
@@ -64,7 +50,7 @@
     color: #1A1A1A;
     font-size: 14px;
     line-height: 140%;
-    padding: 0 4.3mm 4mm;
+    padding: 0 4mm 4mm;
     text-align: justify;
 }
 

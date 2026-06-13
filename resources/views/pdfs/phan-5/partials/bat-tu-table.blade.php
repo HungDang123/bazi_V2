@@ -1,10 +1,10 @@
 @php
     $highlightPillars = $highlightPillars ?? [];
     $pillarCols = [
-        ['key' => 'hour', 'hl' => in_array('hour', $highlightPillars, true)],
-        ['key' => 'day', 'hl' => in_array('day', $highlightPillars, true)],
+        ['key' => 'hour',  'hl' => in_array('hour', $highlightPillars, true)],
+        ['key' => 'day',   'hl' => in_array('day', $highlightPillars, true)],
         ['key' => 'month', 'hl' => in_array('month', $highlightPillars, true)],
-        ['key' => 'year', 'hl' => in_array('year', $highlightPillars, true)],
+        ['key' => 'year',  'hl' => in_array('year', $highlightPillars, true)],
     ];
 @endphp
 
@@ -12,17 +12,17 @@
 
 <table class="bt-table">
     <thead>
-        <tr class="hdr">
-            <th style="width:14%; background-color:#6E0101;"></th>
-            <th style="width:21.5%;">Giờ</th>
-            <th style="width:21.5%;">Ngày<br>Nhật Chủ</th>
-            <th style="width:21.5%;">Tháng</th>
-            <th style="width:21.5%;">Năm</th>
+        <tr class="bt-hdr">
+            <th class="lbl"></th>
+            <th>Giờ</th>
+            <th>Ngày<br>Nhật Chủ</th>
+            <th>Tháng</th>
+            <th>Năm</th>
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td class="lbl-col">Thiên Can</td>
+        <tr class="tc-row">
+            <td class="lbl">Thiên<br>Can</td>
             @foreach($pillarCols as $pillar)
             @php
                 $col   = $pillar['key'];
@@ -31,54 +31,51 @@
                 $isDay = ($col === 'day');
                 $tt    = $isDay ? '/' : ($can['chu_tinh'] ?? '');
             @endphp
-            <td class="data-cell{{ $hl ? ' hl' : '' }}">
-                <div class="name-lg">{{ $can['thien_can'] ?? '' }}</div>
-                <div class="meta-sm">{{ $can['am_duong'] ?? '' }} {{ $can['menh'] ?? '' }}</div>
-                <div class="thap-than">{{ $tt }}</div>
+            <td class="{{ $hl ? 'hl' : '' }}">
+                <div class="bt-name">{{ $can['thien_can'] ?? '' }}</div>
+                <div class="bt-meta">{{ $can['am_duong'] ?? '' }} {{ $can['menh'] ?? '' }}</div>
+                <div class="bt-tt">{{ $tt }}</div>
             </td>
             @endforeach
         </tr>
 
-        <tr>
-            <td class="lbl-col">Địa Chi</td>
+        <tr class="dc-row">
+            <td class="lbl">Địa<br>Chi</td>
             @foreach($pillarCols as $pillar)
             @php
                 $col = $pillar['key'];
                 $hl  = $pillar['hl'];
                 $chi = $batTu[$col]['chi'] ?? [];
-                $kv  = !empty($chi['khong_vong']);
             @endphp
-            <td class="data-cell{{ $hl ? ' hl' : '' }}">
-                <div class="name-lg">{{ $chi['dia_chi'] ?? '' }}</div>
-                <div class="meta-sm">{{ $chi['am_duong'] ?? '' }} {{ $chi['menh'] ?? '' }}</div>
-                @if($kv)<div class="kv-txt">(Không vong)</div>@endif
-                <div class="thap-than">/</div>
+            <td class="{{ $hl ? 'hl' : '' }}">
+                <div class="bt-name">{{ $chi['dia_chi'] ?? '' }}</div>
+                <div class="bt-meta">{{ $chi['am_duong'] ?? '' }} {{ $chi['menh'] ?? '' }}</div>
+                @if(!empty($chi['khong_vong']))<div class="kv-note">(KV)</div>@endif
+                <div class="bt-tt">/</div>
             </td>
             @endforeach
         </tr>
 
-        <tr>
-            <td class="lbl-col">Tàng can</td>
-            @foreach(['hour','day','month','year'] as $col)
-            @php $tangs = $batTu[$col]['can_tang'] ?? []; @endphp
-            <td class="tc-cell">
-                <table class="tc-sub">
-                    <tr>
-                        @foreach($tangs as $tc)
-                        <td><div class="tc-can">{{ $tc['can_tang'] ?? '' }}</div></td>
-                        @endforeach
-                    </tr>
-                    <tr>
-                        @foreach($tangs as $tc)
-                        <td><div class="tc-meta">{{ ($tc['am_duong'] ?? '') }} {{ $tc['menh'] ?? '' }}</div></td>
-                        @endforeach
-                    </tr>
-                    <tr>
-                        @foreach($tangs as $tc)
-                        <td><div class="tc-pho">{{ $tc['pho_tinh'] ?? '' }}</div></td>
-                        @endforeach
-                    </tr>
-                </table>
+        <tr class="tang-row">
+            <td class="lbl">Tàng<br>Can</td>
+            @foreach($pillarCols as $pillar)
+            @php
+                $col   = $pillar['key'];
+                $hl    = $pillar['hl'];
+                $tangs = $batTu[$col]['can_tang'] ?? [];
+                $cnt   = max(1, count($tangs));
+                $wCls  = $cnt >= 3 ? 'w3' : ($cnt === 2 ? 'w2' : 'w1');
+            @endphp
+            <td class="{{ $hl ? 'hl' : '' }}">
+                <div class="tang-stack">
+                    @foreach($tangs as $tc)
+                    <div class="tang-item {{ $wCls }}">
+                        <span class="t-can">{{ $tc['can_tang'] ?? '' }}</span>
+                        <span class="t-meta">{{ ($tc['am_duong'] ?? '') }} {{ preg_replace('/^[+\-]\s*/u', '', (string) ($tc['menh'] ?? '')) }}</span>
+                        <span class="t-pho">{{ $tc['pho_tinh'] ?? '' }}</span>
+                    </div>
+                    @endforeach
+                </div>
             </td>
             @endforeach
         </tr>

@@ -130,14 +130,6 @@ class Phan5BlockBuilder
             }
         }
 
-        $giaiNghia = PdfTextSanitizer::trimMultiline((string) ($data['giaiNghia'] ?? ''));
-        if ($giaiNghia !== '') {
-            $blocks[] = ['type' => 'muc_label', 'text' => 'Giải nghĩa năng lượng'];
-            foreach (self::linesAsParas($giaiNghia) as $p) {
-                $blocks[] = $p;
-            }
-        }
-
         foreach ($data['bodySections'] ?? [] as $sec) {
             if (! is_array($sec)) {
                 continue;
@@ -190,10 +182,17 @@ class Phan5BlockBuilder
     public static function fromTraits(array $data): array
     {
         $blocks = [];
-        $tich = PdfTextSanitizer::trimMultiline((string) ($data['tichCuc'] ?? ''));
-        $tieu = PdfTextSanitizer::trimMultiline((string) ($data['tieuCuc'] ?? ''));
-        if ($tich !== '' || $tieu !== '') {
-            $blocks[] = ['type' => 'traits', 'tichCuc' => $tich, 'tieuCuc' => $tieu];
+        $giaiNghia = PdfTextSanitizer::trimMultiline((string) ($data['giaiNghia'] ?? ''));
+        $tich      = PdfTextSanitizer::trimMultiline((string) ($data['tichCuc'] ?? ''));
+        $tieu      = PdfTextSanitizer::trimMultiline((string) ($data['tieuCuc'] ?? ''));
+
+        if ($giaiNghia !== '' || $tich !== '' || $tieu !== '') {
+            $blocks[] = [
+                'type'       => 'energy_traits',
+                'giaiNghia'  => $giaiNghia,
+                'tichCuc'    => $tich,
+                'tieuCuc'    => $tieu,
+            ];
         }
 
         $chienLuoc = PdfTextSanitizer::trimMultiline((string) ($data['chienLuoc'] ?? ''));

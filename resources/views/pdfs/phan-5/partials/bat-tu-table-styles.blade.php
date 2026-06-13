@@ -2,101 +2,80 @@
     text-align: center;
     font-weight: bold;
     color: #6E0101;
-    font-size: 11pt;
-    margin: 2mm 0 3mm;
-    letter-spacing: 0.5px;
+    font-size: 10pt;
+    margin: 1mm 0 2.5mm;
+    letter-spacing: 0.3px;
 }
 
 .bt-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
-    border: 1.5pt solid #6E0101;
+    border: 1.2pt solid #6E0101;
 }
 .bt-table th,
 .bt-table td {
-    border: 1pt solid #9C3030;
+    border: 0.5pt solid #FFFFFF;
     text-align: center;
     vertical-align: middle;
+    padding: 0.8mm 0.5mm;
 }
 
-.hdr th {
+.bt-hdr th {
     background-color: #6E0101;
     color: #FFFFFF;
-    font-size: 9pt;
-    font-weight: bold;
-    padding: 2.5mm 1mm;
-    height: 11mm;
-}
-
-.lbl-col {
-    width: 14%;
     font-size: 8pt;
     font-weight: bold;
-    color: #333;
-    text-align: center !important;
-    padding: 2mm !important;
-    background-color: #F2F2F2;
+    height: 9mm;
+    line-height: 1.2;
+    border: 0.5pt solid #6E0101;
 }
-
-.data-cell {
-    width: 21.5%;
-    height: 30mm;
-    padding: 1.5mm 1mm;
-    background-color: #FAFAFA;
-    vertical-align: middle;
-}
-
-.data-cell.hl {
-    background-color: #F8D7DC;
-}
-
-.name-lg {
-    font-size: 20pt;
-    font-weight: bold;
-    color: #6E0101;
-    margin-bottom: 1.5mm;
-    line-height: 1;
-}
-
-.meta-sm {
-    font-size: 10pt;
-    color: #555555;
-    margin-bottom: 1mm;
-    line-height: 1.1;
-}
-
-.thap-than {
-    font-size: 10pt;
-    font-weight: bold;
-    color: #6E0101;
-    line-height: 1.1;
-}
-
-.kv-txt {
+th.lbl {
+    background-color: #6E0101 !important;
+    color: #E5CA8E !important;
     font-size: 7pt;
-    font-style: italic;
-    color: #777;
-    margin-bottom: 0.5mm;
+    font-weight: bold;
+    width: 12%;
+    line-height: 1.25;
+}
+td.lbl {
+    background-color: #EBE7E0 !important;
+    color: #333333 !important;
+    font-size: 7pt;
+    font-weight: bold;
+    width: 12%;
+    line-height: 1.25;
 }
 
-.tc-cell {
-    width: 21.5%;
-    height: 26mm;
-    padding: 1.5mm 1mm;
-    background-color: #FAFAFA;
-    vertical-align: middle;
+.tc-row td  { height: 22mm; background-color: #F8F6F2; }
+.dc-row td  { height: 18mm; background-color: #F3F3F3; }
+.tang-row td { height: auto; min-height: 20mm; background-color: #F8F6F2; vertical-align: middle; padding: 1.2mm 0.4mm; }
+
+.tc-row td.hl,
+.dc-row td.hl,
+.tang-row td.hl {
+    background-color: #F5E0E3 !important;
 }
 
-.tc-sub {
+.bt-name { font-size: 11pt; font-weight: bold; color: #6E0101; line-height: 1.2; }
+.bt-meta { font-size: 7.5pt; color: #444444; line-height: 1.2; margin-top: 0.5mm; }
+.bt-tt   { font-size: 7.5pt; font-weight: bold; color: #6E0101; line-height: 1.2; margin-top: 0.5mm; }
+.kv-note { font-size: 6pt; font-style: normal; color: #888888; margin-top: 0.3mm; }
+
+.tang-stack {
     width: 100%;
-    border-collapse: collapse;
-}
-.tc-sub td {
-    border: none !important;
-    padding: 0.6mm 0.4mm;
     text-align: center;
-    vertical-align: top;
+    font-size: 0;
 }
-.tc-can  { font-size: 7pt; font-weight: bold; color: #6E0101; }
-.tc-meta { font-size: 6.5pt; color: #555555; }
-.tc-pho  { font-size: 6.5pt; font-weight: bold; color: #6E0101; }
+.tang-item {
+    display: inline-block;
+    vertical-align: top;
+    padding: 0 0.3mm;
+    text-align: center;
+}
+.tang-item.w1 { width: 96%; }
+.tang-item.w2 { width: 48%; }
+.tang-item.w3 { width: 31%; }
+.tang-item .t-can  { display: block; font-size: 7pt; font-weight: bold; color: #6E0101; line-height: 1.25; }
+.tang-item .t-meta { display: block; font-size: 6pt; color: #555555; line-height: 1.25; margin-top: 0.3mm; }
+.tang-item .t-pho  { display: block; font-size: 6pt; font-weight: bold; color: #6E0101; line-height: 1.25; margin-top: 0.3mm; }

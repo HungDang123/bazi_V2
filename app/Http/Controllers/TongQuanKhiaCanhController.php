@@ -255,16 +255,6 @@ class TongQuanKhiaCanhController extends Controller
             ];
         }
 
-        $transition = DongChayGioiThieu::query()
-            ->where('tru_loai', 'transition_phan9a')
-            ->first();
-        $transitionPhan9a = null;
-        if ($transition !== null && trim((string) $transition->noi_dung) !== '') {
-            $transitionPhan9a = [
-                'noi_dung' => trim((string) $transition->noi_dung),
-            ];
-        }
-
         return response()->json([
             'data' => [
                 'phan_1' => [
@@ -275,7 +265,6 @@ class TongQuanKhiaCanhController extends Controller
                     'noi_dung_hanh' => $hanhBlock,
                 ],
                 'phan_2' => $phan2,
-                'transition_phan9a' => $transitionPhan9a,
             ],
         ]);
     }
@@ -337,16 +326,6 @@ class TongQuanKhiaCanhController extends Controller
             ? Phan9bService::buildDisplay($thanTrangThai, $boNguHanh)
             : null;
 
-        $transition = DongChayGioiThieu::query()
-            ->where('tru_loai', 'transition_phan9b')
-            ->first();
-        $transitionPhan9b = null;
-        if ($transition !== null && trim((string) $transition->noi_dung) !== '') {
-            $transitionPhan9b = [
-                'noi_dung' => trim((string) $transition->noi_dung),
-            ];
-        }
-
         $thanLabel = $thanTrangThai !== null
             ? (Phan9bGiaiPhapCanBang::THAN_LABELS[$thanTrangThai] ?? $thanTrangThai)
             : null;
@@ -376,7 +355,6 @@ class TongQuanKhiaCanhController extends Controller
                 'thap_than_cao_nhat_label' => Phan9bService::formatThapThanCaoNhat($thapThanCaoNhat),
                 'ngu_hanh_ban_menh' => $nguHanhBanMenh,
                 'ngu_hanh_yeu_nhat' => $nguHanhYeuNhat,
-                'transition_phan9b' => $transitionPhan9b,
             ],
         ]);
     }

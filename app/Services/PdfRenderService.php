@@ -88,31 +88,27 @@ class PdfRenderService
             return $value;
         }
 
-        if (!is_file($value)) {
-            return $value;
+        $normalized = str_replace('\\', '/', $value);
+
+        // Tiêu đề UTM-Davida / pill / keyword (pdf-cache/titles) — nhúng base64.
+        if (str_contains($normalized, '/pdf-cache/titles/')) {
+            return NguHanhTitleRenderer::embedPath($value);
         }
 
-        $normalized = str_replace('\\', '/', $value);
-        // Tiêu đề UTM-Davida (NguHanhTitleRenderer) — nhúng base64, tránh DomPDF lỗi đường dẫn cục bộ.
-        if (str_contains($normalized, '/pdf-cache/titles/') && preg_match('/\.png$/i', $normalized)) {
-            return self::pngPathToDataUri($value);
+        // Overlay PNG trong suốt (thuyền rồng mục lục) — giữ alpha, không chuyển JPEG.
+        if (str_contains($normalized, '/pdf-cache/toc-dragon-overlay-')) {
+            return NguHanhTitleRenderer::embedPath($value);
+        }
+
+        if (str_contains($normalized, '/pdfs/shared/lbtv-') && str_contains($normalized, '-muc-luc-bg.png')) {
+            return NguHanhTitleRenderer::embedPath($value);
+        }
+
+        if (! is_file($value)) {
+            return '';
         }
 
         return PdfMergeService::optimizedRasterPath($value);
-    }
-
-    private static function pngPathToDataUri(string $path): string
-    {
-        if ($path === '' || ! is_file($path)) {
-            return '';
-        }
-
-        $blob = @file_get_contents($path);
-        if ($blob === false || $blob === '') {
-            return '';
-        }
-
-        return 'data:image/png;base64,' . base64_encode($blob);
     }
 
     private static function normalizeUnicode(string $text): string

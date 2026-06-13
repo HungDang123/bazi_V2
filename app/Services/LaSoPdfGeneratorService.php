@@ -60,6 +60,15 @@ class LaSoPdfGeneratorService
             }
         }
 
+        $nguHanhDong = $normalized['ngu_hanh_dong'] ?? null;
+        if (is_array($nguHanhDong)) {
+            foreach (['kim', 'moc', 'thuy', 'hoa', 'tho'] as $key) {
+                if (! array_key_exists($key, $normalized) && isset($nguHanhDong[$key])) {
+                    $normalized[$key] = (int) $nguHanhDong[$key];
+                }
+            }
+        }
+
         return $normalized;
     }
 

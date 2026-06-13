@@ -92,44 +92,7 @@
             margin: 3mm 0 4mm;
         }
 
-        .lsbt-wrap { margin: 3mm 0 5mm; }
-        .lsbt-title {
-            text-align: center;
-            color: #6E0101;
-            font-weight: bold;
-            font-size: 14px;
-            line-height: 130%;
-            margin-bottom: 2mm;
-        }
-        .lsbt-table {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1pt solid #6E0101;
-            font-size: 8pt;
-        }
-        .lsbt-table th,
-        .lsbt-table td {
-            border: 0.6pt solid #9C3030;
-            padding: 1.5mm 1mm;
-            vertical-align: top;
-            text-align: left;
-        }
-        .lsbt-h {
-            background-color: #6E0101;
-            color: #FFFFFF;
-            font-weight: bold;
-            text-align: center;
-        }
-        .lsbt-loai {
-            font-weight: bold;
-            background-color: #F2F2F2;
-            width: 18%;
-        }
-        .lsbt-cell {
-            color: #1A1A1A;
-            line-height: 125%;
-            white-space: pre-line;
-        }
+        @include('pdfs.phan-6.partials.la-so-bat-tu-table-styles')
     </style>
 </head>
 <body>

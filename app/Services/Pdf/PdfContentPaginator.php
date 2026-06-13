@@ -145,7 +145,7 @@ class PdfContentPaginator
                 }
             }
 
-            if ($chunk !== [] && $type === 'traits') {
+            if ($chunk !== [] && in_array($type, ['traits', 'energy_traits'], true)) {
                 $nextNeed = self::traitsTrailingHeightMm($blocks, $idx, $config);
                 if ($nextNeed > 0 && ($used + $need + $nextNeed) > $maxMm) {
                     break;
@@ -153,7 +153,7 @@ class PdfContentPaginator
             }
 
             if ($chunk !== [] && ($used + $need) > $maxMm) {
-                // Traits không vừa phần còn lại → tách phần đầu vào trang này
+                // Traits / energy_traits không vừa phần còn lại → tách phần đầu vào trang này
                 if ($type === 'traits') {
                     $available = $maxMm - $used;
                     [$head, $tail] = self::splitTraitsBlock($block, $available, $config);
@@ -177,6 +177,10 @@ class PdfContentPaginator
                         return [$chunk, array_slice($blocks, $idx), $used];
                     }
 
+                    break;
+                }
+
+                if ($type === 'energy_traits') {
                     break;
                 }
 
@@ -214,6 +218,15 @@ class PdfContentPaginator
 
                     return [$chunk, $rest, $used];
                 }
+
+                break;
+            }
+
+            if ($chunk === [] && $need > $maxMm && $type === 'energy_traits') {
+                // Khối quá cao — vẫn render nguyên khối (giải nghĩa + traits cùng trang)
+                $chunk[] = $block;
+                $used += $need;
+                $idx++;
 
                 break;
             }
@@ -324,7 +337,7 @@ class PdfContentPaginator
             return true;
         }
 
-        if ($type === 'traits') {
+        if (in_array($type, ['traits', 'energy_traits'], true)) {
             $next = $blocks[$idx + 1] ?? null;
 
             return is_array($next) && ($next['type'] ?? '') === 'chien_luoc_title';
@@ -367,7 +380,7 @@ class PdfContentPaginator
             return $need;
         }
 
-        if ($type === 'traits') {
+        if (in_array($type, ['traits', 'energy_traits'], true)) {
             $next = $blocks[$idx + 1] ?? null;
             if (is_array($next) && ($next['type'] ?? '') === 'chien_luoc_title') {
                 return self::blockHeightMm($next, $config) + self::TRAITS_CHIEN_LUOC_BUFFER_MM;

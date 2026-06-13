@@ -1,3 +1,4 @@
+/* Vùng nội dung prose — include justify MỘT LẦN tại đây (không include thêm ở pdf-base-typography). */
 .content-zone {
     position: absolute;
     overflow: hidden;
@@ -24,6 +25,17 @@
 .content-zone p {
     color: #1A1A1A;
     background: transparent;
+}
+
+.content-zone .muc-label {
+    color: #6E0101;
+    font-family: 'svn-poppins', sans-serif;
+    font-weight: bold;
+    font-style: normal !important;
+    font-size: 14px;
+    line-height: 130%;
+    margin-bottom: 3mm;
+    text-align: left;
 }
 
 @include('pdfs.partials.pdf-justify-styles')

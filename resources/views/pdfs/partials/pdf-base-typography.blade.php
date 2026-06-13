@@ -1,23 +1,7 @@
-/* SVN-Poppins – đăng ký qua PdfFontService::registerWithDompdf()
- * Typography:
- *   Body : 14px, weight 400, line-height 140%, justify
- *   Bold : 14px, weight 700, line-height 140%, justify
+/* SVN-Poppins — đăng ký qua PdfFontService::registerWithDompdf()
+ * Chỉ typography chữ; căn đều nằm ở pdf-justify-styles (include qua content-zone-styles).
  */
-
-body,
-.page,
-.page * {
-    font-family: 'svn-poppins', sans-serif;
-    font-style: normal;
-    letter-spacing: 0;
-}
-
-body {
-    font-weight: normal;
-    font-size: 14px;
-    line-height: 140%;
-    text-align: justify;
-}
+@include('pdfs.partials.pdf-fonts')
 
 .para-text,
 .item-title,
@@ -33,7 +17,6 @@ body {
     font-size: 14px;
     line-height: 140%;
     letter-spacing: 0;
-    text-align: justify;
 }
 
 strong,
@@ -49,7 +32,4 @@ b,
 
 .para-text p {
     margin-bottom: 5px;
-    text-align: justify;
 }
-
-@include('pdfs.partials.pdf-justify-styles')

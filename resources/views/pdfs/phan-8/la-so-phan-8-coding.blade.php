@@ -180,6 +180,8 @@
 </head>
 <body>
 
+@php use App\Services\NguHanhTitleRenderer; @endphp
+
 @foreach ($pages ?? [] as $page)
 <div class="page">
     <img class="bg-img" src="{{ $page['bgPath'] }}">
@@ -210,14 +212,18 @@
                 <div class="tru-heading">{{ $hd['truHeading'] }}</div>
                 @endif
 
-                @if (!empty($hd['titleImagePath']))
                 @php
+                    $titleSrc = NguHanhTitleRenderer::embedPath((string) ($hd['titleImagePath'] ?? ''));
+                    if ($titleSrc === '' && ! empty($hd['title'])) {
+                        $titleSrc = NguHanhTitleRenderer::goldTitleEmbedded($hd['title'], 16, 162.0)['src'];
+                    }
                     $titleStyle = 'width:162mm;height:auto;object-fit:contain;';
                     if (!empty($hd['titleImageHeightMm'])) {
                         $titleStyle .= 'max-height:'.$hd['titleImageHeightMm'].'mm;';
                     }
                 @endphp
-                <img class="golden-title-img" src="{{ $hd['titleImagePath'] }}" style="{{ $titleStyle }}">
+                @if ($titleSrc !== '')
+                <img class="golden-title-img" src="{!! $titleSrc !!}" style="{{ $titleStyle }}">
                 @elseif (!empty($hd['title']))
                 <div class="golden-title">{{ $hd['title'] }}</div>
                 @endif
@@ -228,14 +234,18 @@
 
             @elseif ($kind === 'cont')
                 @php $cd = $it['data'] ?? []; @endphp
-                @if (!empty($cd['contTitleImagePath']))
                 @php
+                    $contSrc = NguHanhTitleRenderer::embedPath((string) ($cd['contTitleImagePath'] ?? ''));
+                    if ($contSrc === '' && ! empty($cd['continuationTitle'])) {
+                        $contSrc = NguHanhTitleRenderer::goldTitleEmbedded($cd['continuationTitle'], 12, 162.0)['src'];
+                    }
                     $contStyle = 'width:162mm;height:auto;object-fit:contain;';
                     if (!empty($cd['contTitleImageHeightMm'])) {
                         $contStyle .= 'max-height:'.$cd['contTitleImageHeightMm'].'mm;';
                     }
                 @endphp
-                <img class="golden-title-img" src="{{ $cd['contTitleImagePath'] }}" style="{{ $contStyle }}">
+                @if ($contSrc !== '')
+                <img class="golden-title-img" src="{!! $contSrc !!}" style="{{ $contStyle }}">
                 @elseif (!empty($cd['continuationTitle']))
                 <div class="continuation-title">{{ $cd['continuationTitle'] }}</div>
                 @endif

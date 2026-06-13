@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Services\Pdf\PdfLayoutVersion;
+
 /**
  * Cache PDF render từ blade khi dữ liệu không đổi giữa các request (vd. nội dung DB tĩnh).
  */
@@ -14,7 +16,7 @@ class PdfViewCache
             mkdir($cacheDir, 0755, true);
         }
 
-        $key    = hash('xxh128', $view . '|' . ($cacheSalt ?? '') . '|' . self::dataFingerprint($data));
+        $key    = hash('xxh128', PdfLayoutVersion::fingerprint().'|'.$view.'|'.($cacheSalt ?? '').'|'.self::dataFingerprint($data));
         $cached = $cacheDir . DIRECTORY_SEPARATOR . $key . '.pdf';
 
         if (file_exists($cached)) {

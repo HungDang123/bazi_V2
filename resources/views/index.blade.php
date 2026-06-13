@@ -148,27 +148,33 @@
         /* Styles for Chất Lượng Thập Thần Table */
         .chat-luong-table {
             font-family: Arial, sans-serif;
+            border-collapse: collapse;
         }
 
-        .chat-luong-table tbody tr:nth-child(odd) {
-            background-color: #f9f9f9;
+        .chat-luong-table thead th {
+            background-color: #6E0101;
+            color: #E5CA8E;
+            border: 1px solid #ffffff;
+            font-weight: bold;
+            text-align: center;
         }
 
-        .chat-luong-table tbody tr:nth-child(even) {
-            background-color: #ffffff;
+        .chat-luong-table tbody tr {
+            background-color: #EBE7E0;
         }
 
         .chat-luong-table tbody td {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
+            padding: 6px 10px;
+            border: 1px solid #ffffff;
             font-size: 13px;
+            background-color: #EBE7E0;
         }
 
         .chat-luong-table tbody td:first-child {
             font-weight: bold;
-            color: white;
-            background-color: #009900;
-            border: 1px solid #000;
+            color: #E5CA8E;
+            background-color: #6E0101;
+            text-align: center;
         }
 
         .chat-luong-table .bar-container {
@@ -177,6 +183,9 @@
             width: 100%;
             position: relative;
             height: 24px;
+            background-color: #D5D5D5;
+            border-radius: 9999px;
+            overflow: hidden;
         }
 
         .chat-luong-table .bar {
@@ -186,6 +195,13 @@
             top: 0;
             transition: width 0.3s ease;
             z-index: 1;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 12px;
         }
 
         .chat-luong-table .bar.natal {
@@ -193,13 +209,20 @@
         }
 
         .chat-luong-table .bar.annual {
-            background-color: #8B4513;
+            background-color: #6E0101;
         }
 
-        .chat-luong-table .bar-bg {
-            background-color: #e0e0e0;
-            height: 24px;
-            width: 100%;
+        .chat-luong-table .bar-zero-label {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #000000;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            z-index: 10;
         }
 
         /* Scroll indicator cho bảng */
@@ -1507,19 +1530,19 @@
                                     <thead>
                                         <tr>
                                             <th colspan="3"
-                                                style="text-align: center; padding: 12px; background-color: #333; color: white; font-size: 14px; font-weight: bold; border: 1px solid #000;">
+                                                style="text-align: center; padding: 12px; background-color: #6E0101; color: #E5CA8E; font-size: 14px; font-weight: bold; border: 1px solid #ffffff;">
                                                 CHẤT LƯỢNG THẬP THẦN
                                             </th>
                                         </tr>
                                         <tr>
                                             <th
-                                                style="padding: 8px 12px; background-color: #333; color: white; font-size: 13px; font-weight: normal; border: 1px solid #000; width: 25%;">
+                                                style="padding: 8px 12px; background-color: #6E0101; color: #E5CA8E; font-size: 13px; font-weight: bold; border: 1px solid #ffffff; width: 25%;">
                                             </th>
                                             <th
-                                                style="padding: 8px 12px; background-color: #333; color: white; font-size: 13px; font-weight: normal; border: 1px solid #000; width: 37.5%;">
-                                                Bản Mệnh</th>
-                                            <th style="padding: 8px 12px; background-color: #333; color: white; font-size: 13px; font-weight: normal; border: 1px solid #000; width: 37.5%;"
-                                                id="nienMenhYear">Niên Mệnh</th>
+                                                style="padding: 8px 12px; background-color: #6E0101; color: #E5CA8E; font-size: 13px; font-weight: bold; border: 1px solid #ffffff; width: 37.5%;">
+                                                BẢN MỆNH</th>
+                                            <th style="padding: 8px 12px; background-color: #6E0101; color: #E5CA8E; font-size: 13px; font-weight: bold; border: 1px solid #ffffff; width: 37.5%;"
+                                                id="nienMenhYear">NIÊN MỆNH</th>
                                         </tr>
                                     </thead>
                                     <tbody id="chatLuongThapThanBody">
@@ -2090,6 +2113,17 @@
                     if (!$el.hasClass('quyen-section') || $el.hasClass('quyen-shared')) {
                         return true;
                     }
+                    if ($el.attr('id') === 'phan9Section') {
+                        const has9a = !!$el.data('phan9a-has-content');
+                        const has9b = !!$el.data('phan9b-has-content');
+                        if (activeQuyenCuon === 1) {
+                            return has9a;
+                        }
+                        if (activeQuyenCuon === 2) {
+                            return has9b;
+                        }
+                        return false;
+                    }
                     const $panel = $el.closest('.quyen-panel');
                     if ($panel.length) {
                         return parseInt($panel.data('quyen'), 10) === activeQuyenCuon;
@@ -2159,27 +2193,35 @@
                     const isCuon2 = activeQuyenCuon === 2;
                     const $section = $('#phan9Section');
 
-                    if (!$section.data('quyen-was-shown')) {
+                    const has9a = !!$section.data('phan9a-has-content');
+                    const has9b = !!$section.data('phan9b-has-content');
+                    const hasAny = has9a || has9b;
+
+                    if (!$section.data('quyen-was-shown') || !hasAny) {
                         return;
                     }
 
-                    const has9a = !!$section.data('phan9a-has-content');
-                    const has9b = !!$section.data('phan9b-has-content');
+                    mountPhan9Section();
+
+                    const showForCuon = (isCuon1 && has9a) || (isCuon2 && has9b);
 
                     $('#phan9aBlock').toggle(isCuon1 && has9a);
                     $('#phan9bBlock').toggle(isCuon2 && has9b);
 
-                    $('#phan9SharedCovers').toggle(
-                        (isCuon1 && has9a) || (isCuon2 && has9b)
-                    );
-
-                    if ((isCuon1 && has9a) || (isCuon2 && has9b)) {
+                    $('#phan9SharedCovers').toggle(showForCuon);
+                    if (showForCuon) {
                         $('#phan9CoverImg').attr(
                             'src',
                             isCuon1
                                 ? @json(asset('images/phan-9/bia-phan-9a.png'))
                                 : @json(asset('images/phan-9/bia-phan-9b.png'))
                         );
+                    }
+
+                    if (showForCuon && isQuyenSectionAllowed($section)) {
+                        $section.show();
+                    } else if (!showForCuon) {
+                        $section.hide();
                     }
                 }
 
@@ -2800,9 +2842,19 @@
                         return line.trim();
                     }
 
+                    function splitVeColonPrefix(line) {
+                        line = String(line || '').trim();
+                        const m = line.match(/^(Về\s+[^:]+):\s*(.+)$/u);
+                        if (!m) return null;
+                        const label = m[1].trim();
+                        const body = m[2].trim();
+                        if (!label || !body) return null;
+                        return { label: label, body: body };
+                    }
+
                     function isPhan9SubLabelLine(line) {
                         line = normalizeSubLabelLine(line);
-                        if (!line) return false;
+                        if (!line || splitVeColonPrefix(line)) return false;
                         return /^[a-z]\.\s+/i.test(line)
                             || /^\d+\.\s+/.test(line)
                             || /^Về\s+/u.test(line);
@@ -2815,7 +2867,12 @@
                         lines.forEach(function(line) {
                             line = line.trim();
                             if (!line) return;
-                            if (isPhan9SubLabelLine(line)) {
+                            const veSplit = splitVeColonPrefix(line);
+                            if (veSplit) {
+                                html += '<p class="mb-3 leading-relaxed text-gray-700">' +
+                                    '<span class="phan9-sub-label">' + escapeHtml(veSplit.label) + ':</span> ' +
+                                    escapeHtml(veSplit.body) + '</p>';
+                            } else if (isPhan9SubLabelLine(line)) {
                                 html += '<p class="mb-2 phan9-sub-label leading-relaxed">' +
                                     escapeHtml(line) + '</p>';
                             } else {
@@ -3277,8 +3334,12 @@
                                     }
                                     const text = item.noi_dung || '';
                                     if (!text.trim()) return;
-                                    const isLabel = isPhan9SubLabelLine(text);
-                                    if (isLabel) {
+                                    const veSplit = splitVeColonPrefix(text);
+                                    if (veSplit) {
+                                        html += '<p class="text-gray-700 mb-2 leading-relaxed">' +
+                                            '<span class="phan9-sub-label">' + escapeHtml(veSplit.label) + ':</span> ' +
+                                            escapeHtml(veSplit.body) + '</p>';
+                                    } else if (isPhan9SubLabelLine(text)) {
                                         html += '<p class="phan9-sub-label mt-3 mb-1 leading-relaxed">' +
                                             escapeHtml(text) + '</p>';
                                     } else {
@@ -3335,14 +3396,6 @@
                                 const data = (res && res.data) ? res.data : (res || {});
                                 let shown = false;
 
-                                if (data.transition_phan9b && data.transition_phan9b.noi_dung) {
-                                    transitionContent.html(
-                                        '<div class="leading-relaxed whitespace-pre-line">' +
-                                        escapeHtml(data.transition_phan9b.noi_dung) + '</div>');
-                                    transitionBox.show();
-                                    shown = true;
-                                }
-
                                 if (data.noi_dung || data.noi_luc || data.thap_than || data.ngoai_luc || data.hieu_qua) {
                                     content.html(renderPhan9bContent(data));
                                     initPhan9bBeamCharts(content);
@@ -3353,9 +3406,7 @@
                                     section.data('phan9b-has-content', true);
                                     section.data('quyen-was-shown', true);
                                     refreshPhan9QuyenVisibility();
-                                    if (isQuyenSectionAllowed(section)) {
-                                        section.show();
-                                    }
+                                    refreshQuyenSectionsVisibility();
                                 }
                             }
                         });
@@ -3456,14 +3507,6 @@
                                 const data = (res && res.data) ? res.data : (res || {});
                                 let shown = false;
 
-                                if (data.transition_phan9a && data.transition_phan9a.noi_dung) {
-                                    transitionContent.html(
-                                        '<div class="leading-relaxed whitespace-pre-line">' +
-                                        escapeHtml(data.transition_phan9a.noi_dung) + '</div>');
-                                    transitionBox.show();
-                                    shown = true;
-                                }
-
                                 if (data.phan_1) {
                                     ma1Content.html(renderPhan9Ma1(data.phan_1));
                                     ma1Box.show();
@@ -3480,9 +3523,7 @@
                                     section.data('phan9a-has-content', true);
                                     section.data('quyen-was-shown', true);
                                     refreshPhan9QuyenVisibility();
-                                    if (isQuyenSectionAllowed(section)) {
-                                        section.show();
-                                    }
+                                    refreshQuyenSectionsVisibility();
                                 }
                             }
                         });
@@ -5853,7 +5894,7 @@
                         }
 
                         // Update year in header
-                        yearHeader.text(`Niên Mệnh ${currentYear}`);
+                        yearHeader.text(`NIÊN MỆNH ${currentYear}`);
 
                         // Clear existing rows
                         tableBody.empty();
@@ -5865,19 +5906,19 @@
 
                             const row = `
                                 <tr>
-                                    <td style="font-weight: bold; color: white;">${item.name}</td>
+                                    <td>${item.name}</td>
                                     <td style="padding: 4px 8px;">
-                                        <div class="bar-container" style="position: relative;">
-                                            ${natalPercent > 0 ? `<div class="bar natal" style="width: ${natalPercent}%;"></div>` : ''}
-                                            <div class="bar-bg" style="flex: 1;"></div>
-                                            <span style="position: absolute; left: 8px; top: 54%; transform: translateY(-50%); color: ${natalPercent > 0 ? 'white' : '#4169E1'}; font-weight: bold; font-size: 12px; z-index: 10;">${natalPercent}%</span>
+                                        <div class="bar-container">
+                                            ${natalPercent > 0
+                                                ? `<div class="bar natal" style="width: ${natalPercent}%;">${natalPercent}%</div>`
+                                                : `<span class="bar-zero-label">${natalPercent}%</span>`}
                                         </div>
                                     </td>
                                     <td style="padding: 4px 8px;">
-                                        <div class="bar-container" style="position: relative;">
-                                            ${annualPercent > 0 ? `<div class="bar annual" style="width: ${annualPercent}%;"></div>` : ''}
-                                            <div class="bar-bg" style="flex: 1;"></div>
-                                            <span style="position: absolute; left: 8px; top: 54%; transform: translateY(-50%); color: ${annualPercent > 0 ? 'white' : '#8B4513'}; font-weight: bold; font-size: 12px; z-index: 10;">${annualPercent}%</span>
+                                        <div class="bar-container">
+                                            ${annualPercent > 0
+                                                ? `<div class="bar annual" style="width: ${annualPercent}%;">${annualPercent}%</div>`
+                                                : `<span class="bar-zero-label">${annualPercent}%</span>`}
                                         </div>
                                     </td>
                                 </tr>
