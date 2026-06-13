@@ -585,11 +585,14 @@ class NguHanhTitleRenderer
         }
 
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        $mime = match ($ext) {
-            'jpg', 'jpeg' => 'image/jpeg',
-            'webp' => 'image/webp',
-            default => 'image/png',
-        };
+        $info = @getimagesize($path);
+        $mime = is_array($info) && ! empty($info['mime'])
+            ? (string) $info['mime']
+            : match ($ext) {
+                'jpg', 'jpeg' => 'image/jpeg',
+                'webp' => 'image/webp',
+                default => 'image/png',
+            };
 
         return 'data:' . $mime . ';base64,' . base64_encode($blob);
     }
