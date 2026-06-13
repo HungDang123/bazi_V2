@@ -8,7 +8,7 @@ namespace App\Services\Pdf;
  */
 class PdfLayoutVersion
 {
-    public const VERSION = '2026-06-13-toc-dragon';
+    public const VERSION = '2026-06-13-footer-dark';
 
     public static function fingerprint(): string
     {

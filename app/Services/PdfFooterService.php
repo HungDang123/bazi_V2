@@ -456,12 +456,12 @@ class PdfFooterService
 
         $displayName = trim($fullName) !== '' ? mb_strtoupper(trim($fullName), 'UTF-8') : '';
 
-        // Trang cuối → trắng; bìa phần (whiteNamePages) → trắng; worksheet (darkNamePages) → đen
+        // Trang cuối → trắng; darkName (worksheet/nền sáng) ưu tiên hơn whiteName (bìa)
         $onWhiteList = $physicalPageNo > 0 && in_array($physicalPageNo, $whiteNamePhysicalPages, true);
         $onDarkList  = $physicalPageNo > 0 && in_array($physicalPageNo, $darkNamePhysicalPages, true);
         $whiteText   = $isLastPage
-            || $onWhiteList
-            || (! $onDarkList && $displayPage === self::FIRST_DISPLAY_PAGE_NUMBER);
+            || ($onWhiteList && ! $onDarkList)
+            || (! $onWhiteList && ! $onDarkList && $displayPage === self::FIRST_DISPLAY_PAGE_NUMBER);
         $namePath  = $displayName !== '' ? self::renderNameStrip($displayName, $whiteText) : null;
         $nameWmm  = 0.0;
         $nameHmm  = 0.0;

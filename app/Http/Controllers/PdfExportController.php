@@ -932,7 +932,7 @@ class PdfExportController extends Controller
                 $bodyPaths,
                 $mergeSegments,
                 $pagePhan7Muc1Path,
-                null,
+                'darkName',
                 'phan7.i',
                 'I. TAM THẾ'
             );
@@ -949,7 +949,7 @@ class PdfExportController extends Controller
                 $bodyPaths,
                 $mergeSegments,
                 $pagePhan7Muc2Path,
-                null,
+                'darkName',
                 'phan7.ii',
                 'II. BÀI HỌC CUỘC SỐNG'
             );
@@ -961,7 +961,7 @@ class PdfExportController extends Controller
         if ($phan7Muc1CuoiSpec !== null) {
             $pagePhan7Muc1CuoiPath = $tempDir . '/q2p-phan7-muc1-cuoi-' . $uid . '.pdf';
             PdfRenderService::saveView($phan7Muc1CuoiSpec['view'], $phan7Muc1CuoiSpec['data'], $pagePhan7Muc1CuoiPath);
-            self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $pagePhan7Muc1CuoiPath);
+            self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $pagePhan7Muc1CuoiPath, 'darkName');
             $tempFiles[]   = $pagePhan7Muc1CuoiPath;
         }
 
@@ -977,7 +977,7 @@ class PdfExportController extends Controller
                     $bodyPaths,
                     $mergeSegments,
                     $pagePhan8Path,
-                    $isCover ? 'all' : null,
+                    $isCover ? 'all' : 'darkName',
                     'phan8',
                     'PHẦN 8: DỰ BÁO HẠN VẬN'
                 );
@@ -987,7 +987,7 @@ class PdfExportController extends Controller
                     $bodyPaths,
                     $mergeSegments,
                     $pagePhan8Path,
-                    $isCover ? 'all' : null
+                    $isCover ? 'all' : 'darkName'
                 );
             }
             if (($phan8Page['view'] ?? '') === 'pdfs.phan-8.la-so-phan-8-content') {
@@ -1034,7 +1034,7 @@ class PdfExportController extends Controller
             $pagePhan9Path = $tempDir . '/q2p-phan9b-' . $idx . '-' . $uid . '.pdf';
             PdfRenderService::saveView($phan9Page['view'], $phan9Page['data'], $pagePhan9Path);
             $phan9Start = $tocTracker->physicalPage() + 1;
-            self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $pagePhan9Path);
+            self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $pagePhan9Path, 'darkName');
             self::tocMarkChapters($tocTracker, $phan9Page, $phan9Start, [
                 'I.' => 'phan9b.i',
                 'II.' => 'phan9b.ii',
@@ -1044,7 +1044,7 @@ class PdfExportController extends Controller
             $tempFiles[]   = $pagePhan9Path;
         }
 
-        // ── Phụ lục Q2: bìa 562–564 (tên trắng) + worksheet 572, 581 (tên đen; trang cuối PDF trắng) ─
+        // ── Phụ lục Q2: bìa 562–564 (tên trắng) + worksheet 566–569, 572, 581 (tên đen) ─
         $q2AppendixDir = resource_path('views/pdfs/q2-appendix');
         self::appendQ2AppendixSegments($mergeSegments, $q2AppendixDir, $tocTracker, $bodyPaths);
 
@@ -1251,7 +1251,7 @@ class PdfExportController extends Controller
     }
 
     /**
-     * Phụ lục cuối Cuốn 2 — bìa tối (562–564, tên trắng) + worksheet nền sáng (572, 581, tên đen).
+     * Phụ lục cuối Cuốn 2 — bìa 562–564 (tên trắng) + worksheet 566–569, 572, 581 (tên đen).
      *
      * @param  array<int, array{path: string, coverPages?: mixed, darkNamePages?: mixed}>  $mergeSegments
      */
@@ -1267,9 +1267,14 @@ class PdfExportController extends Controller
             $appendixDir . '/page-564.png',
         ];
 
+        $phan9Dir = resource_path('views/pdfs/phan-9');
         $worksheetSources = [
+            $phan9Dir . '/page-566.png',
+            $phan9Dir . '/page-567.png',
+            $phan9Dir . '/page-568.png',
+            $phan9Dir . '/page-569.png',
             $appendixDir . '/page-572.png',
-            $appendixDir . '/page-581.png',
+            $phan9Dir . '/page-581.png',
         ];
 
         $coverBundle = PdfStaticPageCache::resolveBundle('q2-appendix-covers-v1', $coverSources);
@@ -1292,7 +1297,7 @@ class PdfExportController extends Controller
             }
         }
 
-        $worksheetBundle = PdfStaticPageCache::resolveBundle('q2-appendix-worksheets-v1', $worksheetSources);
+        $worksheetBundle = PdfStaticPageCache::resolveBundle('q2-appendix-worksheets-v2', $worksheetSources);
         if ($worksheetBundle !== null) {
             if ($tocTracker !== null && $pathList !== null) {
                 self::tocPushMergeSegment($tocTracker, $pathList, $mergeSegments, $worksheetBundle, 'darkName');
