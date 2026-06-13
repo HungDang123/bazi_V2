@@ -27,7 +27,7 @@
         }
         .content {
             position: absolute;
-            top: 18mm;
+            top: 24mm;
             left: 16mm;
             width: 178mm;
         }
@@ -103,7 +103,7 @@
         .tang-item .t-meta { display: block; font-size: 6.5pt; color: #555555; line-height: 1.25; margin-top: 0.3mm; }
         .tang-item .t-pho  { display: block; font-size: 6.5pt; font-weight: bold; color: #6E0101; line-height: 1.25; margin-top: 0.3mm; }
 
-        .ts-table { margin-top: 5mm; }
+        .ts-table { margin-top: 8mm; }
         .ts-row td.ts-val { height: 8mm; background-color: #F8F6F2; font-size: 8pt; font-weight: bold; color: #333333; width: 50%; }
         .ts-row-alt td.ts-val { background-color: #EDE8DF; }
         .ts-row td.lbl { width: 50%; }

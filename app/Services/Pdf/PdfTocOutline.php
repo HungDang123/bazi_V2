@@ -33,6 +33,11 @@ class PdfTocOutline
 
         $sections = [];
 
+        $sections = array_merge(
+            self::part1And2Sections($tracker, $actualTocPages),
+            $sections
+        );
+
         $sections[] = self::partBlock(
             'PHẦN 3: TỔNG QUAN NGŨ HÀNH BẢN MỆNH',
             $tracker->bookmarkDisplayPage('phan3', $actualTocPages),
@@ -127,6 +132,11 @@ class PdfTocOutline
         }
 
         $sections = [];
+
+        $sections = array_merge(
+            self::part1And2Sections($tracker, $actualTocPages),
+            $sections
+        );
 
         if ($phan4Items !== []) {
             $sections[] = self::partBlock(
@@ -229,6 +239,43 @@ class PdfTocOutline
         }
 
         return $items;
+    }
+
+    /**
+     * @return array<int, array{title: string, page: int|null, items: array<int, array{label: string, page: int|null}>}>
+     */
+    private static function part1And2Sections(PdfTocTracker $tracker, int $actualTocPages): array
+    {
+        $blocks = [];
+
+        $part1 = self::partBlock(
+            'PHẦN 1: HIỂU VỀ CÁC KHÁI NIỆM',
+            $tracker->bookmarkDisplayPage('phan1', $actualTocPages),
+            array_filter([
+                self::item('I. BÁT TỰ – TỨ TRỤ', $tracker->bookmarkDisplayPage('phan1.i', $actualTocPages)),
+                self::item('II. THUYẾT TAM TÀI & NGŨ THUẬT', $tracker->bookmarkDisplayPage('phan1.ii', $actualTocPages)),
+                self::item('III. ÂM DƯƠNG – NGŨ HÀNH', $tracker->bookmarkDisplayPage('phan1.iii', $actualTocPages)),
+                self::item('IV. CÁC KHÁI NIỆM KHÁC', $tracker->bookmarkDisplayPage('phan1.iv', $actualTocPages)),
+            ])
+        );
+        if (($part1['page'] ?? null) !== null || $part1['items'] !== []) {
+            $blocks[] = $part1;
+        }
+
+        $part2 = self::partBlock(
+            'PHẦN 2: LÁ SỐ BÁT TỰ CỦA BẠN',
+            $tracker->bookmarkDisplayPage('phan2', $actualTocPages),
+            array_filter([
+                self::item('CHẤT LƯỢNG NGŨ HÀNH', $tracker->bookmarkDisplayPage('phan2.i', $actualTocPages)),
+                self::item('CHẤT LƯỢNG THẬP THẦN', $tracker->bookmarkDisplayPage('phan2.ii', $actualTocPages)),
+                self::item('CÁC KHÍA CẠNH CUỘC SỐNG', $tracker->bookmarkDisplayPage('phan2.iii', $actualTocPages)),
+            ])
+        );
+        if (($part2['page'] ?? null) !== null || $part2['items'] !== []) {
+            $blocks[] = $part2;
+        }
+
+        return $blocks;
     }
 
     private static function khiaCanhItemLabel(string $code, string $title): string

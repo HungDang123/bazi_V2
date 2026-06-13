@@ -109,49 +109,47 @@
             text-align: left !important;
         }
         .bar-track {
+            position: relative;
             width: 100%;
             height: 4.8mm;
             background: #D5D5D5;
             border-radius: 2.4mm;
             overflow: hidden;
         }
-        .bar-inner {
-            width: 100%;
-            height: 4.8mm;
-            border-collapse: collapse;
-            border-spacing: 0;
-            table-layout: fixed;
-        }
-        .bar-inner td {
-            height: 4.8mm;
-            padding: 0;
-            margin: 0;
-            border: 0;
-            vertical-align: middle;
-        }
         .bar-fill {
-            font-size: 7pt;
-            font-weight: bold;
-            line-height: 4.8mm;
-            color: #ffffff;
-            text-align: right !important;
-            padding-right: 1.5mm;
-            white-space: nowrap;
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            border-radius: 2.4mm 0 0 2.4mm;
         }
         .bar-fill-bm {
             background: #4169E1;
-            border-radius: 2.4mm 0 0 2.4mm;
         }
         .bar-fill-nv {
             background: #6E0101;
-            border-radius: 2.4mm 0 0 2.4mm;
         }
-        .bar-empty {
-            background: #D5D5D5;
+        .bar-label-layer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            text-align: center;
+            line-height: 4.8mm;
+            color: #ffffff;
+            font-size: 7pt;
+            font-weight: bold;
+            white-space: nowrap;
+            z-index: 2;
         }
         .bar-zero {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
             background: #D5D5D5;
-            text-align: left !important;
+            text-align: left;
             font-size: 7pt;
             font-weight: bold;
             line-height: 4.8mm;
@@ -266,30 +264,22 @@
                     <td class="ts-lbl-col" align="center" valign="middle">{{ $item['name'] ?? '' }}</td>
                     <td class="bar-cell" valign="middle" align="left">
                         <div class="bar-track">
-                            <table class="bar-inner" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    @if($bmPct > 0)
-                                    <td class="bar-fill bar-fill-bm" width="{{ $bmPct }}%" align="right">{{ $bmPct }}%</td>
-                                    <td class="bar-empty">&nbsp;</td>
-                                    @else
-                                    <td class="bar-zero" align="left">0%</td>
-                                    @endif
-                                </tr>
-                            </table>
+                            @if($bmPct > 0)
+                            <div class="bar-fill bar-fill-bm" style="width: {{ $bmPct }}%;"></div>
+                            <div class="bar-label-layer" style="width: {{ $bmPct }}%;">{{ $bmPct }}%</div>
+                            @else
+                            <div class="bar-zero">0%</div>
+                            @endif
                         </div>
                     </td>
                     <td class="bar-cell" valign="middle" align="left">
                         <div class="bar-track">
-                            <table class="bar-inner" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    @if($nvPct > 0)
-                                    <td class="bar-fill bar-fill-nv" width="{{ $nvPct }}%" align="right">{{ $nvPct }}%</td>
-                                    <td class="bar-empty">&nbsp;</td>
-                                    @else
-                                    <td class="bar-zero" align="left">0%</td>
-                                    @endif
-                                </tr>
-                            </table>
+                            @if($nvPct > 0)
+                            <div class="bar-fill bar-fill-nv" style="width: {{ $nvPct }}%;"></div>
+                            <div class="bar-label-layer" style="width: {{ $nvPct }}%;">{{ $nvPct }}%</div>
+                            @else
+                            <div class="bar-zero">0%</div>
+                            @endif
                         </div>
                     </td>
                 </tr>

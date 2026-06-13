@@ -55,7 +55,7 @@ class Phan9bBeamChartService
             @mkdir($cacheDir, 0755, true);
         }
 
-        $cacheKey = hash('sha256', 'phan9b-beam-v3|'.json_encode($rows, JSON_UNESCAPED_UNICODE));
+        $cacheKey = hash('sha256', 'phan9b-beam-v4|'.json_encode($rows, JSON_UNESCAPED_UNICODE));
         $path = $cacheDir.DIRECTORY_SEPARATOR.$cacheKey.'.png';
         if (is_file($path)) {
             return $path;
@@ -365,12 +365,19 @@ class Phan9bBeamChartService
 
     private static function loadNguHanhLabel(string $slug): ?\GdImage
     {
-        $svg = public_path('images/ngu-hanh/'.$slug.'.svg');
-        if (! is_file($svg)) {
-            return null;
+        $png = resource_path('views/pdfs/phan-9/'.$slug.'.png');
+        if (is_file($png) && function_exists('imagecreatefromstring')) {
+            $blob = @file_get_contents($png);
+            if ($blob !== false) {
+                $gd = @imagecreatefromstring($blob);
+                if ($gd instanceof \GdImage) {
+                    return $gd;
+                }
+            }
         }
 
-        if (! class_exists(\Imagick::class)) {
+        $svg = public_path('images/ngu-hanh/'.$slug.'.svg');
+        if (! is_file($svg) || ! class_exists(\Imagick::class)) {
             return null;
         }
 

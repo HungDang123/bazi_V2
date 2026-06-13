@@ -62,7 +62,7 @@ class Phan8TruSectionService
             if ($t === '') {
                 continue;
             }
-            if (preg_match('/^(Thiên Can|Địa Chi)\s+(Niên Vận|Năm|Tháng|Ngày|Giờ)\s*$/ui', $t)) {
+            if (preg_match('/^(Thiên Can|Địa Chi)\s+(Niên Vận|Đại Vận|Năm|Tháng|Ngày|Giờ)\s*:?\s*$/ui', $t)) {
                 continue;
             }
             if (preg_match('/^Nếu có Hợp\s*\/\s*Khắc/ui', $t)) {
@@ -78,6 +78,24 @@ class Phan8TruSectionService
         }
 
         return trim(implode("\n", $kept));
+    }
+
+    public static function isTruGioiThieuKey(string $key): bool
+    {
+        if (preg_match('/^dai_van_tru_(nam|thang|ngay|gio)$/', $key) === 1) {
+            return true;
+        }
+
+        return preg_match('/^nien_van_.*_tru_(nam|thang|ngay|gio)$/', $key) === 1;
+    }
+
+    public static function cleanTruGioiThieu(string $text, ?string $truLoai = null): string
+    {
+        if ($truLoai === null || ! self::isTruGioiThieuKey($truLoai)) {
+            return $text;
+        }
+
+        return self::stripTemplateBoilerplate($text);
     }
 
     public static function stripInteractionTitleLine(string $text): string

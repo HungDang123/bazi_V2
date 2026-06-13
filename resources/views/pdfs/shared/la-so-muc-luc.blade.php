@@ -27,7 +27,7 @@
 
         .toc-box {
             position: absolute;
-            left: 14mm;
+            left: 12mm;
             width: 172mm;
             top: 50mm;
             z-index: 2;
@@ -48,7 +48,7 @@
             width: 172mm;
             border: 1.2px solid #C9A227;
             border-radius: 10mm;
-            padding: 8mm 9mm 12mm 9mm;
+            padding: 8mm 12mm 12mm 12mm;
             box-sizing: border-box;
             background: transparent;
         }
@@ -92,6 +92,7 @@
             white-space: nowrap;
             text-align: right;
             padding-left: 2mm;
+            padding-right: 1mm;
             padding-bottom: 1.4mm;
             border-bottom: 1px dotted #888888;
         }
@@ -121,16 +122,6 @@
             color: #444444;
             font-size: 9.5pt;
         }
-
-        /* Thuyền rồng — lớp trên, nền PNG trong suốt */
-        .toc-dragon {
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            width: 118mm;
-            height: auto;
-            z-index: 4;
-        }
     </style>
 </head>
 <body>
@@ -140,7 +131,6 @@
 @foreach ($pages as $pageIndex => $page)
 @php
     $bgSrc = PdfImageEmbed::src((string) ($page['templatePath'] ?? ''));
-    $dragonSrc = PdfImageEmbed::src((string) ($page['dragonOverlayPath'] ?? ''));
 @endphp
 <div class="page">
     @if ($bgSrc !== '')
@@ -175,9 +165,6 @@
             </table>
         </div>
     </div>
-    @if ($dragonSrc !== '')
-    <img class="toc-dragon" src="{!! $dragonSrc !!}">
-    @endif
 </div>
 @endforeach
 

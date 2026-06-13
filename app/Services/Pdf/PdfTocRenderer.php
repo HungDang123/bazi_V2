@@ -41,12 +41,10 @@ class PdfTocRenderer
      */
     public static function attachBackgrounds(array $pages): array
     {
-        $dragonPath = PdfTocAssetService::dragonOverlayPath();
         $result = [];
         foreach ($pages as $idx => $page) {
             $result[] = array_merge($page, [
                 'templatePath' => PdfTocAssetService::backgroundPath((int) $idx),
-                'dragonOverlayPath' => $dragonPath,
             ]);
         }
 

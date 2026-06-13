@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\DongChayGioiThieu;
+use App\Services\Phan8TruSectionService;
 use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -74,7 +75,7 @@ class ImportPhan8bGioiThieu extends Command
                 }
                 DongChayGioiThieu::updateOrCreate(
                     ['tru_loai' => $key],
-                    ['noi_dung' => implode("\n\n", $lines)]
+                    ['noi_dung' => Phan8TruSectionService::cleanTruGioiThieu(implode("\n\n", $lines), $key)]
                 );
                 $count++;
                 $this->info("I. NIÊN VẬN TIẾP THEO ({$key}): " . count($lines) . ' đoạn.');

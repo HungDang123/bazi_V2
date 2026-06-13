@@ -196,12 +196,18 @@
             transition: width 0.3s ease;
             z-index: 1;
             border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        }
+
+        .chat-luong-table .bar-label {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
             color: #ffffff;
             font-weight: bold;
             font-size: 12px;
+            white-space: nowrap;
+            pointer-events: none;
         }
 
         .chat-luong-table .bar.natal {
@@ -535,7 +541,7 @@
                 height: 20px !important;
             }
 
-            .chat-luong-table .bar-container span {
+            .chat-luong-table .bar-label {
                 font-size: 10px !important;
             }
         }
@@ -5910,14 +5916,16 @@
                                     <td style="padding: 4px 8px;">
                                         <div class="bar-container">
                                             ${natalPercent > 0
-                                                ? `<div class="bar natal" style="width: ${natalPercent}%;">${natalPercent}%</div>`
+                                                ? `<div class="bar natal" style="width: ${natalPercent}%;"></div>
+                                                   <span class="bar-label" style="left: ${natalPercent / 2}%;">${natalPercent}%</span>`
                                                 : `<span class="bar-zero-label">${natalPercent}%</span>`}
                                         </div>
                                     </td>
                                     <td style="padding: 4px 8px;">
                                         <div class="bar-container">
                                             ${annualPercent > 0
-                                                ? `<div class="bar annual" style="width: ${annualPercent}%;">${annualPercent}%</div>`
+                                                ? `<div class="bar annual" style="width: ${annualPercent}%;"></div>
+                                                   <span class="bar-label" style="left: ${annualPercent / 2}%;">${annualPercent}%</span>`
                                                 : `<span class="bar-zero-label">${annualPercent}%</span>`}
                                         </div>
                                     </td>

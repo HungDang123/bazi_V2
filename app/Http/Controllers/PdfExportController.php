@@ -160,7 +160,16 @@ class PdfExportController extends Controller
 
         $afterTocBundle = PdfStaticPageCache::resolveBundle('q1-pages-6-13-v1', $q1AfterTocSources);
         if ($afterTocBundle !== null) {
+            $bundleStart = $tocTracker->physicalPage() + 1;
             self::tocPush($tocTracker, $bodyPaths, $afterTocBundle);
+            self::tocMarkBundlePages($tocTracker, $bundleStart, [
+                [0, 'phan1', 'PHẦN 1: HIỂU VỀ CÁC KHÁI NIỆM'],
+                [1, 'phan1.i', 'I. BÁT TỰ – TỨ TRỤ'],
+                [2, 'phan1.ii', 'II. THUYẾT TAM TÀI & NGŨ THUẬT'],
+                [3, 'phan1.iii', 'III. ÂM DƯƠNG – NGŨ HÀNH'],
+                [4, 'phan1.iv', 'IV. CÁC KHÁI NIỆM KHÁC'],
+                [7, 'phan2', 'PHẦN 2: LÁ SỐ BÁT TỰ CỦA BẠN'],
+            ]);
         } else {
             Log::warning('PdfExport Q1: không tạo được bundle trang 6–13');
         }
@@ -196,6 +205,8 @@ class PdfExportController extends Controller
         // ── Trang 16: blade la-so-chat-luong (Radar ngũ hành + Thập Thần) ────
         $page16Path   = $tempDir . '/q1p16-' . $uid . '.pdf';
         $nienMenhYear = !empty($nienVan[1]['nam']) ? $nienVan[1]['nam'] : (int) date('Y');
+        $tocTracker->mark('phan2.i', 'CHẤT LƯỢNG NGŨ HÀNH');
+        $tocTracker->mark('phan2.ii', 'CHẤT LƯỢNG THẬP THẦN');
         PdfRenderService::saveView('pdfs.quyen-2.la-so-chat-luong', [
             'templatePath'      => $q2Dir . '/page-14-bg.png',
             'iconDir'           => $q2Dir . '/chat-luong-ngu-hanh',
@@ -208,6 +219,7 @@ class PdfExportController extends Controller
 
         // ── Trang 17: blade la-so-6-khia-canh (Biểu đồ 6 khía cạnh) ─────────
         $page17Path = $tempDir . '/q1p17-' . $uid . '.pdf';
+        $tocTracker->mark('phan2.iii', 'CÁC KHÍA CẠNH CUỘC SỐNG');
         PdfRenderService::saveView('pdfs.quyen-2.la-so-6-khia-canh', [
             'templatePath'   => $q2Dir . '/page-15-bg.png',
             'chiSoBieuDoCot' => $chiSoBieuDoCot,
@@ -697,8 +709,17 @@ class PdfExportController extends Controller
 
         $afterTocBundle = PdfStaticPageCache::resolveBundle('q2-pages-6-11-v1', $q2AfterTocSources);
         if ($afterTocBundle !== null) {
+            $bundleStart = $tocTracker->physicalPage() + 1;
             // Trang 11 trong cuốn = trang bìa section (trang thứ 6 trong bundle 6–11)
             self::tocPushMergeSegment($tocTracker, $bodyPaths, $mergeSegments, $afterTocBundle, [6]);
+            self::tocMarkBundlePages($tocTracker, $bundleStart, [
+                [0, 'phan1', 'PHẦN 1: HIỂU VỀ CÁC KHÁI NIỆM'],
+                [0, 'phan1.i', 'I. BÁT TỰ – TỨ TRỤ'],
+                [0, 'phan1.ii', 'II. THUYẾT TAM TÀI & NGŨ THUẬT'],
+                [1, 'phan1.iii', 'III. ÂM DƯƠNG – NGŨ HÀNH'],
+                [2, 'phan1.iv', 'IV. CÁC KHÁI NIỆM KHÁC'],
+                [5, 'phan2', 'PHẦN 2: LÁ SỐ BÁT TỰ CỦA BẠN'],
+            ]);
         } else {
             Log::warning('PdfExport Q2: không tạo được bundle trang 6–11');
         }
@@ -765,6 +786,8 @@ class PdfExportController extends Controller
         // ── Trang 14: la-so-chat-luong ───────────────────────────────────────
         $page14Path   = $tempDir . '/p14-' . $uid . '.pdf';
         $nienMenhYear = !empty($nienVan[1]['nam']) ? $nienVan[1]['nam'] : (int) date('Y');
+        $tocTracker->mark('phan2.i', 'CHẤT LƯỢNG NGŨ HÀNH');
+        $tocTracker->mark('phan2.ii', 'CHẤT LƯỢNG THẬP THẦN');
         PdfRenderService::saveView('pdfs.quyen-2.la-so-chat-luong', [
             'templatePath'      => $pdfDir . '/page-14-bg.png',
             'iconDir'           => $pdfDir . '/chat-luong-ngu-hanh',
@@ -777,6 +800,7 @@ class PdfExportController extends Controller
 
         // ── Trang 15: la-so-6-khia-canh ─────────────────────────────────────
         $page15Path = $tempDir . '/p15-' . $uid . '.pdf';
+        $tocTracker->mark('phan2.iii', 'CÁC KHÍA CẠNH CUỘC SỐNG');
         PdfRenderService::saveView('pdfs.quyen-2.la-so-6-khia-canh', [
             'templatePath'   => $pdfDir . '/page-15-bg.png',
             'chiSoBieuDoCot' => $chiSoBieuDoCot,
@@ -1384,6 +1408,25 @@ class PdfExportController extends Controller
         array $prefixMap
     ): void {
         $tracker->markChaptersFromSpec($spec, $segmentStartPhysical, $prefixMap);
+    }
+
+    /**
+     * Đánh dấu bookmark theo offset (0-based) trong bundle PDF nhiều trang.
+     *
+     * @param  array<int, array{0: int, 1: string, 2: string}>  $marks
+     */
+    private static function tocMarkBundlePages(
+        PdfTocTracker $tracker,
+        int $bundleStartPhysical,
+        array $marks
+    ): void {
+        foreach ($marks as $mark) {
+            if (! is_array($mark) || count($mark) < 3) {
+                continue;
+            }
+            [$offset, $key, $label] = $mark;
+            $tracker->markAtPhysical((string) $key, (string) $label, $bundleStartPhysical + (int) $offset);
+        }
     }
 
     private static function phan5TocBookmarkKey(string $slug): string

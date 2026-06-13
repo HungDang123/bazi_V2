@@ -8,7 +8,7 @@ namespace App\Services\Pdf;
  */
 class PdfLayoutVersion
 {
-    public const VERSION = '2026-06-13-footer-dark';
+    public const VERSION = '2026-06-13-bar-label-center';
 
     public static function fingerprint(): string
     {
@@ -39,9 +39,15 @@ class PdfLayoutVersion
             app_path('Services/Pdf/PdfContentPaginator.php'),
             app_path('Services/Pdf/Phan3NguHanhBanMenhPaginator.php'),
             app_path('Services/Pdf/Phan5TraitLayout.php'),
+            app_path('Services/Pdf/PdfTocOutline.php'),
+            app_path('Services/Pdf/PdfTocRenderer.php'),
+            app_path('Services/Pdf/PdfTocTracker.php'),
+            app_path('Http/Controllers/PdfExportController.php'),
             app_path('Services/PdfRenderService.php'),
             app_path('Services/NguHanhTitleRenderer.php'),
             app_path('Services/PdfViewCache.php'),
+            resource_path('views/pdfs/shared/la-so-muc-luc.blade.php'),
+            resource_path('views/pdfs/quyen-2/la-so-chat-luong.blade.php'),
         ];
     }
 }

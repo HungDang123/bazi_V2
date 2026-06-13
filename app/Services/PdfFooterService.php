@@ -492,7 +492,7 @@ class PdfFooterService
     /** Badge PNG (tên badge gốc + số trang) — chỉ rộng bằng badge, không có nền trắng thừa. */
     private static function renderBadgeStrip(int $displayPage, string $bannerPath): ?string
     {
-        if (! function_exists('imagecreatefrompng') || ! function_exists('imagettftext')) {
+        if (! function_exists('imagecreatefromstring') || ! function_exists('imagettftext')) {
             return null;
         }
 
@@ -501,14 +501,20 @@ class PdfFooterService
             mkdir($cacheDir, 0755, true);
         }
 
-        $cacheKey = hash('sha256', 'badge-v3|'.$displayPage.'|'.self::RENDER_BANNER_PX);
+        $bannerSig = is_file($bannerPath) ? (string) filemtime($bannerPath).'-'.filesize($bannerPath) : 'missing';
+        $cacheKey = hash('sha256', 'badge-v4|'.$displayPage.'|'.self::RENDER_BANNER_PX.'|'.$bannerSig);
         $cachePath = $cacheDir.'/'.$cacheKey.'.png';
         if (file_exists($cachePath)) {
             return $cachePath;
         }
 
-        $banner = @imagecreatefrompng($bannerPath);
-        if ($banner === false) {
+        $blob = @file_get_contents($bannerPath);
+        if ($blob === false) {
+            return null;
+        }
+
+        $banner = @imagecreatefromstring($blob);
+        if (! $banner instanceof \GdImage) {
             return null;
         }
 

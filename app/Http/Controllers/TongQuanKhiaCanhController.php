@@ -1106,8 +1106,16 @@ class TongQuanKhiaCanhController extends Controller
                 $thapThanDV_DC
             );
 
+            $gt = $getGt($gioiThieuKey);
+            if ($gt !== null) {
+                $gt = ['noi_dung' => Phan8TruSectionService::stripTemplateBoilerplate($gt['noi_dung'])];
+                if (trim($gt['noi_dung']) === '') {
+                    $gt = null;
+                }
+            }
+
             return [
-                'gioi_thieu' => $getGt($gioiThieuKey),
+                'gioi_thieu' => $gt,
                 'thien_can'  => $tc,
                 'dia_chi'    => $dc,
             ];
@@ -1458,32 +1466,7 @@ class TongQuanKhiaCanhController extends Controller
      */
     protected function filterPhan8TruTemplateBoilerplate(string $text): string
     {
-        if ($text === '') {
-            return $text;
-        }
-
-        $kept = [];
-        foreach (preg_split('/\r\n|\r|\n/', $text) as $line) {
-            $t = trim($line);
-            if ($t === '') {
-                continue;
-            }
-            if (preg_match('/^(Thiên Can|Địa Chi)\s+(Niên Vận|Năm|Tháng|Ngày|Giờ)\s*$/ui', $t)) {
-                continue;
-            }
-            if (preg_match('/^Nếu có Hợp\s*\/\s*Khắc/ui', $t)) {
-                continue;
-            }
-            if (preg_match('/^Nếu có Hợp\s*\/\s*Xung/ui', $t)) {
-                continue;
-            }
-            if (preg_match('/^Thập Thần\s+ở\s+(Thiên Can|Địa Chi)\s+Trụ/ui', $t)) {
-                continue;
-            }
-            $kept[] = $line;
-        }
-
-        return implode("\n", $kept);
+        return Phan8TruSectionService::stripTemplateBoilerplate($text);
     }
 
     /**

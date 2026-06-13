@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\PdfFooterService;
 use App\Services\PdfMergeService;
 use Illuminate\Console\Command;
 
@@ -19,6 +20,7 @@ class PdfDoctor extends Command
         $this->newLine();
 
         $failures += $this->checkPhpExtensions();
+        $failures += $this->checkGdFallbackAssets();
         $failures += $this->checkPhpRuntime();
         $failures += $this->checkMergeBinaries();
         $failures += $this->checkQueue();
@@ -60,6 +62,48 @@ class PdfDoctor extends Command
             $this->line('  [OK] Imagick (tùy chọn — footer SVG đẹp hơn)');
         } else {
             $this->line('  [--] Imagick không có — footer dùng GD fallback');
+        }
+
+        $this->newLine();
+
+        return $failures;
+    }
+
+    private function checkGdFallbackAssets(): int
+    {
+        if (! extension_loaded('imagick')) {
+            $this->line('<fg=cyan>GD fallbacks (không có Imagick)</>');
+        } else {
+            return 0;
+        }
+
+        $failures = 0;
+
+        $banner = PdfFooterService::bannerPath();
+        if (is_file($banner)) {
+            $this->line('  [OK] footer-banner.png');
+            $opaque = PdfFooterService::opaqueBannerPath();
+            if ($opaque !== null && is_file($opaque)) {
+                $this->line('  [OK] Badge GD cache tạo được');
+            } else {
+                $this->error('  [FAIL] Không tạo được badge PNG từ GD');
+                $failures++;
+            }
+        } else {
+            $this->error('  [FAIL] Thiếu footer-banner.png — footer sẽ không có badge');
+            $failures++;
+        }
+
+        foreach (['moc', 'hoa', 'tho', 'kim', 'thuy'] as $slug) {
+            $png = resource_path('views/pdfs/phan-9/'.$slug.'.png');
+            if (! is_file($png)) {
+                $this->error("  [FAIL] Thiếu icon ngũ hành: phan-9/{$slug}.png");
+                $failures++;
+            }
+        }
+
+        if ($failures === 0) {
+            $this->line('  [OK] Icon ngũ hành Phần 9B (PNG)');
         }
 
         $this->newLine();

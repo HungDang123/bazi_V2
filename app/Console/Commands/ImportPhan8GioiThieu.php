@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\DongChayGioiThieu;
+use App\Services\Phan8TruSectionService;
 use App\Support\ImportPath;
 use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -113,7 +114,7 @@ class ImportPhan8GioiThieu extends Command
                 }
                 DongChayGioiThieu::updateOrCreate(
                     ['tru_loai' => $truLoai],
-                    ['noi_dung' => implode("\n\n", $lines)]
+                    ['noi_dung' => Phan8TruSectionService::cleanTruGioiThieu(implode("\n\n", $lines), $truLoai)]
                 );
                 $count++;
                 $this->info("Sheet $sheetIdx ($truLoai): " . count($lines) . ' đoạn.');
@@ -149,7 +150,7 @@ class ImportPhan8GioiThieu extends Command
                     $truLoai = $prefix . '_' . $truKey;
                     DongChayGioiThieu::updateOrCreate(
                         ['tru_loai' => $truLoai],
-                        ['noi_dung' => implode("\n\n", $lines)]
+                        ['noi_dung' => Phan8TruSectionService::cleanTruGioiThieu(implode("\n\n", $lines), $truLoai)]
                     );
                     $count++;
                     $this->info("Sheet '$title' ($truLoai): " . count($lines) . ' đoạn.');
@@ -279,7 +280,10 @@ class ImportPhan8GioiThieu extends Command
             if (empty($lines)) {
                 continue;
             }
-            DongChayGioiThieu::updateOrCreate(['tru_loai' => $key], ['noi_dung' => implode("\n\n", $lines)]);
+            DongChayGioiThieu::updateOrCreate(
+                ['tru_loai' => $key],
+                ['noi_dung' => Phan8TruSectionService::cleanTruGioiThieu(implode("\n\n", $lines), $key)]
+            );
             $count++;
             $this->info("I. ĐẠI VẬN ({$key}): " . count($lines) . ' đoạn.');
         }
@@ -297,7 +301,10 @@ class ImportPhan8GioiThieu extends Command
                 if (empty($lines)) {
                     continue;
                 }
-                DongChayGioiThieu::updateOrCreate(['tru_loai' => $key], ['noi_dung' => implode("\n\n", $lines)]);
+                DongChayGioiThieu::updateOrCreate(
+                ['tru_loai' => $key],
+                ['noi_dung' => Phan8TruSectionService::cleanTruGioiThieu(implode("\n\n", $lines), $key)]
+            );
                 $count++;
                 $this->info("II. NĂM HIỆN TẠI ({$key}): " . count($lines) . ' đoạn.');
             }
